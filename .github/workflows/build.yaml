@@ -84,9 +84,7 @@ jobs:
       # Verify formatting
       - name: Check formatting
         run: |
-          find include src tests \
-            \( -name "*.hpp" -o -name "*.cpp" \) \
-            -exec clang-format --dry-run --Werror {} +
+          run-clang-tidy -p build/release
 
       # Static analysis
       - name: Run clang-tidy
