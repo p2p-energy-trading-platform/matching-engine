@@ -1,0 +1,55 @@
+---
+# Base Style
+BasedOnStyle: Google
+Language: Cpp
+
+
+# Indentation
+IndentWidth: 4
+TabWidth: 4
+UseTab: Never
+
+# Line Length
+ColumnLimit: 100
+
+# Braces
+BreakBeforeBraces: Attach
+
+# Pointer & Reference Style
+
+PointerAlignment: Left
+ReferenceAlignment: Left
+
+# Example:
+# int* ptr;
+# const Order& order;
+
+# Includes
+SortIncludes: true
+IncludeBlocks: Preserve
+
+# Empty Lines
+KeepEmptyLinesAtTheStartOfBlocks: false
+MaxEmptyLinesToKeep: 1
+
+# Functions
+AllowShortFunctionsOnASingleLine: Empty
+AllowShortIfStatementsOnASingleLine: Never
+AllowShortLoopsOnASingleLine: false
+
+
+# Classes
+AccessModifierOffset: -4
+
+# Constructor Initializers
+ConstructorInitializerIndentWidth: 4
+BreakConstructorInitializers: BeforeComma
+
+# Spaces
+SpaceBeforeParens: ControlStatements
+SpacesInParentheses: false
+SpacesInContainerLiterals: false
+SpaceAfterCStyleCast: true
+
+
+Standard: c++20---
