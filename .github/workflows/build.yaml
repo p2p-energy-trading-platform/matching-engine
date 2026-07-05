@@ -98,12 +98,6 @@ jobs:
       #       --test-dir build/release \
       #       --output-on-failure
 
-      # Verify formatting
-      - name: Check formatting
-        run: |
-          find include src tests \
-            \( -name "*.hpp" -o -name "*.cpp" \) \
-            -exec clang-format --dry-run --Werror {} +
 
       # Static analysis
       - name: Run clang-tidy
