@@ -95,3 +95,10 @@ target_include_directories(
 
 # Testing
 enable_testing()
+
+
+# We can add a test for the matching-engine executable later if needed. For now, we can leave it commented out.
+# test(
+#     NAME MatchingEngineTest
+#     COMMAND matching-engine
+# )
