@@ -1,55 +1,50 @@
----
-# Base Style
 BasedOnStyle: Google
 Language: Cpp
 
-
-# Indentation
+# Use 4-space indentation. Never use tabs.
 IndentWidth: 4
 TabWidth: 4
 UseTab: Never
 
-# Line Length
+# Maximum line length.
 ColumnLimit: 100
 
-# Braces
+# Attach opening braces to the same line.
 BreakBeforeBraces: Attach
 
-# Pointer & Reference Style
-
+# Pointer and reference alignment.
+#
+# Example:
+#   int* ptr;
+#   const Order& order;
 PointerAlignment: Left
 ReferenceAlignment: Left
 
-# Example:
-# int* ptr;
-# const Order& order;
-
-# Includes
+# Automatically sort #include directives.
 SortIncludes: true
 IncludeBlocks: Preserve
 
-# Empty Lines
+# Preserve at most one consecutive empty line.
 KeepEmptyLinesAtTheStartOfBlocks: false
 MaxEmptyLinesToKeep: 1
 
-# Functions
+# Formatting rules for short statements.
 AllowShortFunctionsOnASingleLine: Empty
 AllowShortIfStatementsOnASingleLine: Never
 AllowShortLoopsOnASingleLine: false
 
-
-# Classes
+# Indent access specifiers (public, private, protected).
 AccessModifierOffset: -4
 
-# Constructor Initializers
+# Constructor initializer formatting.
 ConstructorInitializerIndentWidth: 4
 BreakConstructorInitializers: BeforeComma
 
-# Spaces
+# Spacing rules.
 SpaceBeforeParens: ControlStatements
 SpacesInParentheses: false
 SpacesInContainerLiterals: false
 SpaceAfterCStyleCast: true
 
-
-Standard: c++20---
+# Format code according to the C++20 standard.
+Standard: c++20
