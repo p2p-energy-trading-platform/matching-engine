@@ -36,15 +36,15 @@ jobs:
           restore-keys: |
             conan-${{ runner.os }}-
 
-      # Install build tools
-      - name: Install build dependencies
-        run: |
-          sudo apt-get update
+      # Install build tools : for now we comment this out as we are using the pre-installed versions on the GitHub runner. Uncomment if you need to install specific versions.
+      # - name: Install build dependencies
+      #   run: |
+      #     sudo apt-get update
 
-          sudo apt-get install -y \
-            clang \
-            cmake \
-            ninja-build
+      #     sudo apt-get install -y \
+      #       clang \
+      #       cmake \
+      #       ninja-build
 
       # Install Conan
       - name: Install Conan
