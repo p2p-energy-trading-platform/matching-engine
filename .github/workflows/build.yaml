@@ -1,0 +1,96 @@
+name: GridX Matching Engine Build Pipeline
+
+on:
+  push:
+    branches: [ main ] 
+     
+
+  pull_request:
+    branches: [ main ]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Build & Verify
+    runs-on: ubuntu-latest
+
+    steps:
+      # Checkout repository
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # Install Python (required by Conan)
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      # Cache Conan packages
+      - name: Cache Conan
+        uses: actions/cache@v4
+        with:
+          path: ~/.conan2
+          key: conan-${{ runner.os }}-${{ hashFiles('conanfile.py') }}
+          restore-keys: |
+            conan-${{ runner.os }}-
+
+      # Install build tools
+      - name: Install build dependencies
+        run: |
+          sudo apt-get update
+
+          sudo apt-get install -y \
+            clang \
+            cmake \
+            ninja-build
+
+      # Install Conan
+      - name: Install Conan
+        run: |
+          python -m pip install --upgrade pip
+          pip install conan
+
+      # Detect compiler
+      - name: Detect Conan profile
+        run: |
+          conan profile detect --force
+
+      # Install dependencies
+      - name: Install Conan dependencies
+        run: |
+          conan install . \
+            --settings build_type=Release \
+            --build=missing
+
+      # Configure
+      - name: Configure CMake
+        run: |
+          cmake --preset release
+
+      # Build
+      - name: Build project
+        run: |
+          cmake --build build/release
+
+      # Run unit tests
+      - name: Run unit tests
+        run: |
+          ctest \
+            --test-dir build/release \
+            --output-on-failure
+
+      # Verify formatting
+      - name: Check formatting
+        run: |
+          find include src tests \
+            \( -name "*.hpp" -o -name "*.cpp" \) \
+            -exec clang-format --dry-run --Werror {} +
+
+      # Static analysis
+      - name: Run clang-tidy
+        run: |
+          find src \
+            -name "*.cpp" \
+            -exec clang-tidy {} -p build/release \;
