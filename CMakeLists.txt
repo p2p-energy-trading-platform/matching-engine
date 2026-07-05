@@ -39,22 +39,36 @@ else()
     )
 endif()
 
+ # Core Matching Library
+add_library(
+    gridx_matching_engine
+    STATIC
+)
+
+# Add source files to the gridx_matching_engine library
+target_sources(
+    gridx_matching_engine
+    PRIVATE
+)
+
 # Main Executable
 add_executable(
     matching-engine
     src/main.cpp
 )
 
+# Link gridx_matching_engine library to the matching-engine executable
+target_link_libraries(
+    matching-engine
+    PRIVATE
+        gridx_matching_engine
+)
+
+# Include Directories
 target_include_directories(
     matching-engine
     PRIVATE
         include
-)
-
-target_compile_features(
-    matching-engine
-    PRIVATE
-        cxx_std_20
 )
 
 # Testing
