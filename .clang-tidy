@@ -1,0 +1,77 @@
+Checks: >
+  # Detect common programming mistakes.
+  bugprone-*,
+
+  # Suggest performance improvements.
+  performance-*,
+
+  # Encourage modern C++ practices.
+  modernize-*,
+
+  # Improve code readability.
+  readability-*,
+
+  # Enforce C++ Core Guidelines.
+  cppcoreguidelines-*,
+
+  # Run Clang's built-in static analyzer.
+  clang-analyzer-*,
+
+  # Disabled checks.
+  -readability-magic-numbers,
+  -cppcoreguidelines-avoid-magic-numbers,
+  -cppcoreguidelines-owning-memory,
+  -cppcoreguidelines-pro-bounds-array-to-pointer-decay,
+  -cppcoreguidelines-pro-type-reinterpret-cast,
+  -modernize-use-trailing-return-type
+
+# Treat warnings as warnings during development.
+# CI can choose to promote them to errors.
+WarningsAsErrors: ""
+
+# Analyze only project source and header files.
+HeaderFilterRegex: "^(include|src)/"
+
+# Use formatting rules defined in .clang-format.
+FormatStyle: file
+
+# Naming conventions used throughout the project.
+CheckOptions:
+  - key: readability-identifier-naming.NamespaceCase   
+    value: lower_case   
+
+  - key: readability-identifier-naming.ClassCase
+    value: CamelCase
+
+  - key: readability-identifier-naming.StructCase
+    value: CamelCase
+
+  - key: readability-identifier-naming.EnumCase
+    value: CamelCase
+
+  - key: readability-identifier-naming.EnumConstantCase
+    value: CamelCase
+
+  - key: readability-identifier-naming.FunctionCase
+    value: camelBack
+
+  - key: readability-identifier-naming.MethodCase
+    value: camelBack
+
+  - key: readability-identifier-naming.VariableCase
+    value: lower_case
+
+  - key: readability-identifier-naming.ParameterCase
+    value: lower_case
+
+  - key: readability-identifier-naming.MemberCase
+    value: lower_case
+
+  - key: readability-identifier-naming.PrivateMemberSuffix
+    value: _
+
+  - key: readability-identifier-naming.ConstantCase
+    value: CamelCase
+
+  - key: readability-identifier-naming.MacroDefinitionCase
+    value: UPPER_CASE
