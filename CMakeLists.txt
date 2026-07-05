@@ -63,8 +63,7 @@ compiling the gridx_matching_core library and not for any targets that link agai
 target_sources(
     gridx_matching_core
     PRIVATE
-    # We can add source files here if needed, for example:
-    # src/MatchingEngine.cpp
+     src/common/Version.cpp
     # or we can use file(GLOB ...) to automatically include all .cpp files in the src directory
 )
 
