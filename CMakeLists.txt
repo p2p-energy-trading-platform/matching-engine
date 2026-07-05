@@ -25,8 +25,8 @@ message(STATUS "Build Type: ${CMAKE_BUILD_TYPE}")
 # Compiler Warnings
 if(MSVC)
     add_compile_options(
-        /W4.              # MSVC version of -Wall and -Wextra
-        /WX.              # MSVC version of -Werror
+        /W4               # MSVC version of -Wall and -Wextra
+        /WX               # MSVC version of -Werror
         /permissive-      # Strict standards compliance 
     )
 else()
@@ -34,7 +34,7 @@ else()
         -Wall            # Enable most useful compiler warnings.
         -Wextra          # Enable extra compiler warnings that are not included by -Wall.
         -Werror          # Treat warnings as errors
-        -Wpedantic.      # Issue all the warnings demanded by strict ISO C and ISO C++.
+        -Wpedantic      # Issue all the warnings demanded by strict ISO C and ISO C++.
         -Wshadow         # Warn if a variable shadows another
     )
 endif()
@@ -46,9 +46,16 @@ add_library(
 )
 
 # Add source files to the gridx_matching_engine library
+#[[
+NOTE: PRIVATE is used here to indicate that the source files are only used for 
+compiling the gridx_matching_engine library and not for any targets that link against it.
+]]
 target_sources(
     gridx_matching_engine
     PRIVATE
+    # We can add source files here if needed, for example:
+    # src/MatchingEngine.cpp
+    # or we can use file(GLOB ...) to automatically include all .cpp files in the src directory
 )
 
 # Main Executable
@@ -64,10 +71,15 @@ target_link_libraries(
         gridx_matching_engine
 )
 
-# Include Directories
+# Include directories for the gridx_matching_engine library
+#[[ 
+Note: The include directory is specified as PUBLIC,
+which means that it will be used both for compiling the gridx_matching_engine library
+and for any targets(matching-engine) that link against it.
+]]
 target_include_directories(
-    matching-engine
-    PRIVATE
+    gridx_matching_engine
+    PUBLIC
         include
 )
 
