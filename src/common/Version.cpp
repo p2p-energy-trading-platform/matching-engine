@@ -2,9 +2,8 @@
 
 namespace gridx::matching::common {
 
-std::string Version::getVersion()
-{
+std::string Version::getVersion() {
     return "0.1.0";
 }
 
-} // namespace gridx::matching::common
+}  // namespace gridx::matching::common

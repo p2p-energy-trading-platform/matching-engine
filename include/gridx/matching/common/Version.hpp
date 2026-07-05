@@ -9,4 +9,4 @@ public:
     [[nodiscard]] static std::string getVersion();
 };
 
-} // namespace gridx::matching::common
+}  // namespace gridx::matching::common
