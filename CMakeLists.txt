@@ -37,9 +37,19 @@ else()
         -Wpedantic      # Issue all the warnings demanded by strict ISO C and ISO C++.
         -Wshadow         # Warn if a variable shadows another
     )
+
+    # Release Build Optimizations
+    add_compile_options($<$<CONFIG:Release>:-O3>)   # Optimize for speed in Release builds
+    add_compile_options($<$<CONFIG:Release>:-flto>) # Enable Compile Time Optimization in Release builds
+    add_link_options($<$<CONFIG:Release>:-flto>)    # Enable Link Time Optimization in Release builds
+
 endif()
 
  # Core Matching Library
+ #[[
+ The gridx_matching_engine is built as a static library to allow for easy integration 
+ into other projects and to enable better optimization by the compiler.
+ ]]
 add_library(
     gridx_matching_engine
     STATIC
