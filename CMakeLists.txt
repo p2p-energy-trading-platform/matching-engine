@@ -38,7 +38,7 @@ else()
         -Wshadow         # Warn if a variable shadows another
     )
 
-    # Release Build Optimizations
+    # Enable aggressive compiler optimizations for production builds.
     add_compile_options($<$<CONFIG:Release>:-O3>)   # Optimize for speed in Release builds
     add_compile_options($<$<CONFIG:Release>:-flto>) # Enable Compile Time Optimization in Release builds
     add_link_options($<$<CONFIG:Release>:-flto>)    # Enable Link Time Optimization in Release builds
@@ -47,21 +47,21 @@ endif()
 
  # Core Matching Library
  #[[
- The gridx_matching_engine is built as a static library to allow for easy integration 
+ The gridx_matching_core is built as a static library to allow for easy integration 
  into other projects and to enable better optimization by the compiler.
  ]]
 add_library(
-    gridx_matching_engine
+    gridx_matching_core
     STATIC
 )
 
-# Add source files to the gridx_matching_engine library
+# Add source files to the gridx_matching_core library
 #[[
 NOTE: PRIVATE is used here to indicate that the source files are only used for 
-compiling the gridx_matching_engine library and not for any targets that link against it.
+compiling the gridx_matching_core library and not for any targets that link against it.
 ]]
 target_sources(
-    gridx_matching_engine
+    gridx_matching_core
     PRIVATE
     # We can add source files here if needed, for example:
     # src/MatchingEngine.cpp
@@ -74,21 +74,21 @@ add_executable(
     src/main.cpp
 )
 
-# Link gridx_matching_engine library to the matching-engine executable
+# Link gridx_matching_core library to the matching-engine executable
 target_link_libraries(
     matching-engine
     PRIVATE
-        gridx_matching_engine
+        gridx_matching_core
 )
 
-# Include directories for the gridx_matching_engine library
+# Include directories for the gridx_matching_core library
 #[[ 
 Note: The include directory is specified as PUBLIC,
-which means that it will be used both for compiling the gridx_matching_engine library
+which means that it will be used both for compiling the gridx_matching_core library
 and for any targets(matching-engine) that link against it.
 ]]
 target_include_directories(
-    gridx_matching_engine
+    gridx_matching_core
     PUBLIC
         include
 )
