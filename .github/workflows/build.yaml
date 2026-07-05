@@ -21,7 +21,7 @@ jobs:
       matrix:
         os:
           - ubuntu-24.04
-          - macos-15
+          # - macos-15
 
     steps:
       # Checkout repository
@@ -58,10 +58,8 @@ jobs:
       # - name: Install dependencies (macOS)
       #   if: runner.os == 'macOS'
       #   run: |
-      #      brew install \
-      #      llvm \
-      #      cmake \
-      #      ninja
+      #     brew install llvm
+      #     echo "$(brew --prefix llvm)/bin" >> "$GITHUB_PATH"
 
       # Install Conan
       - name: Install Conan
@@ -84,14 +82,7 @@ jobs:
       # Configure
       - name: Configure CMake
         run: |
-              cmake \
-                -S . \
-                -B build/release \
-                -G Ninja \
-                -DCMAKE_BUILD_TYPE=Release \
-                -DCMAKE_C_COMPILER=clang \
-                -DCMAKE_CXX_COMPILER=clang++
-
+              cmake --preset release 
 
       # Build
       - name: Build project
