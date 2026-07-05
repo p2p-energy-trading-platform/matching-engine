@@ -13,8 +13,15 @@ permissions:
 
 jobs:
   build:
-    name: Build & Verify
-    runs-on: ubuntu-latest
+    name: Build (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - ubuntu-24.04
+          - macos-15
 
     steps:
       # Checkout repository
@@ -32,8 +39,9 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ~/.conan2
-          key: conan-${{ runner.os }}-${{ hashFiles('conanfile.py') }}
+          key: conan-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('conanfile.py') }}
           restore-keys: |
+            conan-${{ runner.os }}-${{ runner.arch }}-
             conan-${{ runner.os }}-
 
       # Install build tools : for now we comment this out as we are using the pre-installed versions on the GitHub runner. Uncomment if you need to install specific versions.
@@ -44,7 +52,16 @@ jobs:
       #     sudo apt-get install -y \
       #       clang \
       #       cmake \
+      #       clang-tools \
       #       ninja-build
+
+      # - name: Install dependencies (macOS)
+      #   if: runner.os == 'macOS'
+      #   run: |
+      #      brew install \
+      #      llvm \
+      #      cmake \
+      #      ninja
 
       # Install Conan
       - name: Install Conan
