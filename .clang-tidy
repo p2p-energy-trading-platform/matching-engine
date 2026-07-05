@@ -1,23 +1,22 @@
 Checks: >
-  # Detect common programming mistakes.
   bugprone-*,
 
-  # Suggest performance improvements.
+  #Suggest performance improvements.
   performance-*,
 
-  # Encourage modern C++ practices.
+  #Encourage modern C++ practices.
   modernize-*,
 
-  # Improve code readability.
+  #Improve code readability.
   readability-*,
 
-  # Enforce C++ Core Guidelines.
+  #Enforce C++ Core Guidelines.
   cppcoreguidelines-*,
 
-  # Run Clang's built-in static analyzer.
+  #Run Clang's built-in static analyzer.
   clang-analyzer-*,
 
-  # Disabled checks.
+  #Disabled checks.
   -readability-magic-numbers,
   -cppcoreguidelines-avoid-magic-numbers,
   -cppcoreguidelines-owning-memory,
