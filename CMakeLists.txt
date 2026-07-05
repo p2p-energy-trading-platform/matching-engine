@@ -8,9 +8,9 @@ project(
 )
 
 # C++ Standard
-set(CMAKE_CXX_STANDARD 20)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_CXX_EXTENSIONS OFF)
+set(CMAKE_CXX_STANDARD 20)              # Use C++20 standard
+set(CMAKE_CXX_STANDARD_REQUIRED ON)     # Require C++20 standard    
+set(CMAKE_CXX_EXTENSIONS OFF)           # Do not use compiler-specific extensions
 
 # Export compile_commands.json for clangd and other tools
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
@@ -25,17 +25,17 @@ message(STATUS "Build Type: ${CMAKE_BUILD_TYPE}")
 # Compiler Warnings
 if(MSVC)
     add_compile_options(
-        /W4
-        /WX
-        /permissive-
+        /W4.              # MSVC version of -Wall and -Wextra
+        /WX.              # MSVC version of -Werror
+        /permissive-      # Strict standards compliance 
     )
 else()
     add_compile_options(
-        -Wall
-        -Wextra
-        -Werror
-        -Wpedantic
-        -Wshadow
+        -Wall            # Enable most useful compiler warnings.
+        -Wextra          # Enable extra compiler warnings that are not included by -Wall.
+        -Werror          # Treat warnings as errors
+        -Wpedantic.      # Issue all the warnings demanded by strict ISO C and ISO C++.
+        -Wshadow         # Warn if a variable shadows another
     )
 endif()
 
