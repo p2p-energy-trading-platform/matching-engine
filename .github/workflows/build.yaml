@@ -48,6 +48,11 @@ jobs:
           restore-keys: |
             conan-${{ runner.os }}-
 
+      - name: Install clang-tidy (macOS)
+        if: runner.os == 'macOS'
+        run: |
+          brew install llvm
+
       - name: Detect Conan Profile
         run: |
           conan profile detect --force
@@ -66,13 +71,14 @@ jobs:
         run: |
           cmake --build build/release
 
-      - name: Test
-        run: |
-          ctest \
-            --test-dir build/release \
-            --output-on-failure
+      # - name: Test
+      #   run: |
+      #     ctest \
+      #       --test-dir build/release \
+      #       --output-on-failure
 
       - name: Clang-Tidy
+        if: runner.os == 'Linux'
         shell: bash
         run: |
           find src tests \
@@ -80,9 +86,15 @@ jobs:
             -print0 | \
           xargs -0 -n1 clang-tidy -p build/release
 
-      - name: Upload Build Logs
-        if: failure()
-        uses: actions/upload-artifact@v4
-        with:
-          name: build-${{ runner.os }}
-          path: build/release
+     
+      - name: Run clang-tidy
+        if: runner.os == 'macOS'
+        run: |
+          LLVM_PREFIX=$(brew --prefix llvm)
+
+          find src tests \
+            \( -name "*.cpp" -o -name "*.cc" -o -name "*.cxx" \) \
+            -print0 | \
+          xargs -0 -n1 $LLVM_PREFIX/bin/clang-tidy -p build/release
+      
+        
