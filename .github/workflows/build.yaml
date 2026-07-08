@@ -73,8 +73,12 @@ jobs:
             --output-on-failure
 
       - name: Clang-Tidy
+        shell: bash
         run: |
-          run-clang-tidy -p build/release
+          find src tests \
+            \( -name "*.cpp" -o -name "*.cc" -o -name "*.cxx" \) \
+            -print0 | \
+          xargs -0 -n1 clang-tidy -p build/release
 
       - name: Upload Build Logs
         if: failure()
