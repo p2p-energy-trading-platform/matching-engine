@@ -1,3 +1,5 @@
+#include <gtest/gtest.h>
+
 #include <gridx/matching/common/Version.hpp>
 
 TEST(VersionTest, ReturnsCurrentVersion) {
