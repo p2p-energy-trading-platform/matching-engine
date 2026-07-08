@@ -30,6 +30,7 @@ class GridXMatchingEngineConan(ConanFile):
     requires = (
         "spdlog/1.15.3",
         "fmt/11.2.0",
+        "gtest/1.16.0",
     )
 
     tool_requires = (
