@@ -1,5 +1,4 @@
 # Stage 1: Build
-
 FROM ubuntu:24.04 AS builder
 
 ENV DEBIAN_FRONTEND=noninteractive
@@ -42,11 +41,13 @@ RUN conan install . \
 
 # Configure project
 RUN cmake \
-    --preset release
+    -B build/Release \
+    -G Ninja \
+    -DCMAKE_TOOLCHAIN_FILE=build/Release/generators/conan_toolchain.cmake \
+    -DCMAKE_BUILD_TYPE=Release
 
 # Build
-RUN cmake \
-    --build --preset release
+RUN cmake --build build/Release
 
 # Stage 2: Runtime
 
@@ -55,7 +56,7 @@ FROM ubuntu:24.04
 WORKDIR /app
 
 COPY --from=builder \
-    /app/build/release/matching-engine \
+    /app/build/Release/matching-engine \
     .
 
 ENTRYPOINT ["./matching-engine"]
