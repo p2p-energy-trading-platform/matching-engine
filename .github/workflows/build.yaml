@@ -1,4 +1,4 @@
-name: CI
+name: Build and Test
 
 on:
   pull_request:
@@ -61,15 +61,20 @@ jobs:
 
       - name: Configure
         run: |
-          cmake --preset release
+          cmake \
+          -S . \
+          -B build/Release \
+          -G Ninja \
+          -DCMAKE_TOOLCHAIN_FILE=build/Release/generators/conan_toolchain.cmake \
+          -DCMAKE_BUILD_TYPE=Release
 
       - name: Build
         run: |
-          cmake --build --preset release
+          cmake --build build/Release
 
       - name: Test
         run: |
-          ctest --preset release --output-on-failure
+          ctest --test-dir build/Release --output-on-failure
 
       
       
