@@ -16,4 +16,9 @@ target_link_libraries(
 
 include(GoogleTest)
 
-gtest_discover_tests(unit-tests)
+gtest_discover_tests(
+    unit-tests
+    
+    PROPERTIES
+        LABELS "unit"
+)
