@@ -1,4 +1,4 @@
-name: CI
+name: Build and Test
 
 on:
   pull_request:
@@ -23,7 +23,7 @@ jobs:
       fail-fast: false
       matrix:
         os:
-          - ubuntu-24.04
+          - ubuntu-latest
           - macos-15
 
     steps:
@@ -56,21 +56,25 @@ jobs:
         run: |
           conan install . \
             --build=missing \
-            -s build_type=Release
+            -s build_type=Release \
+            -c tools.cmake.cmaketoolchain:generator=Ninja
 
       - name: Configure
         run: |
-          cmake --preset release
+          cmake \
+          -S . \
+          -B build/Release \
+          -G Ninja \
+          -DCMAKE_TOOLCHAIN_FILE=build/Release/generators/conan_toolchain.cmake \
+          -DCMAKE_BUILD_TYPE=Release
 
       - name: Build
         run: |
-          cmake --build build/release
+          cmake --build build/Release
 
-      # - name: Test
-      #   run: |
-      #     ctest \
-      #       --test-dir build/release \
-      #       --output-on-failure
+      - name: Test
+        run: |
+          ctest --test-dir build/Release --output-on-failure
 
       
       

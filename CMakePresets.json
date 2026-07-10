@@ -1,21 +1,37 @@
 {
   "version": 6,
+  "include": [
+    "build/Debug/generators/CMakePresets.json",
+    "build/Release/generators/CMakePresets.json"
+  ],
   "configurePresets": [
     {
       "name": "debug",
-      "generator": "Ninja",
-      "binaryDir": "build/debug",
-      "cacheVariables": {
-        "CMAKE_BUILD_TYPE": "Debug"
-      }
+      "inherits": "conan-debug"
     },
     {
       "name": "release",
-      "generator": "Ninja",
-      "binaryDir": "build/release",
-      "cacheVariables": {
-        "CMAKE_BUILD_TYPE": "Release"
-      }
+      "inherits": "conan-release"
+    }
+  ],
+  "buildPresets": [
+    {
+      "name": "debug",
+      "configurePreset": "debug"
+    },
+    {
+      "name": "release",
+      "configurePreset": "release"
+    }
+  ],
+  "testPresets": [
+    {
+      "name": "debug",
+      "configurePreset": "debug"
+    },
+    {
+      "name": "release",
+      "configurePreset": "release"
     }
   ]
 }
