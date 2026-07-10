@@ -92,6 +92,47 @@ target_include_directories(
         include
 )
 
+# Find clang-format
+find_program(CLANG_FORMAT_EXECUTABLE clang-format REQUIRED)
+
+# Recursively find all source files for formatting
+file(GLOB_RECURSE PROJECT_SOURCE_FILES
+    CONFIGURE_DEPENDS
+    ${CMAKE_SOURCE_DIR}/src/*.cpp
+    ${CMAKE_SOURCE_DIR}/include/*.hpp
+    ${CMAKE_SOURCE_DIR}/include/*.h
+    ${CMAKE_SOURCE_DIR}/tests/*.cpp
+)
+
+# Add custom targets for formatting and format checking
+if(CLANG_FORMAT_EXECUTABLE)
+    add_custom_target(
+        format
+        COMMAND ${CLANG_FORMAT_EXECUTABLE} -i ${PROJECT_SOURCE_FILES}
+        COMMENT "Formatting source files"
+    )
+
+    add_custom_target(
+        format-check
+        COMMAND ${CLANG_FORMAT_EXECUTABLE} --dry-run --Werror ${PROJECT_SOURCE_FILES}
+        COMMENT "Checking code formatting"
+    )
+endif()
+
+# Find clang-tidy
+find_program(CLANG_TIDY_EXECUTABLE clang-tidy REQUIRED)
+
+# Add custom target for linting
+add_custom_target(
+    lint
+    COMMAND
+        ${CLANG_TIDY_EXECUTABLE}
+        -p ${CMAKE_BINARY_DIR}
+        ${PROJECT_SOURCE_FILES}
+    COMMENT "Running clang-tidy"
+    VERBATIM
+)
+
 # Testing
 enable_testing()
 
