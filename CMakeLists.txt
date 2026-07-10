@@ -93,7 +93,7 @@ target_include_directories(
 )
 
 # Find clang-format
-find_program(CLANG_FORMAT_EXECUTABLE clang-format REQUIRED)
+find_program(CLANG_FORMAT_EXECUTABLE clang-format )
 
 # Recursively find all source files for formatting
 file(GLOB_RECURSE PROJECT_SOURCE_FILES
@@ -120,22 +120,21 @@ if(CLANG_FORMAT_EXECUTABLE)
 endif()
 
 # Find clang-tidy
-find_program(CLANG_TIDY_EXECUTABLE clang-tidy REQUIRED)
+find_program(CLANG_TIDY_EXECUTABLE clang-tidy )
 
 # Add custom target for linting
-add_custom_target(
-    lint
-    COMMAND
-        ${CLANG_TIDY_EXECUTABLE}
-        -p ${CMAKE_BINARY_DIR}
-        ${PROJECT_SOURCE_FILES}
-    COMMENT "Running clang-tidy"
-    VERBATIM
-)
+if(CLANG_TIDY_EXECUTABLE)
+    add_custom_target(
+        lint
+        COMMAND ${CLANG_TIDY_EXECUTABLE} -p ${CMAKE_BINARY_DIR} ${PROJECT_SOURCE_FILES}
+        COMMENT "Running clang-tidy"
+    )
+endif()
 
 # Testing
 enable_testing()
 
 add_subdirectory(tests)
+
 
 
