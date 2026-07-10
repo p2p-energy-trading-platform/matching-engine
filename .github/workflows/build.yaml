@@ -65,7 +65,7 @@ jobs:
 
       - name: Build
         run: |
-          cmake --build build/release
+          cmake --build --preset release
 
       - name: Test
         run: |

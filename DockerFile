@@ -37,6 +37,7 @@ RUN conan profile detect --force
 # Install dependencies
 RUN conan install . \
     -s build_type=Release \
+    -c tools.cmake.cmaketoolchain:generator=Ninja \
     --build=missing
 
 # Configure project
@@ -45,7 +46,7 @@ RUN cmake \
 
 # Build
 RUN cmake \
-    --build build/release
+    --build --preset release
 
 # Stage 2: Runtime
 
