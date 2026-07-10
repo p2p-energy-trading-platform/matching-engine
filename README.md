@@ -28,17 +28,17 @@ The project is standardized on:
 
 ---
 
-## Installing Dependencies
+## Development Environment Setup
 
 ### macOS
 
-Install the required tools using Homebrew:
+Install the required tools:
 
 ```bash
 brew install llvm cmake ninja conan
 ```
 
-Configure LLVM Clang as the default compiler:
+Configure LLVM Clang for the current terminal session:
 
 ```bash
 export PATH="$(brew --prefix llvm)/bin:$PATH"
@@ -46,30 +46,33 @@ export CC=clang
 export CXX=clang++
 ```
 
-To make these settings permanent, add them to your shell configuration file (`~/.zshrc`, `~/.bashrc`, etc.).
-
-Verify the installation:
+To make these settings permanent, add the commands above to your shell configuration file (for example, `~/.zshrc` or `~/.bashrc`) and reload your shell:
 
 ```bash
-clang++ --version
-clang-format --version
-clang-tidy --version
-cmake --version
-conan --version
-ninja --version
+source ~/.zshrc
 ```
+
+Verify the compiler:
+
+```bash
+which clang++
+clang++ --version
+```
+
+The reported compiler should be the LLVM version installed by Homebrew.
 
 ---
 
 ### Ubuntu / Debian
+
+Install the required tools:
 
 ```bash
 sudo apt update
 
 sudo apt install -y \
     clang \
-    clang-format \
-    clang-tidy \
+    clang-tools \
     cmake \
     ninja-build \
     python3-pip
@@ -77,16 +80,29 @@ sudo apt install -y \
 python3 -m pip install --user conan
 ```
 
-Configure Clang:
+Configure Clang for the current terminal session:
 
 ```bash
 export CC=clang
 export CXX=clang++
 ```
 
----
+To make these settings permanent, add the commands above to your shell configuration file (for example, `~/.bashrc` or `~/.zshrc`) and reload your shell:
+
+```bash
+source ~/.bashrc
+```
+
+Verify the compiler:
+
+```bash
+which clang++
+clang++ --version
+```
 
 ### Fedora
+
+Install the required tools:
 
 ```bash
 sudo dnf install -y \
@@ -104,6 +120,15 @@ Configure Clang:
 ```bash
 export CC=clang
 export CXX=clang++
+```
+
+To make these settings permanent, add the commands above to your shell configuration file and reload your shell.
+
+Verify the compiler:
+
+```bash
+which clang++
+clang++ --version
 ```
 
 ---
@@ -143,6 +168,8 @@ conan install . \
 ---
 
 ## Building
+
+Ensure the corresponding Debug or Release Conan configuration has been generated during the initial project setup before using these presets.
 
 ### Debug
 
@@ -198,7 +225,10 @@ Typical development workflow:
 
 ```bash
 # Configure once
-conan install ...
+conan install . \
+    --build=missing \
+    -s build_type=Debug \
+    -c tools.cmake.cmaketoolchain:generator=Ninja
 
 # Configure CMake (only required after CMake or Conan changes)
 cmake --preset debug
@@ -244,11 +274,46 @@ matching-engine/
 
 ## Code Quality
 
-The project uses:
+The project uses the following tools to maintain code quality:
 
 * **clang-format** for source code formatting
 * **clang-tidy** for static analysis
 * **GoogleTest** for unit and integration testing
 * **CTest** as the test runner
 
-Compiler warnings are treated as errors using `-Werror`. All code should be formatted and pass static analysis before being committed.
+### Formatting
+
+Format all source files:
+
+```bash
+cmake --build --preset debug --target format
+```
+
+Verify formatting without modifying files:
+
+```bash
+cmake --build --preset debug --target format-check
+```
+
+### Static Analysis
+
+Run static analysis:
+
+```bash
+cmake --build --preset debug --target lint
+```
+
+> **Note**
+>
+> The `lint` target requires the project to be configured first so that CMake generates the `compile_commands.json` compilation database:
+>
+> ```bash
+> cmake --preset debug
+> ```
+
+All code submitted to the repository should:
+
+* Pass `format-check`
+* Pass `lint`
+* Compile without warnings (`-Werror`)
+* Pass all unit and integration tests
