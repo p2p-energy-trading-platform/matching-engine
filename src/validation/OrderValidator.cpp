@@ -42,7 +42,7 @@ ValidationResult OrderValidator::validate(const Order& order) const {
         return {false, ValidationError::OrderExpired};
     }
 
-      // TODO:
+    // TODO:
     // Validate that the market is still open using the
     // in-memory market cache once it is available.
     //

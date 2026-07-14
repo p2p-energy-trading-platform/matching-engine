@@ -1,10 +1,8 @@
 #pragma once
 
-namespace gridx::matching::validation
-{
+namespace gridx::matching::validation {
 
-enum class ValidationError
-{
+enum class ValidationError {
     None,
 
     // Required fields
@@ -24,10 +22,9 @@ enum class ValidationError
     MarketClosed
 };
 
-struct ValidationResult
-{
+struct ValidationResult {
     bool valid{true};
     ValidationError error{ValidationError::None};
 };
 
-} // namespace gridx::matching::validation
+}  // namespace gridx::matching::validation
