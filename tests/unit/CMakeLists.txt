@@ -4,6 +4,8 @@ add_executable(
     unit-tests
 
     VersionTest.cpp
+    validation/OrderValidatorTest.cpp
+
 )
 
 target_link_libraries(
