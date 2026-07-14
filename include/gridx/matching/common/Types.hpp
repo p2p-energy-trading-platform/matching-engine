@@ -7,7 +7,6 @@
 namespace gridx::matching
 {
 
-
 // Identifier Types
 using OrderId = std::uint64_t;
 using TradeId = std::uint64_t;
@@ -19,7 +18,7 @@ using Quantity = double;
 using GridFee = double;
 
 // Domain Types
-using GridZoneId = std::string;
+using GridZoneId = std::uint32_t;
 
 // Time Types
 using Timestamp = std::chrono::system_clock::time_point;
@@ -32,6 +31,9 @@ enum class Side
     Sell
 };
 
+/* Note: OrderType is currently limited to Limit orders, 
+but can be extended  to support other order types such as Market.
+*/
 enum class OrderType
 {
     Limit
@@ -44,11 +46,6 @@ enum class OrderStatus
     Filled,
     Cancelled,
     Expired
-};
-
-enum class ProductType
-{
-    Energy
 };
 
 } // namespace gridx::matching
