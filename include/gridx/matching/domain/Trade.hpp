@@ -2,11 +2,9 @@
 
 #include "gridx/matching/common/Types.hpp"
 
-namespace gridx::matching
-{
+namespace gridx::matching {
 
-struct Trade
-{
+struct Trade {
     TradeId tradeId;
 
     OrderId buyOrderId;
@@ -29,4 +27,4 @@ struct Trade
     Timestamp executedAt;
 };
 
-} // namespace gridx::matching
+}  // namespace gridx::matching

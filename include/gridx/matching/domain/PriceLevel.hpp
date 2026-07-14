@@ -4,11 +4,9 @@
 
 #include "gridx/matching/domain/Order.hpp"
 
-namespace gridx::matching
-{
+namespace gridx::matching {
 
-struct PriceLevel
-{
+struct PriceLevel {
     Price price;
 
     // std::deque<Order> orders;
@@ -20,4 +18,4 @@ struct PriceLevel
     // based on performance and ownership requirements.
 };
 
-} // namespace gridx::matching
+}  // namespace gridx::matching

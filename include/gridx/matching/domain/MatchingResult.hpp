@@ -5,11 +5,9 @@
 #include "gridx/matching/domain/Order.hpp"
 #include "gridx/matching/domain/Trade.hpp"
 
-namespace gridx::matching
-{
+namespace gridx::matching {
 
-struct MatchingResult
-{
+struct MatchingResult {
     std::vector<Trade> trades;
 
     // Orders whose state changed during matching (e.g. remaining quantity or status).
@@ -19,4 +17,4 @@ struct MatchingResult
     Quantity remainingQuantity;
 };
 
-} // namespace gridx::matching
+}  // namespace gridx::matching

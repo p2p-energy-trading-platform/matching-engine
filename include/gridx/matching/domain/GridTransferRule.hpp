@@ -2,11 +2,9 @@
 
 #include "gridx/matching/common/Types.hpp"
 
-namespace gridx::matching
-{
+namespace gridx::matching {
 
-struct GridTransferRule
-{
+struct GridTransferRule {
     GridZoneId sellerGridZone;
     GridZoneId buyerGridZone;
 
@@ -17,4 +15,4 @@ struct GridTransferRule
     GridRuleVersion version;
 };
 
-} // namespace gridx::matching
+}  // namespace gridx::matching

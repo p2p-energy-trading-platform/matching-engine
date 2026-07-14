@@ -3,11 +3,9 @@
 #include "gridx/matching/common/Types.hpp"
 #include "gridx/matching/domain/MarketId.hpp"
 
-namespace gridx::matching
-{
+namespace gridx::matching {
 
-struct Order
-{
+struct Order {
     OrderId orderId;
     UserId userId;
 
@@ -26,4 +24,4 @@ struct Order
     Timestamp createdAt;
 };
 
-} // namespace gridx::matching
+}  // namespace gridx::matching
