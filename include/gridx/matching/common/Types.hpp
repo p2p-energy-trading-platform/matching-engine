@@ -20,6 +20,8 @@ using GridFee = double;
 // Domain Types
 using GridZoneId = std::uint32_t;
 
+using GridRuleVersion = std::uint32_t;
+
 // Time Types
 using Timestamp = std::chrono::system_clock::time_point;
 

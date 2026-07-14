@@ -23,9 +23,10 @@ struct Trade
 
     Quantity quantity;
 
-    std::uint64_t gridRuleVersion;
+    // Version of the grid transfer rules applied when this trade was executed.
+    GridRuleVersion gridRuleVersion;
 
-    Timestamp timestamp;
+    Timestamp executedAt;
 };
 
 } // namespace gridx::matching
