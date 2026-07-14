@@ -64,6 +64,7 @@ target_sources(
     gridx_matching_core
     PRIVATE
      src/common/Version.cpp
+     src/validation/OrderValidator.cpp
     # or we can use file(GLOB ...) to automatically include all .cpp files in the src directory
 )
 
