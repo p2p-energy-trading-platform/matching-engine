@@ -14,7 +14,6 @@ enum class ValidationError
     InvalidGridZone,
 
     // Field validation
-    InvalidGridZone,
     InvalidOrderType,
     InvalidPrice,
     InvalidQuantity,
