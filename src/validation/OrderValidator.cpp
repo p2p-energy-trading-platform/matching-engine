@@ -16,7 +16,15 @@ ValidationResult OrderValidator::validate(const Order& order) const {
     if (order.orderType != OrderType::Limit) {
         return {false, ValidationError::InvalidOrderType};
     }
-    
+
+    // TODO:
+    // Validate MarketId against the in-memory market cache once
+    // the Market Cache component is implemented.
+    //
+    // if (!marketCache.contains(order.marketId))
+    // {
+    //     return {false, ValidationError::InvalidMarketId};
+    // }
 
     if (order.price <= 0.0) {
         return {false, ValidationError::InvalidPrice};
@@ -33,6 +41,15 @@ ValidationResult OrderValidator::validate(const Order& order) const {
     if (order.expiresAt <= std::chrono::system_clock::now()) {
         return {false, ValidationError::OrderExpired};
     }
+
+      // TODO:
+    // Validate that the market is still open using the
+    // in-memory market cache once it is available.
+    //
+    // if (!market.isOpen())
+    // {
+    //     return {false, ValidationError::MarketClosed};
+    // }
 
     return {true, ValidationError::None};
 }
