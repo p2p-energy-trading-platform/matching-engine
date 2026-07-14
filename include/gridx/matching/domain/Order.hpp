@@ -22,11 +22,8 @@ struct Order
     Quantity quantity;
     Quantity remainingQuantity;
 
-    Timestamp deliverySlotStart;
-    Timestamp deliverySlotEnd;
-
     Timestamp expiresAt;
-    Timestamp timestamp;
+    Timestamp createdAt;
 };
 
 } // namespace gridx::matching
