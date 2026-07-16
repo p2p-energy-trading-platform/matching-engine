@@ -22,28 +22,50 @@ endif()
 
 message(STATUS "Build Type: ${CMAKE_BUILD_TYPE}")
 
+# Dependencies
+
+# Third-party dependencies provided by Conan
+find_package(fmt CONFIG REQUIRED)
+find_package(spdlog CONFIG REQUIRED)
+find_package(Protobuf CONFIG REQUIRED)
+
+# GridX generated C++ Protobuf SDK
+include(FetchContent)
+
+FetchContent_Declare(
+    gridx_cpp_sdk
+    GIT_REPOSITORY
+        https://github.com/p2p-energy-trading-platform/cpp-sdk.git
+    GIT_TAG
+        v0.5.1
+    GIT_SHALLOW
+        TRUE
+)
+
+FetchContent_MakeAvailable(gridx_cpp_sdk)
+
 # Compiler Warnings
-if(MSVC)
-    add_compile_options(
-        /W4               # MSVC version of -Wall and -Wextra
-        /WX               # MSVC version of -Werror
-        /permissive-      # Strict standards compliance 
-    )
-else()
-    add_compile_options(
-        -Wall            # Enable most useful compiler warnings.
-        -Wextra          # Enable extra compiler warnings that are not included by -Wall.
-        -Werror          # Treat warnings as errors
-        -Wpedantic      # Issue all the warnings demanded by strict ISO C and ISO C++.
-        -Wshadow         # Warn if a variable shadows another
-    )
-
-    # Enable aggressive compiler optimizations for production builds.
-    add_compile_options($<$<CONFIG:Release>:-O3>)   # Optimize for speed in Release builds
-    add_compile_options($<$<CONFIG:Release>:-flto>) # Enable Compile Time Optimization in Release builds
-    add_link_options($<$<CONFIG:Release>:-flto>)    # Enable Link Time Optimization in Release builds
-
-endif()
+function(gridx_enable_warnings target_name)
+    if(MSVC)
+        target_compile_options(
+            ${target_name}
+            PRIVATE
+                /W4
+                /WX
+                /permissive-
+        )
+    else()
+        target_compile_options(
+            ${target_name}
+            PRIVATE
+                -Wall
+                -Wextra
+                -Werror
+                -Wpedantic
+                -Wshadow
+        )
+    endif()
+endfunction()
 
  # Core Matching Library
  #[[
@@ -68,17 +90,35 @@ target_sources(
     # or we can use file(GLOB ...) to automatically include all .cpp files in the src directory
 )
 
-# Main Executable
-add_executable(
-    matching-engine
-    src/main.cpp
+target_compile_features(
+    gridx_matching_core
+    PUBLIC
+        cxx_std_20
+)
+
+target_include_directories(
+    gridx_matching_core
+    PUBLIC
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
 )
 
 # Link gridx_matching_core library to the matching-engine executable
 target_link_libraries(
-    matching-engine
+    gridx_matching_core
+    PUBLIC
+        gridx::cpp_sdk
     PRIVATE
-        gridx_matching_core
+        fmt::fmt
+        spdlog::spdlog
+)
+
+gridx_enable_warnings(gridx_matching_core)
+
+# Main executable
+
+add_executable(
+    matching-engine
+    src/main.cpp
 )
 
 # Include directories for the gridx_matching_core library
@@ -87,11 +127,33 @@ Note: The include directory is specified as PUBLIC,
 which means that it will be used both for compiling the gridx_matching_core library
 and for any targets(matching-engine) that link against it.
 ]]
-target_include_directories(
-    gridx_matching_core
-    PUBLIC
-        include
+target_link_libraries(
+    matching-engine
+    PRIVATE
+        gridx_matching_core
 )
+
+gridx_enable_warnings(matching-engine)
+
+# Enable interprocedural optimization for Release builds where supported.
+include(CheckIPOSupported)
+
+check_ipo_supported(
+    RESULT GRIDX_IPO_SUPPORTED
+    OUTPUT GRIDX_IPO_ERROR
+)
+
+if(GRIDX_IPO_SUPPORTED)
+    set_property(
+        TARGET gridx_matching_core
+        PROPERTY INTERPROCEDURAL_OPTIMIZATION_RELEASE TRUE
+    )
+else()
+    message(
+        STATUS
+        "IPO/LTO not supported: ${GRIDX_IPO_ERROR}"
+    )
+endif()
 
 # Find clang-format
 find_program(CLANG_FORMAT_EXECUTABLE clang-format )
@@ -99,29 +161,40 @@ find_program(CLANG_FORMAT_EXECUTABLE clang-format )
 # Recursively find all source files for formatting
 file(GLOB_RECURSE PROJECT_SOURCE_FILES
     CONFIGURE_DEPENDS
-    ${CMAKE_SOURCE_DIR}/src/*.cpp
-    ${CMAKE_SOURCE_DIR}/include/*.hpp
-    ${CMAKE_SOURCE_DIR}/include/*.h
-    ${CMAKE_SOURCE_DIR}/tests/*.cpp
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/include/*.hpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/include/*.h"
+    "${CMAKE_CURRENT_SOURCE_DIR}/tests/*.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/tests/*.hpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/tests/*.h"
 )
 
 # Add custom targets for formatting and format checking
-if(CLANG_FORMAT_EXECUTABLE)
+if(CLANG_FORMAT_EXECUTABLE AND PROJECT_SOURCE_FILES)
     add_custom_target(
         format
         COMMAND ${CLANG_FORMAT_EXECUTABLE} -i ${PROJECT_SOURCE_FILES}
         COMMENT "Formatting source files"
+        VERBATIM
     )
 
     add_custom_target(
         format-check
         COMMAND ${CLANG_FORMAT_EXECUTABLE} --dry-run --Werror ${PROJECT_SOURCE_FILES}
         COMMENT "Checking code formatting"
+        VERBATIM
     )
 endif()
 
 # Find clang-tidy
 find_program(CLANG_TIDY_EXECUTABLE clang-tidy )
+
+file(
+    GLOB_RECURSE PROJECT_CPP_SOURCE_FILES
+    CONFIGURE_DEPENDS
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/tests/*.cpp"
+)
 
 # Add custom target for linting
 if(CLANG_TIDY_EXECUTABLE)
@@ -129,13 +202,16 @@ if(CLANG_TIDY_EXECUTABLE)
         lint
         COMMAND ${CLANG_TIDY_EXECUTABLE} -p ${CMAKE_BINARY_DIR} ${PROJECT_SOURCE_FILES}
         COMMENT "Running clang-tidy"
+        VERBATIM
     )
 endif()
 
 # Testing
-enable_testing()
+include(CTest)
 
-add_subdirectory(tests)
+if(BUILD_TESTING)
+    add_subdirectory(tests)
+endif()
 
 
 
