@@ -9,7 +9,7 @@ class GridXMatchingEngineConan(ConanFile):
     # Package Metadata
     license = "Proprietary"
     author = "GridX Team"
-    url = "https://github.com/peer-to-peer-energy-trading-platform/matching-engine"
+    url = "https://github.com/p2p-energy-trading-platform/matching-engine"
     description = "GridX High-Performance Low-Latency Matching Engine"
 
     # Build Settings
@@ -30,10 +30,10 @@ class GridXMatchingEngineConan(ConanFile):
     requires = (
         "spdlog/1.15.3",
         "fmt/11.2.0",
-        "gtest/1.16.0",
+        "protobuf/7.35.0",
     )
 
-    tool_requires = (
+    test_requires = (
         "gtest/1.16.0",
     )
 
