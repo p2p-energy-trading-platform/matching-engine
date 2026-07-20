@@ -38,7 +38,7 @@ FetchContent_Declare(
     GIT_REPOSITORY
         https://github.com/p2p-energy-trading-platform/cpp-sdk.git
     GIT_TAG
-        v0.5.1
+        v0.6.1
     GIT_SHALLOW
         TRUE
 )
