@@ -9,7 +9,9 @@ namespace {
 Timestamp toTimestamp(const google::protobuf::Timestamp& timestamp) {
     using namespace std::chrono;
 
-    return system_clock::time_point{seconds{timestamp.seconds()} + nanoseconds{timestamp.nanos()}};
+    const auto duration = seconds{timestamp.seconds()} + nanoseconds{timestamp.nanos()};
+
+    return system_clock::time_point{duration_cast<system_clock::duration>(duration)};
 }
 
 Side toDomainSide(const gridx::order::v1::Side side) {
