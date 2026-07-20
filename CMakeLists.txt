@@ -28,6 +28,7 @@ message(STATUS "Build Type: ${CMAKE_BUILD_TYPE}")
 find_package(fmt CONFIG REQUIRED)
 find_package(spdlog CONFIG REQUIRED)
 find_package(Protobuf CONFIG REQUIRED)
+find_package(RdKafka CONFIG REQUIRED)
 
 # GridX generated C++ Protobuf SDK
 include(FetchContent)
@@ -37,7 +38,7 @@ FetchContent_Declare(
     GIT_REPOSITORY
         https://github.com/p2p-energy-trading-platform/cpp-sdk.git
     GIT_TAG
-        v0.5.1
+        v0.6.1
     GIT_SHALLOW
         TRUE
 )
@@ -87,6 +88,8 @@ target_sources(
     PRIVATE
      src/common/Version.cpp
      src/validation/OrderValidator.cpp
+     src/adapters/kafka/OrderEventMapper.cpp
+     src/adapters/kafka/ProtobufOrderCodec.cpp
     # or we can use file(GLOB ...) to automatically include all .cpp files in the src directory
 )
 
@@ -110,6 +113,7 @@ target_link_libraries(
     PRIVATE
         fmt::fmt
         spdlog::spdlog
+        RdKafka::rdkafka++
 )
 
 gridx_enable_warnings(gridx_matching_core)

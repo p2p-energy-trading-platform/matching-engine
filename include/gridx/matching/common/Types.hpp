@@ -12,9 +12,9 @@ using TradeId = std::uint64_t;
 using UserId = std::uint64_t;
 
 // Market Types
-using Price = double;
-using Quantity = double;
-using GridFee = double;
+using Price = std::int64_t;     // 1 AED = 1,000,000 micro-AED
+using Quantity = std::int64_t;  // 1 kWh = 1000 Wh
+using GridFee = std::int64_t;   // 1 AED = 1,000,000 micro-AED
 
 // Domain Types
 using GridZoneId = std::uint32_t;

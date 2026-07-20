@@ -31,6 +31,7 @@ class GridXMatchingEngineConan(ConanFile):
         "spdlog/1.15.3",
         "fmt/11.2.0",
         "protobuf/7.35.0",
+        "librdkafka/2.14.2",
     )
 
     test_requires = (
