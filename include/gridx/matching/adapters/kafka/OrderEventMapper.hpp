@@ -9,9 +9,7 @@ namespace gridx::matching::adapters::kafka {
 class OrderEventMapper {
 public:
     [[nodiscard]]
-    Order toDomain(
-        const gridx::order::v1::OrderAccepted& event
-    ) const;
+    Order toDomain(const gridx::order::v1::OrderAccepted& event) const;
 };
 
-} // namespace gridx::matching::adapters::kafka
+}  // namespace gridx::matching::adapters::kafka

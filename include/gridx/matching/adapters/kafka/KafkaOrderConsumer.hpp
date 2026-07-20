@@ -21,4 +21,4 @@ public:
     void stop();
 };
 
-} // namespace gridx::matching::adapters::kafka
+}  // namespace gridx::matching::adapters::kafka

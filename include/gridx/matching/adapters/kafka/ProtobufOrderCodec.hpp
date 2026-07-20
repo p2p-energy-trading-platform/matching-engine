@@ -10,9 +10,7 @@ namespace gridx::matching::adapters::kafka {
 class ProtobufOrderCodec {
 public:
     [[nodiscard]]
-    gridx::order::v1::OrderAccepted deserialize(
-        const std::span<const std::byte> payload
-    ) const;
+    gridx::order::v1::OrderAccepted deserialize(const std::span<const std::byte> payload) const;
 };
 
-} // namespace gridx::matching::adapters::kafka
+}  // namespace gridx::matching::adapters::kafka

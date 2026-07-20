@@ -11,4 +11,4 @@ struct KafkaConsumerConfig {
     int poll_timeout_ms{100};
 };
 
-} // namespace gridx::matching::adapters::kafka
+}  // namespace gridx::matching::adapters::kafka
