@@ -88,6 +88,8 @@ target_sources(
     PRIVATE
      src/common/Version.cpp
      src/validation/OrderValidator.cpp
+     src/adapters/kafka/OrderEventMapper.cpp
+     src/adapters/kafka/ProtobufOrderCodec.cpp
     # or we can use file(GLOB ...) to automatically include all .cpp files in the src directory
 )
 
