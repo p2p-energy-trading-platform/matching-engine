@@ -28,6 +28,7 @@ message(STATUS "Build Type: ${CMAKE_BUILD_TYPE}")
 find_package(fmt CONFIG REQUIRED)
 find_package(spdlog CONFIG REQUIRED)
 find_package(Protobuf CONFIG REQUIRED)
+find_package(RdKafka CONFIG REQUIRED)
 
 # GridX generated C++ Protobuf SDK
 include(FetchContent)
@@ -110,6 +111,7 @@ target_link_libraries(
     PRIVATE
         fmt::fmt
         spdlog::spdlog
+        RdKafka::rdkafka++
 )
 
 gridx_enable_warnings(gridx_matching_core)
