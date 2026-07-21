@@ -18,7 +18,6 @@ class MatchingEngine
 public:
     MatchingEngine(
         SameZoneMatcher& sameZoneMatcher,
-        CrossZoneMatcher& crossZoneMatcher,
         TradeManager& tradeManager,
         MarketBook& marketBook);
 
@@ -34,7 +33,6 @@ public:
 
 private:
     SameZoneMatcher& m_sameZoneMatcher;
-    CrossZoneMatcher& m_crossZoneMatcher;
     TradeManager& m_tradeManager;
     MarketBook& m_marketBook;
 };
