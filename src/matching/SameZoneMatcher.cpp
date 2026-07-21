@@ -89,7 +89,52 @@ std::vector<Trade> SameZoneMatcher::matchSell(
     Order& incomingSell,
     orderbook::ZoneOrderBook& zoneBook)
 {
-    return {};
+    std::vector<Trade> trades;
+
+    auto& buyBook = zoneBook.buyBook();
+
+    while (!buyBook.empty() && incomingSell.remainingQuantity > 0)
+    {
+        auto restingOrder = buyBook.bestOrder();
+
+        if (restingOrder == nullptr)
+        {
+            break;
+        }
+
+        // Stop if the best buy price is below the seller's limit price.
+        if (restingOrder->price < incomingSell.price)
+        {
+            break;
+        }
+
+        const Quantity tradedQuantity =
+            std::min(incomingSell.remainingQuantity,
+                     restingOrder->remainingQuantity);
+
+        trades.push_back(
+            m_tradeManager.createTrade(
+                *restingOrder,
+                incomingSell,
+                tradedQuantity,
+                restingOrder->price,
+                GridFee{0}));
+
+        incomingSell.remainingQuantity -= tradedQuantity;
+        restingOrder->remainingQuantity -= tradedQuantity;
+
+        if (restingOrder->remainingQuantity == 0)
+        {
+            buyBook.removeFrontOrder(restingOrder->price);
+        }
+    }
+
+    if (incomingSell.remainingQuantity > 0)
+    {
+        zoneBook.addOrder(std::make_shared<Order>(std::move(incomingSell)));
+    }
+
+    return trades;
 }
 
 } // namespace gridx::matching::matching
