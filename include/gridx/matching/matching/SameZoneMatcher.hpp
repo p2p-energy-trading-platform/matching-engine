@@ -10,11 +10,12 @@ namespace gridx::matching
 
 class MarketBook;
 class TradeManager;
+class ZoneOrderBook;
 
 class SameZoneMatcher
 {
 public:
-    explicit SameZoneMatcher(
+    SameZoneMatcher(
         MarketBook& marketBook,
         TradeManager& tradeManager);
 
@@ -27,6 +28,17 @@ public:
 
     [[nodiscard]]
     std::vector<Trade> match(Order incomingOrder);
+
+private:
+    [[nodiscard]]
+    std::vector<Trade> matchBuy(
+        Order& incomingBuy,
+        ZoneOrderBook& zoneBook);
+
+    [[nodiscard]]
+    std::vector<Trade> matchSell(
+        Order& incomingSell,
+        ZoneOrderBook& zoneBook);
 
 private:
     MarketBook& m_marketBook;
