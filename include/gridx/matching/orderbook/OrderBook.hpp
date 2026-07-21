@@ -66,3 +66,5 @@ private:
 };
 
 } // namespace gridx::matching::orderbook
+
+#include "gridx/matching/orderbook/OrderBook.tpp"
