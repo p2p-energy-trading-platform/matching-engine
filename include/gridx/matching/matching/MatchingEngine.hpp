@@ -5,7 +5,7 @@
 #include "gridx/matching/domain/Order.hpp"
 #include "gridx/matching/domain/Trade.hpp"
 
-namespace gridx::matching
+namespace gridx::matching::matching
 {
 
 class SameZoneMatcher;
@@ -30,4 +30,4 @@ private:
     SameZoneMatcher& m_sameZoneMatcher;
 };
 
-} // namespace gridx::matching
+} // namespace gridx::matching::matching

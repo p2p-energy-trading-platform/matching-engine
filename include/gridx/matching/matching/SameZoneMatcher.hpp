@@ -5,19 +5,19 @@
 #include "gridx/matching/domain/Order.hpp"
 #include "gridx/matching/domain/Trade.hpp"
 
-namespace gridx::matching
-{
+namespace gridx::matching::orderbook {
 
 class MarketBook;
-class TradeManager;
 class ZoneOrderBook;
+}  // namespace gridx::matching::orderbook
 
-class SameZoneMatcher
-{
+namespace gridx::matching::matching {
+
+class TradeManager;
+
+class SameZoneMatcher {
 public:
-    SameZoneMatcher(
-        MarketBook& marketBook,
-        TradeManager& tradeManager);
+    SameZoneMatcher(orderbook::MarketBook& marketBook, TradeManager& tradeManager);
 
     ~SameZoneMatcher() = default;
 
@@ -39,24 +39,20 @@ private:
      * Matches an incoming BUY order against the SELL book.
      */
     [[nodiscard]]
-    std::vector<Trade> matchBuy(
-        Order& incomingBuy,
-        ZoneOrderBook& zoneBook);
+    std::vector<Trade> matchBuy(Order& incomingBuy, orderbook::ZoneOrderBook& zoneBook);
 
     /**
      * Matches an incoming SELL order against the BUY book.
      */
     [[nodiscard]]
-    std::vector<Trade> matchSell(
-        Order& incomingSell,
-        ZoneOrderBook& zoneBook);
+    std::vector<Trade> matchSell(Order& incomingSell, orderbook::ZoneOrderBook& zoneBook);
 
 private:
     /// Market order books used during matching.
-    MarketBook& m_marketBook;
+    orderbook::MarketBook& m_marketBook;
 
     /// Creates Trade domain objects.
     TradeManager& m_tradeManager;
 };
 
-} // namespace gridx::matching
+}  // namespace gridx::matching::matching
