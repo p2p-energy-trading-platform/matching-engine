@@ -13,11 +13,6 @@ public:
     SellBook() = default;
     ~SellBook() = default;
 
-    SellBook(const SellBook&) = delete;
-    SellBook& operator=(const SellBook&) = delete;
-
-    SellBook(SellBook&&) noexcept = default;
-    SellBook& operator=(SellBook&&) noexcept = default;
 };
 
 } // namespace gridx::matching::orderbook
