@@ -28,7 +28,7 @@ protected:
 
         order->side = side;
         order->orderType = OrderType::Limit;
-        order->status = OrderStatus::Pending;
+        order->status = OrderStatus::New;
 
         order->price = price;
         order->quantity = 100;

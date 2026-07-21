@@ -27,7 +27,7 @@ protected:
 
         order->side = Side::Buy;
         order->orderType = OrderType::Limit;
-        order->status = OrderStatus::Pending;
+        order->status = OrderStatus::New;
 
         order->price = price;
         order->quantity = 100;
@@ -59,7 +59,7 @@ protected:
 
         order->side = Side::Sell;
         order->orderType = OrderType::Limit;
-        order->status = OrderStatus::Pending;
+        order->status = OrderStatus::New;
 
         order->price = price;
         order->quantity = 100;
