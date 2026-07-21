@@ -9,14 +9,13 @@ namespace gridx::matching
 {
 
 class SameZoneMatcher;
-class CrossZoneMatcher;
 class TradeManager;
 class MarketBook;
 
 class MatchingEngine
 {
 public:
-    MatchingEngine(
+    explicit MatchingEngine(
         SameZoneMatcher& sameZoneMatcher,
         TradeManager& tradeManager,
         MarketBook& marketBook);
@@ -29,7 +28,7 @@ public:
     ~MatchingEngine() = default;
 
     [[nodiscard]]
-    std::vector<Trade> process(Order incomingOrder);
+    std::vector<Trade> match(Order incomingOrder);
 
 private:
     SameZoneMatcher& m_sameZoneMatcher;
