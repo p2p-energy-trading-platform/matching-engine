@@ -30,6 +30,8 @@ find_package(spdlog CONFIG REQUIRED)
 find_package(Protobuf CONFIG REQUIRED)
 find_package(RdKafka CONFIG REQUIRED)
 
+
+
 # GridX generated C++ Protobuf SDK
 include(FetchContent)
 
@@ -90,6 +92,8 @@ target_sources(
      src/validation/OrderValidator.cpp
      src/adapters/kafka/OrderEventMapper.cpp
      src/adapters/kafka/ProtobufOrderCodec.cpp
+     src/orderbook/MarketBook.cpp
+     src/orderbook/ZoneOrderBook.cpp
     # or we can use file(GLOB ...) to automatically include all .cpp files in the src directory
 )
 
