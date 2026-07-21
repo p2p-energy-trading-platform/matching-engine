@@ -2,7 +2,7 @@
 
 #include <chrono>
 
-namespace gridx::matching
+namespace gridx::matching::matching
 {
 
 Trade TradeManager::createTrade(
@@ -40,4 +40,4 @@ Trade TradeManager::createTrade(
     return trade;
 }
 
-} // namespace gridx::matching
+} // namespace gridx::matching::matching
