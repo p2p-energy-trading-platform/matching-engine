@@ -41,3 +41,44 @@ protected:
         return order;
     }
 };
+
+TEST_F(ZoneOrderBookTest, StoresGridZone)
+{
+    EXPECT_EQ(zoneBook.gridZone(), ZoneId);
+}
+
+TEST_F(ZoneOrderBookTest, BuyOrderIsInsertedIntoBuyBook)
+{
+    auto order = makeOrder(1, Side::Buy, 100);
+
+    zoneBook.addOrder(order);
+
+    EXPECT_FALSE(zoneBook.buyBook().empty());
+    EXPECT_TRUE(zoneBook.sellBook().empty());
+
+    ASSERT_EQ(zoneBook.buyBook().priceLevels().size(), 1);
+}
+
+TEST_F(ZoneOrderBookTest, SellOrderIsInsertedIntoSellBook)
+{
+    auto order = makeOrder(1, Side::Sell, 100);
+
+    zoneBook.addOrder(order);
+
+    EXPECT_TRUE(zoneBook.buyBook().empty());
+    EXPECT_FALSE(zoneBook.sellBook().empty());
+
+    ASSERT_EQ(zoneBook.sellBook().priceLevels().size(), 1);
+}
+
+TEST_F(ZoneOrderBookTest, BuyAndSellOrdersAreStoredSeparately)
+{
+    zoneBook.addOrder(makeOrder(1, Side::Buy, 100));
+    zoneBook.addOrder(makeOrder(2, Side::Sell, 100));
+
+    ASSERT_EQ(zoneBook.buyBook().priceLevels().size(), 1);
+    ASSERT_EQ(zoneBook.sellBook().priceLevels().size(), 1);
+
+    EXPECT_FALSE(zoneBook.buyBook().empty());
+    EXPECT_FALSE(zoneBook.sellBook().empty());
+}
