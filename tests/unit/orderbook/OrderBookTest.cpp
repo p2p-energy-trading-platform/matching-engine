@@ -40,6 +40,38 @@ protected:
     }
 };
 
+class SellOrderBookTest : public ::testing::Test
+{
+protected:
+    using SellBook = OrderBook<std::less<Price>>;
+
+    SellBook book;
+
+    OrderPtr makeOrder(OrderId id, Price price)
+    {
+        auto order = std::make_shared<Order>();
+
+        order->orderId = id;
+        order->userId = 1;
+
+        order->marketId = {};
+        order->gridZone = 1;
+
+        order->side = Side::Sell;
+        order->orderType = OrderType::Limit;
+        order->status = OrderStatus::Pending;
+
+        order->price = price;
+        order->quantity = 100;
+        order->remainingQuantity = 100;
+
+        order->createdAt = Timestamp{};
+        order->expiresAt = Timestamp{};
+
+        return order;
+    }
+};
+
 TEST_F(BuyOrderBookTest, EmptyOrderBook)
 {
     EXPECT_TRUE(book.empty());
@@ -167,4 +199,27 @@ TEST_F(BuyOrderBookTest, RemoveUnknownPriceDoesNotModifyBook)
 
     ASSERT_NE(it, book.priceLevels().end());
     EXPECT_EQ(it->second.front()->orderId, 1);
+}
+
+TEST_F(SellOrderBookTest, MaintainsAscendingPriceOrder)
+{
+    book.addOrder(makeOrder(1, 100));
+    book.addOrder(makeOrder(2, 110));
+    book.addOrder(makeOrder(3, 105));
+    book.addOrder(makeOrder(4, 95));
+
+    auto it = book.priceLevels().begin();
+
+    ASSERT_NE(it, book.priceLevels().end());
+
+    EXPECT_EQ(it->first, 95);
+
+    ++it;
+    EXPECT_EQ(it->first, 100);
+
+    ++it;
+    EXPECT_EQ(it->first, 105);
+
+    ++it;
+    EXPECT_EQ(it->first, 110);
 }
