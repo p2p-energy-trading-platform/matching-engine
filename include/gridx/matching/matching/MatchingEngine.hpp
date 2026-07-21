@@ -9,16 +9,12 @@ namespace gridx::matching
 {
 
 class SameZoneMatcher;
-class TradeManager;
-class MarketBook;
 
 class MatchingEngine
 {
 public:
     explicit MatchingEngine(
-        SameZoneMatcher& sameZoneMatcher,
-        TradeManager& tradeManager,
-        MarketBook& marketBook);
+        SameZoneMatcher& sameZoneMatcher);
 
     MatchingEngine(const MatchingEngine&) = delete;
     MatchingEngine& operator=(const MatchingEngine&) = delete;
@@ -32,8 +28,6 @@ public:
 
 private:
     SameZoneMatcher& m_sameZoneMatcher;
-    TradeManager& m_tradeManager;
-    MarketBook& m_marketBook;
 };
 
 } // namespace gridx::matching
