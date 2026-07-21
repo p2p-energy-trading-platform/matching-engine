@@ -1,6 +1,5 @@
 #pragma once
 
-#include "gridx/matching/common/Types.hpp"
 #include "gridx/matching/domain/Order.hpp"
 #include "gridx/matching/domain/Trade.hpp"
 
@@ -23,7 +22,7 @@ public:
     Trade createTrade(
         const Order& buyOrder,
         const Order& sellOrder,
-        Quantity quantity,
+        Quantity tradedQuantity,
         Price executionPrice,
         GridFee gridFee) const;
 };
