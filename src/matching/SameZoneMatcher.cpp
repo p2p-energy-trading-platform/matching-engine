@@ -34,7 +34,55 @@ std::vector<Trade> SameZoneMatcher::matchBuy(
     Order& incomingBuy,
     orderbook::ZoneOrderBook& zoneBook)
 {
-    return {};
+    std::vector<Trade> trades;
+
+    auto& sellBook = zoneBook.sellBook();
+
+    while (!sellBook.empty() && incomingBuy.remainingQuantity > 0)
+    {
+        auto restingOrder = sellBook.bestOrder();
+
+        // No resting order available.
+        if (restingOrder == nullptr)
+        {
+            break;
+        }
+
+        // Stop if the best sell price is above the buyer's limit price.
+        if (restingOrder->price > incomingBuy.price)
+        {
+            break;
+        }
+
+        const Quantity tradedQuantity =
+            std::min(incomingBuy.remainingQuantity,
+                     restingOrder->remainingQuantity);
+
+        trades.push_back(
+            m_tradeManager.createTrade(
+                incomingBuy,
+                *restingOrder,
+                tradedQuantity,
+                restingOrder->price,
+                GridFee{0}));
+
+        incomingBuy.remainingQuantity -= tradedQuantity;
+        restingOrder->remainingQuantity -= tradedQuantity;
+
+        // Remove fully matched resting order.
+        if (restingOrder->remainingQuantity == 0)
+        {
+            sellBook.removeFrontOrder(restingOrder->price);
+        }
+    }
+
+    // Store any remaining quantity back in the order book.
+    if (incomingBuy.remainingQuantity > 0)
+    {
+        zoneBook.addOrder(std::make_shared<Order>(std::move(incomingBuy)));
+    }
+
+    return trades;
 }
 
 std::vector<Trade> SameZoneMatcher::matchSell(
