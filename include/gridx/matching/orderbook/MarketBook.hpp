@@ -5,11 +5,9 @@
 #include "gridx/matching/domain/MarketId.hpp"
 #include "gridx/matching/orderbook/ZoneOrderBook.hpp"
 
-namespace gridx::matching::orderbook
-{
+namespace gridx::matching::orderbook {
 
-class MarketBook
-{
+class MarketBook {
 public:
     explicit MarketBook(const MarketId& marketId);
 
@@ -40,4 +38,4 @@ private:
     std::map<GridZoneId, ZoneOrderBook> zoneOrderBooks_;
 };
 
-} // namespace gridx::matching::orderbook
+}  // namespace gridx::matching::orderbook

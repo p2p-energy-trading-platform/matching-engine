@@ -7,18 +7,13 @@
 using namespace gridx::matching;
 using namespace gridx::matching::orderbook;
 
-class ZoneOrderBookTest : public ::testing::Test
-{
+class ZoneOrderBookTest : public ::testing::Test {
 protected:
     static constexpr GridZoneId ZoneId = 1;
 
     ZoneOrderBook zoneBook{ZoneId};
 
-    OrderPtr makeOrder(
-        OrderId id,
-        Side side,
-        Price price)
-    {
+    OrderPtr makeOrder(OrderId id, Side side, Price price) {
         auto order = std::make_shared<Order>();
 
         order->orderId = id;
@@ -42,13 +37,11 @@ protected:
     }
 };
 
-TEST_F(ZoneOrderBookTest, StoresGridZone)
-{
+TEST_F(ZoneOrderBookTest, StoresGridZone) {
     EXPECT_EQ(zoneBook.gridZone(), ZoneId);
 }
 
-TEST_F(ZoneOrderBookTest, BuyOrderIsInsertedIntoBuyBook)
-{
+TEST_F(ZoneOrderBookTest, BuyOrderIsInsertedIntoBuyBook) {
     auto order = makeOrder(1, Side::Buy, 100);
 
     zoneBook.addOrder(order);
@@ -59,8 +52,7 @@ TEST_F(ZoneOrderBookTest, BuyOrderIsInsertedIntoBuyBook)
     ASSERT_EQ(zoneBook.buyBook().priceLevels().size(), 1);
 }
 
-TEST_F(ZoneOrderBookTest, SellOrderIsInsertedIntoSellBook)
-{
+TEST_F(ZoneOrderBookTest, SellOrderIsInsertedIntoSellBook) {
     auto order = makeOrder(1, Side::Sell, 100);
 
     zoneBook.addOrder(order);
@@ -71,8 +63,7 @@ TEST_F(ZoneOrderBookTest, SellOrderIsInsertedIntoSellBook)
     ASSERT_EQ(zoneBook.sellBook().priceLevels().size(), 1);
 }
 
-TEST_F(ZoneOrderBookTest, BuyAndSellOrdersAreStoredSeparately)
-{
+TEST_F(ZoneOrderBookTest, BuyAndSellOrdersAreStoredSeparately) {
     zoneBook.addOrder(makeOrder(1, Side::Buy, 100));
     zoneBook.addOrder(makeOrder(2, Side::Sell, 100));
 
@@ -83,8 +74,7 @@ TEST_F(ZoneOrderBookTest, BuyAndSellOrdersAreStoredSeparately)
     EXPECT_FALSE(zoneBook.sellBook().empty());
 }
 
-TEST_F(ZoneOrderBookTest, MultipleBuyOrdersMaintainPriceOrdering)
-{
+TEST_F(ZoneOrderBookTest, MultipleBuyOrdersMaintainPriceOrdering) {
     zoneBook.addOrder(makeOrder(1, Side::Buy, 100));
     zoneBook.addOrder(makeOrder(2, Side::Buy, 110));
     zoneBook.addOrder(makeOrder(3, Side::Buy, 105));
@@ -102,8 +92,7 @@ TEST_F(ZoneOrderBookTest, MultipleBuyOrdersMaintainPriceOrdering)
     EXPECT_EQ(it->first, 100);
 }
 
-TEST_F(ZoneOrderBookTest, MultipleSellOrdersMaintainPriceOrdering)
-{
+TEST_F(ZoneOrderBookTest, MultipleSellOrdersMaintainPriceOrdering) {
     zoneBook.addOrder(makeOrder(1, Side::Sell, 100));
     zoneBook.addOrder(makeOrder(2, Side::Sell, 110));
     zoneBook.addOrder(makeOrder(3, Side::Sell, 95));

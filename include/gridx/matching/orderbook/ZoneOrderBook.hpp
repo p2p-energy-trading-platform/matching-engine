@@ -3,11 +3,9 @@
 #include "gridx/matching/orderbook/BuyBook.hpp"
 #include "gridx/matching/orderbook/SellBook.hpp"
 
-namespace gridx::matching::orderbook
-{
+namespace gridx::matching::orderbook {
 
-class ZoneOrderBook
-{
+class ZoneOrderBook {
 public:
     explicit ZoneOrderBook(GridZoneId gridZone);
 
@@ -40,4 +38,4 @@ private:
     SellBook sellBook_;
 };
 
-} // namespace gridx::matching::orderbook
+}  // namespace gridx::matching::orderbook

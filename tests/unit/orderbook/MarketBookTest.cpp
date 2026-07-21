@@ -7,17 +7,11 @@
 using namespace gridx::matching;
 using namespace gridx::matching::orderbook;
 
-class MarketBookTest : public ::testing::Test
-{
+class MarketBookTest : public ::testing::Test {
 protected:
     MarketBook marketBook{MarketId{}};
 
-    OrderPtr makeOrder(
-        OrderId id,
-        GridZoneId zone,
-        Side side,
-        Price price)
-    {
+    OrderPtr makeOrder(OrderId id, GridZoneId zone, Side side, Price price) {
         auto order = std::make_shared<Order>();
 
         order->orderId = id;
@@ -41,15 +35,12 @@ protected:
     }
 };
 
-TEST_F(MarketBookTest, StoresMarketId)
-{
+TEST_F(MarketBookTest, StoresMarketId) {
     EXPECT_EQ(marketBook.marketId(), MarketId{});
 }
 
-TEST_F(MarketBookTest, CreatesZoneBookWhenFirstOrderIsAdded)
-{
-    marketBook.addOrder(
-        makeOrder(1, 1, Side::Buy, 100));
+TEST_F(MarketBookTest, CreatesZoneBookWhenFirstOrderIsAdded) {
+    marketBook.addOrder(makeOrder(1, 1, Side::Buy, 100));
 
     ASSERT_EQ(marketBook.zoneOrderBooks().size(), 1);
 
@@ -60,13 +51,10 @@ TEST_F(MarketBookTest, CreatesZoneBookWhenFirstOrderIsAdded)
     EXPECT_EQ(it->second.gridZone(), 1);
 }
 
-TEST_F(MarketBookTest, ReusesExistingZoneBook)
-{
-    marketBook.addOrder(
-        makeOrder(1, 1, Side::Buy, 100));
+TEST_F(MarketBookTest, ReusesExistingZoneBook) {
+    marketBook.addOrder(makeOrder(1, 1, Side::Buy, 100));
 
-    marketBook.addOrder(
-        makeOrder(2, 1, Side::Sell, 105));
+    marketBook.addOrder(makeOrder(2, 1, Side::Sell, 105));
 
     EXPECT_EQ(marketBook.zoneOrderBooks().size(), 1);
 
@@ -78,27 +66,20 @@ TEST_F(MarketBookTest, ReusesExistingZoneBook)
     EXPECT_FALSE(it->second.sellBook().empty());
 }
 
-TEST_F(MarketBookTest, CreatesSeparateZoneBooks)
-{
-    marketBook.addOrder(
-        makeOrder(1, 1, Side::Buy, 100));
+TEST_F(MarketBookTest, CreatesSeparateZoneBooks) {
+    marketBook.addOrder(makeOrder(1, 1, Side::Buy, 100));
 
-    marketBook.addOrder(
-        makeOrder(2, 2, Side::Buy, 100));
+    marketBook.addOrder(makeOrder(2, 2, Side::Buy, 100));
 
-    marketBook.addOrder(
-        makeOrder(3, 3, Side::Sell, 100));
+    marketBook.addOrder(makeOrder(3, 3, Side::Sell, 100));
 
     EXPECT_EQ(marketBook.zoneOrderBooks().size(), 3);
 }
 
-TEST_F(MarketBookTest, RoutesOrdersToCorrectZoneBook)
-{
-    marketBook.addOrder(
-        makeOrder(1, 1, Side::Buy, 100));
+TEST_F(MarketBookTest, RoutesOrdersToCorrectZoneBook) {
+    marketBook.addOrder(makeOrder(1, 1, Side::Buy, 100));
 
-    marketBook.addOrder(
-        makeOrder(2, 2, Side::Sell, 105));
+    marketBook.addOrder(makeOrder(2, 2, Side::Sell, 105));
 
     auto zone1 = marketBook.zoneOrderBooks().find(1);
     auto zone2 = marketBook.zoneOrderBooks().find(2);
@@ -113,10 +94,8 @@ TEST_F(MarketBookTest, RoutesOrdersToCorrectZoneBook)
     EXPECT_FALSE(zone2->second.sellBook().empty());
 }
 
-TEST_F(MarketBookTest, ReturnsExistingZoneOrderBook)
-{
-    marketBook.addOrder(
-        makeOrder(1, 1, Side::Buy, 100));
+TEST_F(MarketBookTest, ReturnsExistingZoneOrderBook) {
+    marketBook.addOrder(makeOrder(1, 1, Side::Buy, 100));
 
     auto& zone1 = marketBook.zoneOrderBook(1);
 
@@ -125,8 +104,7 @@ TEST_F(MarketBookTest, ReturnsExistingZoneOrderBook)
     EXPECT_FALSE(zone1.buyBook().empty());
 }
 
-TEST_F(MarketBookTest, CreatesZoneBookOnDemand)
-{
+TEST_F(MarketBookTest, CreatesZoneBookOnDemand) {
     auto& zone = marketBook.zoneOrderBook(5);
 
     EXPECT_EQ(zone.gridZone(), 5);

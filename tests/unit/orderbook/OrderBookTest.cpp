@@ -8,15 +8,13 @@
 using namespace gridx::matching;
 using namespace gridx::matching::orderbook;
 
-class BuyOrderBookTest : public ::testing::Test
-{
+class BuyOrderBookTest : public ::testing::Test {
 protected:
     using BuyBook = OrderBook<std::greater<Price>>;
 
     BuyBook book;
 
-    OrderPtr makeOrder(OrderId id, Price price)
-    {
+    OrderPtr makeOrder(OrderId id, Price price) {
         auto order = std::make_shared<Order>();
 
         order->orderId = id;
@@ -40,15 +38,13 @@ protected:
     }
 };
 
-class SellOrderBookTest : public ::testing::Test
-{
+class SellOrderBookTest : public ::testing::Test {
 protected:
     using SellBook = OrderBook<std::less<Price>>;
 
     SellBook book;
 
-    OrderPtr makeOrder(OrderId id, Price price)
-    {
+    OrderPtr makeOrder(OrderId id, Price price) {
         auto order = std::make_shared<Order>();
 
         order->orderId = id;
@@ -72,15 +68,13 @@ protected:
     }
 };
 
-TEST_F(BuyOrderBookTest, EmptyOrderBook)
-{
+TEST_F(BuyOrderBookTest, EmptyOrderBook) {
     EXPECT_TRUE(book.empty());
     EXPECT_TRUE(book.priceLevels().empty());
     EXPECT_EQ(book.bestPriceLevel(), nullptr);
 }
 
-TEST_F(BuyOrderBookTest, InsertSingleOrder)
-{
+TEST_F(BuyOrderBookTest, InsertSingleOrder) {
     auto order = makeOrder(1, 100);
 
     book.addOrder(order);
@@ -97,8 +91,7 @@ TEST_F(BuyOrderBookTest, InsertSingleOrder)
     EXPECT_EQ(it->second.front()->orderId, 1);
 }
 
-TEST_F(BuyOrderBookTest, InsertMultipleOrdersSamePriceMaintainsFIFO)
-{
+TEST_F(BuyOrderBookTest, InsertMultipleOrdersSamePriceMaintainsFIFO) {
     book.addOrder(makeOrder(1, 100));
     book.addOrder(makeOrder(2, 100));
     book.addOrder(makeOrder(3, 100));
@@ -112,8 +105,7 @@ TEST_F(BuyOrderBookTest, InsertMultipleOrdersSamePriceMaintainsFIFO)
     EXPECT_EQ(queue[2]->orderId, 3);
 }
 
-TEST_F(BuyOrderBookTest, MaintainsDescendingPriceOrder)
-{
+TEST_F(BuyOrderBookTest, MaintainsDescendingPriceOrder) {
     book.addOrder(makeOrder(1, 100));
     book.addOrder(makeOrder(2, 110));
     book.addOrder(makeOrder(3, 105));
@@ -134,8 +126,7 @@ TEST_F(BuyOrderBookTest, MaintainsDescendingPriceOrder)
     EXPECT_EQ(it->first, 95);
 }
 
-TEST_F(BuyOrderBookTest, RemoveFrontOrderMaintainsFIFO)
-{
+TEST_F(BuyOrderBookTest, RemoveFrontOrderMaintainsFIFO) {
     book.addOrder(makeOrder(1, 100));
     book.addOrder(makeOrder(2, 100));
 
@@ -150,8 +141,7 @@ TEST_F(BuyOrderBookTest, RemoveFrontOrderMaintainsFIFO)
     EXPECT_EQ(it->second.front()->orderId, 2);
 }
 
-TEST_F(BuyOrderBookTest, RemoveLastOrderRemovesPriceLevel)
-{
+TEST_F(BuyOrderBookTest, RemoveLastOrderRemovesPriceLevel) {
     book.addOrder(makeOrder(1, 100));
 
     book.removeFrontOrder(100);
@@ -160,8 +150,7 @@ TEST_F(BuyOrderBookTest, RemoveLastOrderRemovesPriceLevel)
     EXPECT_TRUE(book.priceLevels().empty());
 }
 
-TEST_F(BuyOrderBookTest, ClearRemovesAllOrders)
-{
+TEST_F(BuyOrderBookTest, ClearRemovesAllOrders) {
     book.addOrder(makeOrder(1, 100));
     book.addOrder(makeOrder(2, 105));
     book.addOrder(makeOrder(3, 95));
@@ -173,8 +162,7 @@ TEST_F(BuyOrderBookTest, ClearRemovesAllOrders)
     EXPECT_EQ(book.bestPriceLevel(), nullptr);
 }
 
-TEST_F(BuyOrderBookTest, BestPriceLevelReturnsHighestBid)
-{
+TEST_F(BuyOrderBookTest, BestPriceLevelReturnsHighestBid) {
     book.addOrder(makeOrder(1, 100));
     book.addOrder(makeOrder(2, 110));
     book.addOrder(makeOrder(3, 105));
@@ -187,8 +175,7 @@ TEST_F(BuyOrderBookTest, BestPriceLevelReturnsHighestBid)
     EXPECT_EQ(best->front()->price, 110);
 }
 
-TEST_F(BuyOrderBookTest, RemoveUnknownPriceDoesNotModifyBook)
-{
+TEST_F(BuyOrderBookTest, RemoveUnknownPriceDoesNotModifyBook) {
     book.addOrder(makeOrder(1, 100));
 
     book.removeFrontOrder(999);
@@ -201,8 +188,7 @@ TEST_F(BuyOrderBookTest, RemoveUnknownPriceDoesNotModifyBook)
     EXPECT_EQ(it->second.front()->orderId, 1);
 }
 
-TEST_F(SellOrderBookTest, MaintainsAscendingPriceOrder)
-{
+TEST_F(SellOrderBookTest, MaintainsAscendingPriceOrder) {
     book.addOrder(makeOrder(1, 100));
     book.addOrder(makeOrder(2, 110));
     book.addOrder(makeOrder(3, 105));

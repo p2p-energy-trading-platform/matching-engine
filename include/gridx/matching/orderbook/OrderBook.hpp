@@ -7,15 +7,13 @@
 
 #include "gridx/matching/domain/Order.hpp"
 
-namespace gridx::matching::orderbook
-{
+namespace gridx::matching::orderbook {
 
 using OrderPtr = std::shared_ptr<Order>;
 using OrderQueue = std::deque<OrderPtr>;
 
 template <typename Comparator>
-class OrderBook
-{
+class OrderBook {
 public:
     using PriceLevels = std::map<Price, OrderQueue, Comparator>;
 
@@ -65,6 +63,6 @@ private:
     PriceLevels priceLevels_;
 };
 
-} // namespace gridx::matching::orderbook
+}  // namespace gridx::matching::orderbook
 
 #include "gridx/matching/orderbook/OrderBook.tpp"
