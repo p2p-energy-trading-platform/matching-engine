@@ -3,7 +3,7 @@
 #include "gridx/matching/domain/Order.hpp"
 #include "gridx/matching/domain/Trade.hpp"
 
-namespace gridx::matching
+namespace gridx::matching::matching
 {
 
 class TradeManager
@@ -27,4 +27,4 @@ public:
         GridFee gridFee) const;
 };
 
-} // namespace gridx::matching
+} // namespace gridx::matching::matching
