@@ -5,6 +5,9 @@ add_executable(
 
     VersionTest.cpp
     validation/OrderValidatorTest.cpp
+    orderbook/MarketBookTest.cpp
+    orderbook/ZoneOrderBookTest.cpp
+    orderbook/OrderBookTest.cpp
 
 )
 
