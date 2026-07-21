@@ -82,3 +82,41 @@ TEST_F(ZoneOrderBookTest, BuyAndSellOrdersAreStoredSeparately)
     EXPECT_FALSE(zoneBook.buyBook().empty());
     EXPECT_FALSE(zoneBook.sellBook().empty());
 }
+
+TEST_F(ZoneOrderBookTest, MultipleBuyOrdersMaintainPriceOrdering)
+{
+    zoneBook.addOrder(makeOrder(1, Side::Buy, 100));
+    zoneBook.addOrder(makeOrder(2, Side::Buy, 110));
+    zoneBook.addOrder(makeOrder(3, Side::Buy, 105));
+
+    auto it = zoneBook.buyBook().priceLevels().begin();
+
+    ASSERT_NE(it, zoneBook.buyBook().priceLevels().end());
+
+    EXPECT_EQ(it->first, 110);
+
+    ++it;
+    EXPECT_EQ(it->first, 105);
+
+    ++it;
+    EXPECT_EQ(it->first, 100);
+}
+
+TEST_F(ZoneOrderBookTest, MultipleSellOrdersMaintainPriceOrdering)
+{
+    zoneBook.addOrder(makeOrder(1, Side::Sell, 100));
+    zoneBook.addOrder(makeOrder(2, Side::Sell, 110));
+    zoneBook.addOrder(makeOrder(3, Side::Sell, 95));
+
+    auto it = zoneBook.sellBook().priceLevels().begin();
+
+    ASSERT_NE(it, zoneBook.sellBook().priceLevels().end());
+
+    EXPECT_EQ(it->first, 95);
+
+    ++it;
+    EXPECT_EQ(it->first, 100);
+
+    ++it;
+    EXPECT_EQ(it->first, 110);
+}
