@@ -90,6 +90,8 @@ target_sources(
      src/validation/OrderValidator.cpp
      src/adapters/kafka/OrderEventMapper.cpp
      src/adapters/kafka/ProtobufOrderCodec.cpp
+     src/engine/OrderProcessor.cpp
+     src/adapters/kafka/KafkaOrderConsumer.cpp
     # or we can use file(GLOB ...) to automatically include all .cpp files in the src directory
 )
 
