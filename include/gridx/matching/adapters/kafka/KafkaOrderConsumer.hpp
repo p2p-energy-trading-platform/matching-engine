@@ -18,10 +18,18 @@ public:
 
     ~KafkaOrderConsumer();
 
+    // Constructor & Operator overloading:
+
+    // Removes copy constructor
     KafkaOrderConsumer(const KafkaOrderConsumer&) = delete;
+
+    // Removes copy assignment
     KafkaOrderConsumer& operator=(const KafkaOrderConsumer&) = delete;
 
+    // Remove move contructor
     KafkaOrderConsumer(KafkaOrderConsumer&&) = delete;
+
+    // Removes move assignment
     KafkaOrderConsumer& operator=(KafkaOrderConsumer&&) = delete;
 
     void start();
