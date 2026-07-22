@@ -15,6 +15,9 @@ namespace gridx::matching::adapters::kafka {
 
 namespace {
 
+// The conf comes the the librdkafka pacakge.
+// NOTE: There seems to be an error with vscode not identifying includes
+// FIX LATER
 void setConfig(RdKafka::Conf& config, const std::string& key, const std::string& value) {
     std::string error;
 
@@ -97,6 +100,7 @@ void KafkaOrderConsumer::stop() noexcept {
 
 void KafkaOrderConsumer::consumeLoop() {
     while (running_.load()) {
+        // NOTE: Is polling the right approach? Need to optimize this later
         std::unique_ptr<RdKafka::Message> message{consumer_->consume(config_.pollTimeoutMs)};
 
         if (!message) {
