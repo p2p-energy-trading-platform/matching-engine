@@ -97,7 +97,6 @@ void KafkaOrderConsumer::stop() noexcept {
 
 void KafkaOrderConsumer::consumeLoop() {
     while (running_.load()) {
-        // NOTE: Is polling the right approach? Need to optimize this later
         std::unique_ptr<RdKafka::Message> message{consumer_->consume(config_.pollTimeoutMs)};
 
         if (!message) {
