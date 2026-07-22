@@ -67,6 +67,7 @@ void KafkaOrderConsumer::initializeConsumer() {
     }
 }
 
+// NOTE: This is blocking - fix it later
 void KafkaOrderConsumer::start() {
     if (running_.exchange(true)) {
         throw std::logic_error("Kafka order consumer is already running");
@@ -118,6 +119,11 @@ void KafkaOrderConsumer::consumeLoop() {
                 try {
                     orderProcessor_.process(payloadView);
 
+                    // NOTE: Current commit sync increases network round trips
+                    // Can increase complexity - FIX Later
+                    // Suggested solution - batching and commit sync will reduce
+                    // network round trips but error handling and other implmentaion
+                    // need to be changed
                     const auto commitResult = consumer_->commitSync(message.get());
 
                     if (commitResult != RdKafka::ERR_NO_ERROR) {
@@ -132,6 +138,8 @@ void KafkaOrderConsumer::consumeLoop() {
                         exception.what());
 
                     // Offset intentionally not committed.
+                    // NOTE: There is some minor quirk here (regarding above comment)
+                    // Need to look into this later
                 }
 
                 break;
