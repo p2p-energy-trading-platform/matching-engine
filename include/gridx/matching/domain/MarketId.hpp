@@ -9,6 +9,8 @@ namespace gridx::matching {
 // (e.g., product type) are introduced.
 struct MarketId {
     Timestamp deliverySlotStart;
+
+    bool operator==(const MarketId&) const = default;
 };
 
 }  // namespace gridx::matching
