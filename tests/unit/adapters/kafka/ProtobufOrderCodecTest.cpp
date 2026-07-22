@@ -3,11 +3,10 @@
 #include "gridx/matching/adapters/kafka/ProtobufOrderCodec.hpp"
 #include "gridx/order/v1/order_events.pb.h"
 
-
 namespace {
-    using gridx::order::v1::OrderAccepted;
-    using gridx::matching::adapters::kafka::ProtobufOrderCodec;
-}
+using gridx::matching::adapters::kafka::ProtobufOrderCodec;
+using gridx::order::v1::OrderAccepted;
+}  // namespace
 
 TEST(ProtobufOrderCodecTest, DeserializesValidOrderAccepted) {
     OrderAccepted original;
@@ -23,10 +22,7 @@ TEST(ProtobufOrderCodecTest, DeserializesValidOrderAccepted) {
 
     const std::string serialized = original.SerializeAsString();
 
-    const auto characters = std::span{
-        serialized.data(),
-        serialized.size()
-    };
+    const auto characters = std::span{serialized.data(), serialized.size()};
 
     const auto payload = std::as_bytes(characters);
 
@@ -44,19 +40,13 @@ TEST(ProtobufOrderCodecTest, RejectsEmptyPayload) {
     ProtobufOrderCodec codec;
     const std::span<const std::byte> payload;
 
-    EXPECT_THROW(
-        static_cast<void>(codec.deserialize(payload)),
-        std::invalid_argument);
+    EXPECT_THROW(static_cast<void>(codec.deserialize(payload)), std::invalid_argument);
 }
 
 TEST(ProtobufOrderCodecTest, RejectsMalformedPayload) {
     ProtobufOrderCodec codec;
 
-    const std::array payload{
-        std::byte{0xFF}
-    };
+    const std::array payload{std::byte{0xFF}};
 
-    EXPECT_THROW(
-        static_cast<void>(codec.deserialize(payload)),
-        std::runtime_error);
+    EXPECT_THROW(static_cast<void>(codec.deserialize(payload)), std::runtime_error);
 }

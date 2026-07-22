@@ -33,8 +33,7 @@ protected:
         event.set_price(5000);
         event.set_quantity(100);
 
-        auto* deliverySlot = event.mutable_market_id()
-            ->mutable_delivery_slot_start();
+        auto* deliverySlot = event.mutable_market_id()->mutable_delivery_slot_start();
 
         deliverySlot->set_seconds(1'700'000'000);
         deliverySlot->set_nanos(123'000'000);
@@ -50,21 +49,17 @@ protected:
         return event;
     }
 
-    static Timestamp expectedTimestamp(
-        std::int64_t seconds,
-        std::int32_t nanoseconds) {
+    static Timestamp expectedTimestamp(std::int64_t seconds, std::int32_t nanoseconds) {
         using namespace std::chrono;
 
-        const auto duration =
-            std::chrono::seconds{seconds} +
-            std::chrono::nanoseconds{nanoseconds};
+        const auto duration = std::chrono::seconds{seconds} + std::chrono::nanoseconds{nanoseconds};
 
         return std::chrono::system_clock::time_point{
             duration_cast<std::chrono::system_clock::duration>(duration)};
     }
 };
 
-} // namespace
+}  // namespace
 
 TEST_F(OrderEventMapperTest, MapsValidEventDomainOrder) {
     const auto event = makeValidEvent();
@@ -83,17 +78,11 @@ TEST_F(OrderEventMapperTest, MapsValidEventDomainOrder) {
     EXPECT_EQ(order.quantity, 100);
     EXPECT_EQ(order.remainingQuantity, 100);
 
-    EXPECT_EQ(
-        order.marketId.deliverySlotStart,
-        expectedTimestamp(1'700'000'000, 123'000'000));
+    EXPECT_EQ(order.marketId.deliverySlotStart, expectedTimestamp(1'700'000'000, 123'000'000));
 
-    EXPECT_EQ(
-        order.createdAt,
-        expectedTimestamp(1'700'000'100, 456'000'000));
+    EXPECT_EQ(order.createdAt, expectedTimestamp(1'700'000'100, 456'000'000));
 
-    EXPECT_EQ(
-        order.expiresAt,
-        expectedTimestamp(1'700'003'600, 789'000'000));
+    EXPECT_EQ(order.expiresAt, expectedTimestamp(1'700'003'600, 789'000'000));
 }
 
 TEST_F(OrderEventMapperTest, MapsSellSide) {
@@ -155,43 +144,33 @@ TEST_F(OrderEventMapperTest, RejectsMissingMarketId) {
     auto event = makeValidEvent();
     event.clear_market_id();
 
-    EXPECT_THROW(
-        static_cast<void>(mapper.toDomain(event)),
-        std::invalid_argument);
+    EXPECT_THROW(static_cast<void>(mapper.toDomain(event)), std::invalid_argument);
 }
 
 TEST_F(OrderEventMapperTest, RejectsMissingDeliverySlot) {
     auto event = makeValidEvent();
     event.mutable_market_id()->clear_delivery_slot_start();
 
-    EXPECT_THROW(
-        static_cast<void>(mapper.toDomain(event)),
-        std::invalid_argument);
+    EXPECT_THROW(static_cast<void>(mapper.toDomain(event)), std::invalid_argument);
 }
 
 TEST_F(OrderEventMapperTest, RejectsMissingExpiryTimestamp) {
     auto event = makeValidEvent();
     event.clear_expires_at();
 
-    EXPECT_THROW(
-        static_cast<void>(mapper.toDomain(event)),
-        std::invalid_argument);
+    EXPECT_THROW(static_cast<void>(mapper.toDomain(event)), std::invalid_argument);
 }
 
 TEST_F(OrderEventMapperTest, RejectsMissingCreationTimestamp) {
     auto event = makeValidEvent();
     event.clear_created_at();
 
-    EXPECT_THROW(
-        static_cast<void>(mapper.toDomain(event)),
-        std::invalid_argument);
+    EXPECT_THROW(static_cast<void>(mapper.toDomain(event)), std::invalid_argument);
 }
 
 TEST_F(OrderEventMapperTest, RejectsUnspecifiedSide) {
     auto event = makeValidEvent();
     event.set_side(proto::SIDE_UNSPECIFIED);
 
-    EXPECT_THROW(
-        static_cast<void>(mapper.toDomain(event)),
-        std::invalid_argument);
+    EXPECT_THROW(static_cast<void>(mapper.toDomain(event)), std::invalid_argument);
 }
