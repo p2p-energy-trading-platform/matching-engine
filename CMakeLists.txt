@@ -97,6 +97,8 @@ target_sources(
      src/matching/SameZoneMatcher.cpp
      src/matching/MatchingEngine.cpp
      src/matching/TradeManager.cpp
+     src/engine/OrderProcessor.cpp
+     src/adapters/kafka/KafkaOrderConsumer.cpp
     # or we can use file(GLOB ...) to automatically include all .cpp files in the src directory
 )
 

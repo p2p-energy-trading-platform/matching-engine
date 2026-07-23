@@ -9,6 +9,8 @@ add_executable(
     orderbook/ZoneOrderBookTest.cpp
     orderbook/OrderBookTest.cpp
     matching/SameZoneMatcherTest.cpp
+    adapters/kafka/OrderEventMapperTest.cpp
+    adapters/kafka/ProtobufOrderCodecTest.cpp
 
 )
 
