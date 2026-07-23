@@ -3,10 +3,13 @@
 #include "gridx/matching/common/Types.hpp"
 #include "gridx/matching/orderbook/MarketBook.hpp"
 
-using namespace gridx::matching::orderbook;
 
 namespace gridx::matching::expiry
 {
+
+using orderbook::BuyBook;
+using orderbook::MarketBook;
+using orderbook::SellBook;
 
 class ExpiryManager
 {
@@ -28,10 +31,10 @@ private:
         Timestamp currentTime) const;
 
    void expireBuyOrders(
-        orderbook::BuyBook& buyBook) const;
+        BuyBook& buyBook) const;
 
     void expireSellOrders(
-        orderbook::SellBook& sellBook) const;
+        SellBook& sellBook) const;
 };
 
 } // namespace gridx::matching::expiry
