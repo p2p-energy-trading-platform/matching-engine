@@ -11,6 +11,7 @@ add_executable(
     matching/SameZoneMatcherTest.cpp
     adapters/kafka/OrderEventMapperTest.cpp
     adapters/kafka/ProtobufOrderCodecTest.cpp
+    expiry/ExpiryManagerTest.cpp
 
 )
 
