@@ -1,37 +1,30 @@
 #pragma once
 
-namespace gridx::matching::orderbook
-{
+namespace gridx::matching::orderbook {
 
 template <typename Comparator>
-void OrderBook<Comparator>::addOrder(const OrderPtr& order)
-{
+void OrderBook<Comparator>::addOrder(const OrderPtr& order) {
     priceLevels_[order->price].push_back(order);
 }
 
 template <typename Comparator>
-void OrderBook<Comparator>::removeFrontOrder(Price price)
-{
+void OrderBook<Comparator>::removeFrontOrder(Price price) {
     auto it = priceLevels_.find(price);
 
-    if (it == priceLevels_.end())
-    {
+    if (it == priceLevels_.end()) {
         return;
     }
 
     it->second.pop_front();
 
-    if (it->second.empty())
-    {
+    if (it->second.empty()) {
         priceLevels_.erase(it);
     }
 }
 
 template <typename Comparator>
-const OrderQueue* OrderBook<Comparator>::bestPriceLevel() const
-{
-    if (priceLevels_.empty())
-    {
+const OrderQueue* OrderBook<Comparator>::bestPriceLevel() const {
+    if (priceLevels_.empty()) {
         return nullptr;
     }
 
@@ -39,22 +32,37 @@ const OrderQueue* OrderBook<Comparator>::bestPriceLevel() const
 }
 
 template <typename Comparator>
-const typename OrderBook<Comparator>::PriceLevels&
-OrderBook<Comparator>::priceLevels() const noexcept
-{
+const typename OrderBook<Comparator>::PriceLevels& OrderBook<Comparator>::priceLevels()
+    const noexcept {
     return priceLevels_;
 }
 
 template <typename Comparator>
-bool OrderBook<Comparator>::empty() const noexcept
-{
+Price OrderBook<Comparator>::bestPrice() const {
+    if (empty()) {
+        return Price{};
+    }
+
+    return priceLevels_.begin()->first;
+}
+
+template <typename Comparator>
+OrderPtr OrderBook<Comparator>::bestOrder() const {
+    if (empty()) {
+        return nullptr;
+    }
+
+    return priceLevels_.begin()->second.front();
+}
+
+template <typename Comparator>
+bool OrderBook<Comparator>::empty() const noexcept {
     return priceLevels_.empty();
 }
 
 template <typename Comparator>
-void OrderBook<Comparator>::clear() noexcept
-{
+void OrderBook<Comparator>::clear() noexcept {
     priceLevels_.clear();
 }
 
-} // namespace gridx::matching::orderbook
+}  // namespace gridx::matching::orderbook

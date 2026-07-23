@@ -42,16 +42,33 @@ public:
      * Returns the best price level.
      * Returns nullptr if the book is empty.
      */
+    [[nodiscard]]
     const OrderQueue* bestPriceLevel() const;
+
+    /**
+     * Returns the oldest order at the best price level.
+     * Returns nullptr if the order book is empty.
+     */
+    [[nodiscard]]
+    OrderPtr bestOrder() const;
+
+    /**
+     * Returns the best available price.
+     * Returns Price{} if the order book is empty.
+     */
+    [[nodiscard]]
+    Price bestPrice() const;
 
     /**
      * Returns all price levels.
      */
+    [[nodiscard]]
     const PriceLevels& priceLevels() const noexcept;
 
     /**
      * Returns true if the order book contains no orders.
      */
+    [[nodiscard]]
     bool empty() const noexcept;
 
     /**
