@@ -32,8 +32,7 @@ ZoneOrderBook& MarketBook::zoneOrderBook(GridZoneId gridZone) {
  * Returns all Zone Order Books.
  */
 
- std::map<GridZoneId, ZoneOrderBook>& MarketBook::zoneOrderBooks() noexcept
-{
+std::map<GridZoneId, ZoneOrderBook>& MarketBook::zoneOrderBooks() noexcept {
     return zoneOrderBooks_;
 }
 

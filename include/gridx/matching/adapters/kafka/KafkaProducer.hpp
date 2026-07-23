@@ -31,8 +31,7 @@ public:
     // Removes move assignment
     KafkaProducer& operator=(KafkaProducer&&) = delete;
 
-    void send(std::string_view topic,
-              std::span<const std::byte> payload);
+    void send(std::string_view topic, std::span<const std::byte> payload);
 
     void flush();
 

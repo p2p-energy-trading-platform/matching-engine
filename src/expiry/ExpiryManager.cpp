@@ -17,8 +17,7 @@ void ExpiryManager::expireOrders(MarketBook& marketBook, Timestamp currentTime) 
     }
 }
 
-bool ExpiryManager::isMarketExpired(const MarketBook& marketBook,
-                                    Timestamp currentTime) const {
+bool ExpiryManager::isMarketExpired(const MarketBook& marketBook, Timestamp currentTime) const {
     return currentTime >= marketBook.marketId().deliverySlotEnd();
 }
 

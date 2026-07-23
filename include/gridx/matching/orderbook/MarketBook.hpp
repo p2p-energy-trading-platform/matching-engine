@@ -31,9 +31,8 @@ public:
      * Returns all Zone Order Books.
      */
     std::map<GridZoneId, ZoneOrderBook>& zoneOrderBooks() noexcept;
-    
-    const std::map<GridZoneId, ZoneOrderBook>& zoneOrderBooks() const noexcept;
 
+    const std::map<GridZoneId, ZoneOrderBook>& zoneOrderBooks() const noexcept;
 
 private:
     MarketId marketId_;

@@ -16,8 +16,7 @@ struct MarketId {
     Timestamp deliverySlotStart;
 
     [[nodiscard]]
-    Timestamp deliverySlotEnd() const
-    {
+    Timestamp deliverySlotEnd() const {
         return deliverySlotStart + kDeliverySlotDuration;
     }
 

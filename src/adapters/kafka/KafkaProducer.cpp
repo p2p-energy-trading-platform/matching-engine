@@ -46,13 +46,9 @@ void KafkaProducer::send(std::string_view topic, std::span<const std::byte> payl
         throw std::invalid_argument("Kafka topic cannot be empty");
     }
 
-    const auto result = producer_->produce(std::string(topic), RdKafka::Topic::PARTITION_UA,
-                                           RdKafka::Producer::RK_MSG_COPY,
-                                           const_cast<std::byte*>(payload.data()), payload.size(),
-                                           nullptr,   
-                                           0,         
-                                           0,        
-                                           nullptr);
+    const auto result = producer_->produce(
+        std::string(topic), RdKafka::Topic::PARTITION_UA, RdKafka::Producer::RK_MSG_COPY,
+        const_cast<std::byte*>(payload.data()), payload.size(), nullptr, 0, 0, nullptr);
 
     if (result != RdKafka::ERR_NO_ERROR) {
         throw std::runtime_error("Failed to publish Kafka message: " + RdKafka::err2str(result));

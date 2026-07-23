@@ -63,9 +63,7 @@ TEST_F(ExpiryManagerTest, DoesNotExpireOrdersBeforeDeliverySlotEnd) {
     marketBook.addOrder(buyOrder);
     marketBook.addOrder(sellOrder);
 
-    expiryManager.expireOrders(
-        marketBook,
-        marketId.deliverySlotEnd() - std::chrono::seconds(1));
+    expiryManager.expireOrders(marketBook, marketId.deliverySlotEnd() - std::chrono::seconds(1));
 
     EXPECT_EQ(buyOrder->status, OrderStatus::New);
     EXPECT_EQ(sellOrder->status, OrderStatus::New);
@@ -109,9 +107,7 @@ TEST_F(ExpiryManagerTest, ExpiresBuyAndSellOrdersWhenMarketExpires) {
     marketBook.addOrder(buyOrder);
     marketBook.addOrder(sellOrder);
 
-    expiryManager.expireOrders(
-        marketBook,
-        marketId.deliverySlotEnd());
+    expiryManager.expireOrders(marketBook, marketId.deliverySlotEnd());
 
     EXPECT_EQ(buyOrder->status, OrderStatus::Expired);
     EXPECT_EQ(sellOrder->status, OrderStatus::Expired);
@@ -158,9 +154,7 @@ TEST_F(ExpiryManagerTest, ExpiresOrdersAcrossMultipleZones) {
     marketBook.addOrder(buyOrder);
     marketBook.addOrder(sellOrder);
 
-    expiryManager.expireOrders(
-        marketBook,
-        marketId.deliverySlotEnd());
+    expiryManager.expireOrders(marketBook, marketId.deliverySlotEnd());
 
     EXPECT_EQ(buyOrder->status, OrderStatus::Expired);
     EXPECT_EQ(sellOrder->status, OrderStatus::Expired);
@@ -207,9 +201,7 @@ TEST_F(ExpiryManagerTest, ClearsOrderBooksAfterExpiry) {
     ASSERT_FALSE(marketBook.zoneOrderBook(kZone).buyBook().empty());
     ASSERT_FALSE(marketBook.zoneOrderBook(kZone).sellBook().empty());
 
-    expiryManager.expireOrders(
-        marketBook,
-        marketId.deliverySlotEnd());
+    expiryManager.expireOrders(marketBook, marketId.deliverySlotEnd());
 
     EXPECT_TRUE(marketBook.zoneOrderBook(kZone).buyBook().empty());
     EXPECT_TRUE(marketBook.zoneOrderBook(kZone).sellBook().empty());
@@ -217,4 +209,3 @@ TEST_F(ExpiryManagerTest, ClearsOrderBooksAfterExpiry) {
     EXPECT_EQ(buyOrder->status, OrderStatus::Expired);
     EXPECT_EQ(sellOrder->status, OrderStatus::Expired);
 }
-
