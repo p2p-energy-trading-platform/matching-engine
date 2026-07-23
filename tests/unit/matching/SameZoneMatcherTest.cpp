@@ -32,6 +32,7 @@ protected:
     SameZoneMatcher matcher;
 };
 
+// Test that a BUY order fully matches a SELL order in the same grid zone.
 TEST_F(SameZoneMatcherTest, BuyOrderFullyMatchesSellOrder)
 {
     auto sellOrder = std::make_shared<Order>();
@@ -95,7 +96,7 @@ TEST_F(SameZoneMatcherTest, BuyOrderFullyMatchesSellOrder)
             .empty());
 }
 
-
+// Test that a SELL order fully matches a BUY order in the same grid zone.
 TEST_F(SameZoneMatcherTest, SellOrderFullyMatchesBuyOrder)
 {
     auto buyOrder = std::make_shared<Order>();
@@ -159,6 +160,7 @@ TEST_F(SameZoneMatcherTest, SellOrderFullyMatchesBuyOrder)
             .empty());
 }
 
+// Test that a BUY order partially matches a SELL order in the same grid zone.
 TEST_F(SameZoneMatcherTest, BuyOrderPartiallyMatchesSellOrder)
 {
     auto sellOrder = std::make_shared<Order>();
@@ -220,6 +222,7 @@ TEST_F(SameZoneMatcherTest, BuyOrderPartiallyMatchesSellOrder)
             .empty());
 }
 
+// Test that a SELL order partially matches a BUY order in the same grid zone.
 TEST_F(SameZoneMatcherTest, BuyOrderMatchesMultipleSellOrders)
 {
     auto sellOrder1 = std::make_shared<Order>();
@@ -293,6 +296,8 @@ TEST_F(SameZoneMatcherTest, BuyOrderMatchesMultipleSellOrders)
             .empty());
 }
 
+
+// Test that a BUY order does not match a SELL order with a higher price in the same grid zone.
 TEST_F(SameZoneMatcherTest, BuyOrderDoesNotMatchHigherSellPrice)
 {
     auto sellOrder = std::make_shared<Order>();
@@ -349,6 +354,7 @@ TEST_F(SameZoneMatcherTest, BuyOrderDoesNotMatchHigherSellPrice)
     EXPECT_EQ(restingBuy->remainingQuantity, 10);
 }
 
+// Test that a BUY order with remaining quantity is added to the order book after partial matching.
 TEST_F(SameZoneMatcherTest, RemainingBuyOrderIsAddedToOrderBook)
 {
     auto sellOrder = std::make_shared<Order>();
@@ -403,6 +409,7 @@ TEST_F(SameZoneMatcherTest, RemainingBuyOrderIsAddedToOrderBook)
 
 }
 
+// Test that a trade between orders in the same grid zone has a grid fee of zero.
 TEST_F(SameZoneMatcherTest, SameZoneTradeHasZeroGridFee)
 {
     auto sellOrder = std::make_shared<Order>();
