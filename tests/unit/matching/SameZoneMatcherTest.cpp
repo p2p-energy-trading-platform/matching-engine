@@ -9,6 +9,7 @@
 #include "gridx/matching/orderbook/MarketBook.hpp"
 
 using namespace gridx::matching;
+using namespace gridx::matching::matching;
 using namespace gridx::matching::orderbook;
 
 class SameZoneMatcherTest : public ::testing::Test {
@@ -399,9 +400,10 @@ TEST_F(SameZoneMatcherTest, RemainingBuyOrderIsAddedToOrderBook)
     EXPECT_EQ(remainingBuy->orderId, buyOrder.orderId);
     EXPECT_EQ(remainingBuy->remainingQuantity, 5);
     EXPECT_EQ(remainingBuy->price, 100);
+
 }
 
-TEST_F(SameZoneMatcherTest, RemainingBuyOrderIsAddedToOrderBook)
+TEST_F(SameZoneMatcherTest, SameZoneTradeHasZeroGridFee)
 {
     auto sellOrder = std::make_shared<Order>();
 
@@ -413,8 +415,8 @@ TEST_F(SameZoneMatcherTest, RemainingBuyOrderIsAddedToOrderBook)
     sellOrder->orderType = OrderType::Limit;
     sellOrder->status = OrderStatus::New;
     sellOrder->price = 100;
-    sellOrder->quantity = 5;
-    sellOrder->remainingQuantity = 5;
+    sellOrder->quantity = 10;
+    sellOrder->remainingQuantity = 10;
     sellOrder->createdAt = std::chrono::system_clock::now();
     sellOrder->expiresAt = sellOrder->createdAt + std::chrono::hours(1);
 
@@ -439,17 +441,9 @@ TEST_F(SameZoneMatcherTest, RemainingBuyOrderIsAddedToOrderBook)
 
     ASSERT_EQ(trades.size(), 1);
 
-    EXPECT_EQ(trades.front().quantity, 5);
+    const auto& trade = trades.front();
 
-    auto& zoneBook = marketBook.zoneOrderBook(kZone);
-
-    EXPECT_TRUE(zoneBook.sellBook().empty());
-
-    auto remainingBuy = zoneBook.buyBook().bestOrder();
-
-    ASSERT_NE(remainingBuy, nullptr);
-
-    EXPECT_EQ(remainingBuy->orderId, buyOrder.orderId);
-    EXPECT_EQ(remainingBuy->remainingQuantity, 5);
-    EXPECT_EQ(remainingBuy->price, 100);
+    EXPECT_EQ(trade.buyerGridZone, kZone);
+    EXPECT_EQ(trade.sellerGridZone, kZone);
+    EXPECT_EQ(trade.gridFee, 0);
 }
