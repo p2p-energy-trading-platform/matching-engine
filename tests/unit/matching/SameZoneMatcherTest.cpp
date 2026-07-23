@@ -157,3 +157,193 @@ TEST_F(SameZoneMatcherTest, SellOrderFullyMatchesBuyOrder)
             .sellBook()
             .empty());
 }
+
+TEST_F(SameZoneMatcherTest, BuyOrderPartiallyMatchesSellOrder)
+{
+    auto sellOrder = std::make_shared<Order>();
+
+    sellOrder->orderId = 1;
+    sellOrder->userId = 10;
+    sellOrder->marketId = marketId;
+    sellOrder->gridZone = kZone;
+    sellOrder->side = Side::Sell;
+    sellOrder->orderType = OrderType::Limit;
+    sellOrder->status = OrderStatus::New;
+    sellOrder->price = 100;
+    sellOrder->quantity = 20;
+    sellOrder->remainingQuantity = 20;
+    sellOrder->createdAt = std::chrono::system_clock::now();
+    sellOrder->expiresAt = sellOrder->createdAt + std::chrono::hours(1);
+
+    marketBook.addOrder(sellOrder);
+
+    Order buyOrder{};
+
+    buyOrder.orderId = 2;
+    buyOrder.userId = 20;
+    buyOrder.marketId = marketId;
+    buyOrder.gridZone = kZone;
+    buyOrder.side = Side::Buy;
+    buyOrder.orderType = OrderType::Limit;
+    buyOrder.status = OrderStatus::New;
+    buyOrder.price = 100;
+    buyOrder.quantity = 10;
+    buyOrder.remainingQuantity = 10;
+    buyOrder.createdAt = std::chrono::system_clock::now();
+    buyOrder.expiresAt = buyOrder.createdAt + std::chrono::hours(1);
+
+    const auto trades = matcher.match(buyOrder);
+
+    ASSERT_EQ(trades.size(), 1);
+
+    const auto& trade = trades.front();
+
+    EXPECT_EQ(trade.quantity, 10);
+    EXPECT_EQ(trade.energyPrice, 100);
+
+    auto remainingSell =
+        marketBook
+            .zoneOrderBook(kZone)
+            .sellBook()
+            .bestOrder();
+
+    ASSERT_NE(remainingSell, nullptr);
+
+    EXPECT_EQ(remainingSell->orderId, sellOrder->orderId);
+    EXPECT_EQ(remainingSell->remainingQuantity, 10);
+
+    EXPECT_TRUE(
+        marketBook
+            .zoneOrderBook(kZone)
+            .buyBook()
+            .empty());
+}
+
+TEST_F(SameZoneMatcherTest, BuyOrderMatchesMultipleSellOrders)
+{
+    auto sellOrder1 = std::make_shared<Order>();
+
+    sellOrder1->orderId = 1;
+    sellOrder1->userId = 10;
+    sellOrder1->marketId = marketId;
+    sellOrder1->gridZone = kZone;
+    sellOrder1->side = Side::Sell;
+    sellOrder1->orderType = OrderType::Limit;
+    sellOrder1->status = OrderStatus::New;
+    sellOrder1->price = 100;
+    sellOrder1->quantity = 5;
+    sellOrder1->remainingQuantity = 5;
+    sellOrder1->createdAt = std::chrono::system_clock::now();
+    sellOrder1->expiresAt = sellOrder1->createdAt + std::chrono::hours(1);
+
+    auto sellOrder2 = std::make_shared<Order>();
+
+    sellOrder2->orderId = 2;
+    sellOrder2->userId = 11;
+    sellOrder2->marketId = marketId;
+    sellOrder2->gridZone = kZone;
+    sellOrder2->side = Side::Sell;
+    sellOrder2->orderType = OrderType::Limit;
+    sellOrder2->status = OrderStatus::New;
+    sellOrder2->price = 100;
+    sellOrder2->quantity = 10;
+    sellOrder2->remainingQuantity = 10;
+    sellOrder2->createdAt = std::chrono::system_clock::now();
+    sellOrder2->expiresAt = sellOrder2->createdAt + std::chrono::hours(1);
+
+    marketBook.addOrder(sellOrder1);
+    marketBook.addOrder(sellOrder2);
+
+    Order buyOrder{};
+
+    buyOrder.orderId = 3;
+    buyOrder.userId = 20;
+    buyOrder.marketId = marketId;
+    buyOrder.gridZone = kZone;
+    buyOrder.side = Side::Buy;
+    buyOrder.orderType = OrderType::Limit;
+    buyOrder.status = OrderStatus::New;
+    buyOrder.price = 100;
+    buyOrder.quantity = 15;
+    buyOrder.remainingQuantity = 15;
+    buyOrder.createdAt = std::chrono::system_clock::now();
+    buyOrder.expiresAt = buyOrder.createdAt + std::chrono::hours(1);
+
+    const auto trades = matcher.match(buyOrder);
+
+    ASSERT_EQ(trades.size(), 2);
+
+    EXPECT_EQ(trades[0].sellOrderId, sellOrder1->orderId);
+    EXPECT_EQ(trades[0].quantity, 5);
+
+    EXPECT_EQ(trades[1].sellOrderId, sellOrder2->orderId);
+    EXPECT_EQ(trades[1].quantity, 10);
+
+    EXPECT_TRUE(
+        marketBook
+            .zoneOrderBook(kZone)
+            .sellBook()
+            .empty());
+
+    EXPECT_TRUE(
+        marketBook
+            .zoneOrderBook(kZone)
+            .buyBook()
+            .empty());
+}
+
+TEST_F(SameZoneMatcherTest, BuyOrderDoesNotMatchHigherSellPrice)
+{
+    auto sellOrder = std::make_shared<Order>();
+
+    sellOrder->orderId = 1;
+    sellOrder->userId = 10;
+    sellOrder->marketId = marketId;
+    sellOrder->gridZone = kZone;
+    sellOrder->side = Side::Sell;
+    sellOrder->orderType = OrderType::Limit;
+    sellOrder->status = OrderStatus::New;
+    sellOrder->price = 110;
+    sellOrder->quantity = 10;
+    sellOrder->remainingQuantity = 10;
+    sellOrder->createdAt = std::chrono::system_clock::now();
+    sellOrder->expiresAt = sellOrder->createdAt + std::chrono::hours(1);
+
+    marketBook.addOrder(sellOrder);
+
+    Order buyOrder{};
+
+    buyOrder.orderId = 2;
+    buyOrder.userId = 20;
+    buyOrder.marketId = marketId;
+    buyOrder.gridZone = kZone;
+    buyOrder.side = Side::Buy;
+    buyOrder.orderType = OrderType::Limit;
+    buyOrder.status = OrderStatus::New;
+    buyOrder.price = 100;
+    buyOrder.quantity = 10;
+    buyOrder.remainingQuantity = 10;
+    buyOrder.createdAt = std::chrono::system_clock::now();
+    buyOrder.expiresAt = buyOrder.createdAt + std::chrono::hours(1);
+
+    const auto trades = matcher.match(buyOrder);
+
+    EXPECT_TRUE(trades.empty());
+
+    auto& zoneBook = marketBook.zoneOrderBook(kZone);
+
+    EXPECT_FALSE(zoneBook.sellBook().empty());
+    EXPECT_FALSE(zoneBook.buyBook().empty());
+
+    auto restingSell = zoneBook.sellBook().bestOrder();
+    auto restingBuy = zoneBook.buyBook().bestOrder();
+
+    ASSERT_NE(restingSell, nullptr);
+    ASSERT_NE(restingBuy, nullptr);
+
+    EXPECT_EQ(restingSell->orderId, sellOrder->orderId);
+    EXPECT_EQ(restingSell->remainingQuantity, 10);
+
+    EXPECT_EQ(restingBuy->orderId, buyOrder.orderId);
+    EXPECT_EQ(restingBuy->remainingQuantity, 10);
+}
