@@ -26,6 +26,12 @@ private:
     bool isMarketExpired(
         const MarketBook& marketBook,
         Timestamp currentTime) const;
+
+   void expireBuyOrders(
+        orderbook::BuyBook& buyBook) const;
+
+    void expireSellOrders(
+        orderbook::SellBook& sellBook) const;
 };
 
 } // namespace gridx::matching::expiry
