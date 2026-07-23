@@ -2,16 +2,11 @@
 
 #include <chrono>
 
-namespace gridx::matching::matching
-{
+namespace gridx::matching::matching {
 
-Trade TradeManager::createTrade(
-    const Order& buyOrder,
-    const Order& sellOrder,
-    Quantity tradedQuantity,
-    Price executionPrice,
-    GridFee gridFee) const
-{
+Trade TradeManager::createTrade(const Order& buyOrder, const Order& sellOrder,
+                                Quantity tradedQuantity, Price executionPrice,
+                                GridFee gridFee) const {
     Trade trade{};
 
     // TODO: Replace with Trade ID generator.
@@ -40,4 +35,4 @@ Trade TradeManager::createTrade(
     return trade;
 }
 
-} // namespace gridx::matching::matching
+}  // namespace gridx::matching::matching

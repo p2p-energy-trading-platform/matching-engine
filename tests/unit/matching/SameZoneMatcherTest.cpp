@@ -17,9 +17,9 @@ protected:
     SameZoneMatcherTest()
         : marketId{
               std::chrono::system_clock::now(),
-          },
-          marketBook(marketId),
-          matcher(marketBook, tradeManager) {}
+          }
+        , marketBook(marketId)
+        , matcher(marketBook, tradeManager) {}
 
     static constexpr GridZoneId kZone = 1;
 
@@ -33,8 +33,7 @@ protected:
 };
 
 // Test that a BUY order fully matches a SELL order in the same grid zone.
-TEST_F(SameZoneMatcherTest, BuyOrderFullyMatchesSellOrder)
-{
+TEST_F(SameZoneMatcherTest, BuyOrderFullyMatchesSellOrder) {
     auto sellOrder = std::make_shared<Order>();
 
     sellOrder->orderId = 1;
@@ -83,22 +82,13 @@ TEST_F(SameZoneMatcherTest, BuyOrderFullyMatchesSellOrder)
     EXPECT_EQ(trade.quantity, 10);
     EXPECT_EQ(trade.gridFee, 0);
 
-    EXPECT_TRUE(
-        marketBook
-            .zoneOrderBook(kZone)
-            .sellBook()
-            .empty());
+    EXPECT_TRUE(marketBook.zoneOrderBook(kZone).sellBook().empty());
 
-    EXPECT_TRUE(
-        marketBook
-            .zoneOrderBook(kZone)
-            .buyBook()
-            .empty());
+    EXPECT_TRUE(marketBook.zoneOrderBook(kZone).buyBook().empty());
 }
 
 // Test that a SELL order fully matches a BUY order in the same grid zone.
-TEST_F(SameZoneMatcherTest, SellOrderFullyMatchesBuyOrder)
-{
+TEST_F(SameZoneMatcherTest, SellOrderFullyMatchesBuyOrder) {
     auto buyOrder = std::make_shared<Order>();
 
     buyOrder->orderId = 1;
@@ -147,22 +137,13 @@ TEST_F(SameZoneMatcherTest, SellOrderFullyMatchesBuyOrder)
     EXPECT_EQ(trade.quantity, 10);
     EXPECT_EQ(trade.gridFee, 0);
 
-    EXPECT_TRUE(
-        marketBook
-            .zoneOrderBook(kZone)
-            .buyBook()
-            .empty());
+    EXPECT_TRUE(marketBook.zoneOrderBook(kZone).buyBook().empty());
 
-    EXPECT_TRUE(
-        marketBook
-            .zoneOrderBook(kZone)
-            .sellBook()
-            .empty());
+    EXPECT_TRUE(marketBook.zoneOrderBook(kZone).sellBook().empty());
 }
 
 // Test that a BUY order partially matches a SELL order in the same grid zone.
-TEST_F(SameZoneMatcherTest, BuyOrderPartiallyMatchesSellOrder)
-{
+TEST_F(SameZoneMatcherTest, BuyOrderPartiallyMatchesSellOrder) {
     auto sellOrder = std::make_shared<Order>();
 
     sellOrder->orderId = 1;
@@ -204,27 +185,18 @@ TEST_F(SameZoneMatcherTest, BuyOrderPartiallyMatchesSellOrder)
     EXPECT_EQ(trade.quantity, 10);
     EXPECT_EQ(trade.energyPrice, 100);
 
-    auto remainingSell =
-        marketBook
-            .zoneOrderBook(kZone)
-            .sellBook()
-            .bestOrder();
+    auto remainingSell = marketBook.zoneOrderBook(kZone).sellBook().bestOrder();
 
     ASSERT_NE(remainingSell, nullptr);
 
     EXPECT_EQ(remainingSell->orderId, sellOrder->orderId);
     EXPECT_EQ(remainingSell->remainingQuantity, 10);
 
-    EXPECT_TRUE(
-        marketBook
-            .zoneOrderBook(kZone)
-            .buyBook()
-            .empty());
+    EXPECT_TRUE(marketBook.zoneOrderBook(kZone).buyBook().empty());
 }
 
 // Test that a SELL order partially matches a BUY order in the same grid zone.
-TEST_F(SameZoneMatcherTest, BuyOrderMatchesMultipleSellOrders)
-{
+TEST_F(SameZoneMatcherTest, BuyOrderMatchesMultipleSellOrders) {
     auto sellOrder1 = std::make_shared<Order>();
 
     sellOrder1->orderId = 1;
@@ -283,23 +255,13 @@ TEST_F(SameZoneMatcherTest, BuyOrderMatchesMultipleSellOrders)
     EXPECT_EQ(trades[1].sellOrderId, sellOrder2->orderId);
     EXPECT_EQ(trades[1].quantity, 10);
 
-    EXPECT_TRUE(
-        marketBook
-            .zoneOrderBook(kZone)
-            .sellBook()
-            .empty());
+    EXPECT_TRUE(marketBook.zoneOrderBook(kZone).sellBook().empty());
 
-    EXPECT_TRUE(
-        marketBook
-            .zoneOrderBook(kZone)
-            .buyBook()
-            .empty());
+    EXPECT_TRUE(marketBook.zoneOrderBook(kZone).buyBook().empty());
 }
 
-
 // Test that a BUY order does not match a SELL order with a higher price in the same grid zone.
-TEST_F(SameZoneMatcherTest, BuyOrderDoesNotMatchHigherSellPrice)
-{
+TEST_F(SameZoneMatcherTest, BuyOrderDoesNotMatchHigherSellPrice) {
     auto sellOrder = std::make_shared<Order>();
 
     sellOrder->orderId = 1;
@@ -355,8 +317,7 @@ TEST_F(SameZoneMatcherTest, BuyOrderDoesNotMatchHigherSellPrice)
 }
 
 // Test that a BUY order with remaining quantity is added to the order book after partial matching.
-TEST_F(SameZoneMatcherTest, RemainingBuyOrderIsAddedToOrderBook)
-{
+TEST_F(SameZoneMatcherTest, RemainingBuyOrderIsAddedToOrderBook) {
     auto sellOrder = std::make_shared<Order>();
 
     sellOrder->orderId = 1;
@@ -406,12 +367,10 @@ TEST_F(SameZoneMatcherTest, RemainingBuyOrderIsAddedToOrderBook)
     EXPECT_EQ(remainingBuy->orderId, buyOrder.orderId);
     EXPECT_EQ(remainingBuy->remainingQuantity, 5);
     EXPECT_EQ(remainingBuy->price, 100);
-
 }
 
 // Test that a trade between orders in the same grid zone has a grid fee of zero.
-TEST_F(SameZoneMatcherTest, SameZoneTradeHasZeroGridFee)
-{
+TEST_F(SameZoneMatcherTest, SameZoneTradeHasZeroGridFee) {
     auto sellOrder = std::make_shared<Order>();
 
     sellOrder->orderId = 1;

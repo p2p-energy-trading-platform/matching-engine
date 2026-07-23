@@ -3,11 +3,9 @@
 #include "gridx/matching/domain/Order.hpp"
 #include "gridx/matching/domain/Trade.hpp"
 
-namespace gridx::matching::matching
-{
+namespace gridx::matching::matching {
 
-class TradeManager
-{
+class TradeManager {
 public:
     TradeManager() = default;
 
@@ -19,12 +17,8 @@ public:
     ~TradeManager() = default;
 
     [[nodiscard]]
-    Trade createTrade(
-        const Order& buyOrder,
-        const Order& sellOrder,
-        Quantity tradedQuantity,
-        Price executionPrice,
-        GridFee gridFee) const;
+    Trade createTrade(const Order& buyOrder, const Order& sellOrder, Quantity tradedQuantity,
+                      Price executionPrice, GridFee gridFee) const;
 };
 
-} // namespace gridx::matching::matching
+}  // namespace gridx::matching::matching
