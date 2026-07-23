@@ -99,6 +99,8 @@ target_sources(
      src/matching/TradeManager.cpp
      src/engine/OrderProcessor.cpp
      src/adapters/kafka/KafkaOrderConsumer.cpp
+     src/expiry/ExpiryManager.cpp
+     src/adapters/kafka/KafkaProducer.cpp
     # or we can use file(GLOB ...) to automatically include all .cpp files in the src directory
 )
 
