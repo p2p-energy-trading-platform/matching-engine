@@ -10,9 +10,11 @@ namespace gridx::matching::matching {
 
 constexpr GridFee kSameZoneGridFee{0};
 
+
 SameZoneMatcher::SameZoneMatcher(orderbook::MarketBook& marketBook, TradeManager& tradeManager)
     : m_marketBook(marketBook), m_tradeManager(tradeManager) {}
 
+ // Matches an incoming order against opposite-side orders within the same grid zone.
 std::vector<Trade> SameZoneMatcher::match(Order incomingOrder) {
     auto& zoneBook = m_marketBook.zoneOrderBook(incomingOrder.gridZone);
 
@@ -23,6 +25,7 @@ std::vector<Trade> SameZoneMatcher::match(Order incomingOrder) {
     return matchSell(incomingOrder, zoneBook);
 }
 
+// Matches an incoming BUY order against the SELL book.
 std::vector<Trade> SameZoneMatcher::matchBuy(Order& incomingBuy,
                                              orderbook::ZoneOrderBook& zoneBook) {
     std::vector<Trade> trades;
@@ -65,6 +68,7 @@ std::vector<Trade> SameZoneMatcher::matchBuy(Order& incomingBuy,
     return trades;
 }
 
+// Matches an incoming SELL order against the BUY book.
 std::vector<Trade> SameZoneMatcher::matchSell(Order& incomingSell,
                                               orderbook::ZoneOrderBook& zoneBook) {
     std::vector<Trade> trades;
@@ -97,6 +101,7 @@ std::vector<Trade> SameZoneMatcher::matchSell(Order& incomingSell,
         }
     }
 
+    // Store any remaining quantity back in the order book.
     if (incomingSell.remainingQuantity > 0) {
         zoneBook.addOrder(std::make_shared<Order>(std::move(incomingSell)));
     }
