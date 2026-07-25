@@ -1,0 +1,30 @@
+services:
+  matching-engine:
+    build:
+      context: .
+      dockerfile: Dockerfile
+
+    image: gridx/matching-engine:local
+
+    environment:
+      KAFKA_BOOTSTRAP_SERVERS: kafka:29092
+
+      KAFKA_ORDER_CONSUMER_GROUP_ID: matching-engine-orders
+      KAFKA_GRID_TRANSFER_CONSUMER_GROUP_ID: matching-engine-grid-transfer
+
+      KAFKA_ORDER_TOPIC: order-placements
+      KAFKA_TRADE_TOPIC: completed-trades
+      KAFKA_ORDER_STATE_TOPIC: order-state
+      KAFKA_GRID_TRANSFER_TOPIC: grid.transfer-rules.v1
+
+      LOG_LEVEL: info
+
+    depends_on:
+      kafka:
+        condition: service_healthy
+        restart: true
+
+    networks:
+      - gridx-infra-network
+
+    restart: unless-stopped
