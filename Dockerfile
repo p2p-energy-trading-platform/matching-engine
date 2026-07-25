@@ -22,8 +22,8 @@ RUN python3 -m venv /opt/venv
 ENV PATH="/opt/venv/bin:$PATH"
 
 # Install Conan
-RUN pip install --upgrade pip
-RUN pip install conan
+RUN pip install --no-cache-dir --upgrade pip
+RUN pip install --no-cache-dir conan
 
 WORKDIR /app
 
@@ -49,14 +49,23 @@ RUN cmake \
 # Build
 RUN cmake --build build/Release
 
+RUN ldd /app/build/Release/matching-engine
+
 # Stage 2: Runtime
 
 FROM ubuntu:24.04
+
+ENV DEBIAN_FRONTEND=noninteractive
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    ca-certificates \
+    libstdc++6 \
+    && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 
 COPY --from=builder \
     /app/build/Release/matching-engine \
-    .
+    /app/matching-engine
 
 ENTRYPOINT ["./matching-engine"]
