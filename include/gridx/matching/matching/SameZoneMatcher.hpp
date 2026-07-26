@@ -39,13 +39,13 @@ private:
      * Matches an incoming BUY order against the SELL book.
      */
     [[nodiscard]]
-    MatchingResult matchBuy(Order& incomingBuy, orderbook::ZoneOrderBook& zoneBook);
+    MatchingResult matchBuy(Order& incomingBuy, const orderbook::ZoneOrderBook& zoneBook);
 
     /**
      * Matches an incoming SELL order against the BUY book.
      */
     [[nodiscard]]
-    MatchingResult matchSell(Order& incomingSell, orderbook::ZoneOrderBook& zoneBook);
+    MatchingResult matchSell(Order& incomingSell, const orderbook::ZoneOrderBook& zoneBook);
 
 private:
     /// Market order books used during matching.
