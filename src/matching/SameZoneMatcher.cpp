@@ -25,10 +25,8 @@ MatchingResult SameZoneMatcher::match(Order incomingOrder) {
 }
 
 // Matches an incoming BUY order against the SELL book.
-MatchingResult SameZoneMatcher::matchBuy(
-    Order& incomingBuy,
-    const orderbook::ZoneOrderBook& zoneBook) {
-
+MatchingResult SameZoneMatcher::matchBuy(Order& incomingBuy,
+                                         const orderbook::ZoneOrderBook& zoneBook) {
     MatchingResult result;
 
     auto& sellBook = zoneBook.sellBook();
@@ -44,44 +42,36 @@ MatchingResult SameZoneMatcher::matchBuy(
             break;
         }
 
+        //
         const Quantity tradedQuantity =
-            std::min(incomingBuy.remainingQuantity,
-                     restingOrder->remainingQuantity);
+            std::min(incomingBuy.remainingQuantity, restingOrder->remainingQuantity);
 
-        result.trades.push_back(
-            m_tradeManager.createTrade(
-                incomingBuy,
-                *restingOrder,
-                tradedQuantity,
-                restingOrder->price,
-                kSameZoneGridFee));
+        // Create a Trade object for the matched orders.
+        result.trades.push_back(m_tradeManager.createTrade(
+            incomingBuy, *restingOrder, tradedQuantity, restingOrder->price, kSameZoneGridFee));
 
         incomingBuy.remainingQuantity -= tradedQuantity;
-
+        // Update the resting order's remaining quantity and status.
         Order updatedOrder = *restingOrder;
         updatedOrder.remainingQuantity -= tradedQuantity;
-        updatedOrder.status =
-            updatedOrder.remainingQuantity == 0
-                ? OrderStatus::Filled
-                : OrderStatus::PartiallyFilled;
+        updatedOrder.status = updatedOrder.remainingQuantity == 0 ? OrderStatus::Filled
+                                                                  : OrderStatus::PartiallyFilled;
 
         result.updatedOrders.push_back(std::move(updatedOrder));
     }
 
+    // If the incoming order was not fully matched, it should be inserted into the order book.
     if (incomingBuy.remainingQuantity > 0) {
         incomingBuy.status = OrderStatus::PartiallyFilled;
-        result.incomingOrderToInsert =
-            std::make_shared<Order>(std::move(incomingBuy));
+        result.incomingOrderToInsert = std::make_shared<Order>(std::move(incomingBuy));
     }
 
     return result;
 }
 
 // Matches an incoming SELL order against the BUY book.
-MatchingResult SameZoneMatcher::matchSell(
-    Order& incomingSell,
-    const orderbook::ZoneOrderBook& zoneBook) {
-
+MatchingResult SameZoneMatcher::matchSell(Order& incomingSell,
+                                          const orderbook::ZoneOrderBook& zoneBook) {
     MatchingResult result;
 
     auto& buyBook = zoneBook.buyBook();
@@ -98,33 +88,24 @@ MatchingResult SameZoneMatcher::matchSell(
         }
 
         const Quantity tradedQuantity =
-            std::min(incomingSell.remainingQuantity,
-                     restingOrder->remainingQuantity);
-
-        result.trades.push_back(
-            m_tradeManager.createTrade(
-                *restingOrder,
-                incomingSell,
-                tradedQuantity,
-                restingOrder->price,
-                kSameZoneGridFee));
+            std::min(incomingSell.remainingQuantity, restingOrder->remainingQuantity);
+        // Create a Trade object for the matched orders.
+        result.trades.push_back(m_tradeManager.createTrade(
+            *restingOrder, incomingSell, tradedQuantity, restingOrder->price, kSameZoneGridFee));
 
         incomingSell.remainingQuantity -= tradedQuantity;
-
+        // Update the resting order's remaining quantity and status.
         Order updatedOrder = *restingOrder;
         updatedOrder.remainingQuantity -= tradedQuantity;
-        updatedOrder.status =
-            updatedOrder.remainingQuantity == 0
-                ? OrderStatus::Filled
-                : OrderStatus::PartiallyFilled;
+        updatedOrder.status = updatedOrder.remainingQuantity == 0 ? OrderStatus::Filled
+                                                                  : OrderStatus::PartiallyFilled;
 
         result.updatedOrders.push_back(std::move(updatedOrder));
     }
-
+    // If the incoming order was not fully matched, it should be inserted into the order book.
     if (incomingSell.remainingQuantity > 0) {
         incomingSell.status = OrderStatus::PartiallyFilled;
-        result.incomingOrderToInsert =
-            std::make_shared<Order>(std::move(incomingSell));
+        result.incomingOrderToInsert = std::make_shared<Order>(std::move(incomingSell));
     }
 
     return result;
