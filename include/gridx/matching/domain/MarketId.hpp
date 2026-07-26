@@ -20,7 +20,7 @@ struct MarketId {
         return deliverySlotStart + kDeliverySlotDuration;
     }
 
-    bool operator==(const MarketId&) const = default;
+    auto operator<=>(const MarketId&) const = default;
 };
 
 }  // namespace gridx::matching

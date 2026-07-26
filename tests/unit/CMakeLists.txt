@@ -12,6 +12,7 @@ add_executable(
     adapters/kafka/OrderEventMapperTest.cpp
     adapters/kafka/ProtobufOrderCodecTest.cpp
     expiry/ExpiryManagerTest.cpp
+    orderbook/MarketBookManagerTest.cpp
 
 )
 
