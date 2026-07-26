@@ -25,50 +25,63 @@ MatchingResult SameZoneMatcher::match(Order incomingOrder) {
 }
 
 // Matches an incoming BUY order against the SELL book.
-MatchingResult SameZoneMatcher::matchBuy(Order& incomingBuy, orderbook::ZoneOrderBook& zoneBook) {
+MatchingResult SameZoneMatcher::matchBuy(
+    Order& incomingBuy,
+    const orderbook::ZoneOrderBook& zoneBook) {
+
     MatchingResult result;
+
     auto& sellBook = zoneBook.sellBook();
 
     while (!sellBook.empty() && incomingBuy.remainingQuantity > 0) {
         auto restingOrder = sellBook.bestOrder();
 
-        // No resting order available.
         if (restingOrder == nullptr) {
             break;
         }
 
-        // Stop if the best sell price is above the buyer's limit price.
         if (restingOrder->price > incomingBuy.price) {
             break;
         }
 
         const Quantity tradedQuantity =
-            std::min(incomingBuy.remainingQuantity, restingOrder->remainingQuantity);
+            std::min(incomingBuy.remainingQuantity,
+                     restingOrder->remainingQuantity);
 
-        result.trades.push_back(m_tradeManager.createTrade(
-            incomingBuy, *restingOrder, tradedQuantity, restingOrder->price, kSameZoneGridFee));
+        result.trades.push_back(
+            m_tradeManager.createTrade(
+                incomingBuy,
+                *restingOrder,
+                tradedQuantity,
+                restingOrder->price,
+                kSameZoneGridFee));
 
         incomingBuy.remainingQuantity -= tradedQuantity;
-        restingOrder->remainingQuantity -= tradedQuantity;
 
-        // Remove fully matched resting order.
-        if (restingOrder->remainingQuantity == 0) {
-            sellBook.removeFrontOrder(restingOrder->price);
-        }
+        Order updatedOrder = *restingOrder;
+        updatedOrder.remainingQuantity -= tradedQuantity;
+        updatedOrder.status =
+            updatedOrder.remainingQuantity == 0
+                ? OrderStatus::Filled
+                : OrderStatus::PartiallyFilled;
+
+        result.updatedOrders.push_back(std::move(updatedOrder));
     }
 
-    // Store any remaining quantity back in the order book.
     if (incomingBuy.remainingQuantity > 0) {
-        zoneBook.addOrder(std::make_shared<Order>(std::move(incomingBuy)));
+        incomingBuy.status = OrderStatus::PartiallyFilled;
+        result.incomingOrderToInsert =
+            std::make_shared<Order>(std::move(incomingBuy));
     }
-
-    result.remainingQuantity = incomingBuy.remainingQuantity;
 
     return result;
 }
 
 // Matches an incoming SELL order against the BUY book.
-MatchingResult SameZoneMatcher::matchSell(Order& incomingSell, orderbook::ZoneOrderBook& zoneBook) {
+MatchingResult SameZoneMatcher::matchSell(
+    Order& incomingSell,
+    const orderbook::ZoneOrderBook& zoneBook) {
+
     MatchingResult result;
 
     auto& buyBook = zoneBook.buyBook();
@@ -80,31 +93,39 @@ MatchingResult SameZoneMatcher::matchSell(Order& incomingSell, orderbook::ZoneOr
             break;
         }
 
-        // Stop if the best buy price is below the seller's limit price.
         if (restingOrder->price < incomingSell.price) {
             break;
         }
 
         const Quantity tradedQuantity =
-            std::min(incomingSell.remainingQuantity, restingOrder->remainingQuantity);
+            std::min(incomingSell.remainingQuantity,
+                     restingOrder->remainingQuantity);
 
-        result.trades.push_back(m_tradeManager.createTrade(*restingOrder, incomingSell, tradedQuantity,
-                                                    restingOrder->price, kSameZoneGridFee));
+        result.trades.push_back(
+            m_tradeManager.createTrade(
+                *restingOrder,
+                incomingSell,
+                tradedQuantity,
+                restingOrder->price,
+                kSameZoneGridFee));
 
         incomingSell.remainingQuantity -= tradedQuantity;
-        restingOrder->remainingQuantity -= tradedQuantity;
 
-        if (restingOrder->remainingQuantity == 0) {
-            buyBook.removeFrontOrder(restingOrder->price);
-        }
+        Order updatedOrder = *restingOrder;
+        updatedOrder.remainingQuantity -= tradedQuantity;
+        updatedOrder.status =
+            updatedOrder.remainingQuantity == 0
+                ? OrderStatus::Filled
+                : OrderStatus::PartiallyFilled;
+
+        result.updatedOrders.push_back(std::move(updatedOrder));
     }
 
-    // Store any remaining quantity back in the order book.
     if (incomingSell.remainingQuantity > 0) {
-        zoneBook.addOrder(std::make_shared<Order>(std::move(incomingSell)));
+        incomingSell.status = OrderStatus::PartiallyFilled;
+        result.incomingOrderToInsert =
+            std::make_shared<Order>(std::move(incomingSell));
     }
-
-    result.remainingQuantity = incomingSell.remainingQuantity;
 
     return result;
 }
