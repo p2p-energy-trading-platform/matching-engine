@@ -18,7 +18,7 @@ class OrderBook {
 public:
     using PriceLevels = std::map<Price, OrderQueue, Comparator>;
 
-using ConstOrderIterator = RestingOrderIterator<Comparator>;
+    using ConstOrderIterator = RestingOrderIterator<Comparator>;
 
     OrderBook() = default;
     ~OrderBook() = default;

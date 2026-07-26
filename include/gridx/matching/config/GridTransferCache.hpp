@@ -15,7 +15,7 @@ struct GridTransferKey {
     GridZoneId sellerGridZone{};
     GridZoneId buyerGridZone{};
 
-    // Automatically generates the equality operator. 
+    // Automatically generates the equality operator.
     // The compiler will check if sellerGridZone matches,
     // and then if buyerGridZone matches.
     [[nodiscard]]
@@ -26,7 +26,7 @@ struct GridTransferKey {
 // Turn Grid Transfer Key to a hash number
 struct GridTransferKeyHash {
     [[nodiscard]]
-    std::size_t operator()(const GridTransferKey& key) const noexcept;  
+    std::size_t operator()(const GridTransferKey& key) const noexcept;
 };
 
 class GridTransferCache {
@@ -44,17 +44,12 @@ public:
 
     // For lookup of grid transfer rules between 2 zones
     [[nodiscard]]
-    std::optional<GridTransferRule> find(
-        const GridZoneId sellerGridZone,
-        const GridZoneId buyerGridZone
-    ) const;
+    std::optional<GridTransferRule> find(const GridZoneId sellerGridZone,
+                                         const GridZoneId buyerGridZone) const;
 
     // For matcher to verify if transfer rules allow
     [[nodiscard]]
-    GridTransferRule resolve(
-        const GridZoneId sellerGridZone,
-        const GridZoneId buyerGridZone
-    ) const;
+    GridTransferRule resolve(const GridZoneId sellerGridZone, const GridZoneId buyerGridZone) const;
 
     [[nodiscard]]
     std::size_t size() const;
@@ -67,11 +62,7 @@ public:
     void markReady() noexcept;
 
 private:
-    using RuleMap = std::unordered_map<
-        GridTransferKey,
-        GridTransferRule,
-        GridTransferKeyHash
-    >;
+    using RuleMap = std::unordered_map<GridTransferKey, GridTransferRule, GridTransferKeyHash>;
 
     mutable std::shared_mutex mutex_;
     RuleMap rules_;
@@ -79,4 +70,4 @@ private:
     std::atomic_bool ready_{false};
 };
 
-}
+}  // namespace gridx::matching::config

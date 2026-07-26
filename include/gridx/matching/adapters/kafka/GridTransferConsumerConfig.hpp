@@ -15,4 +15,4 @@ struct GridTransferConsumerConfig {
     std::chrono::seconds bootstrapTimeout{30};
 };
 
-} // namespace gridx::matching::adapters::kafka
+}  // namespace gridx::matching::adapters::kafka

@@ -9,8 +9,7 @@ class GridTransferEventMapper {
 public:
     [[nodiscard]]
     static std::optional<GridTransferRule> toDomain(
-        const gridx::grid::v1::GridTransferRule& source
-    );
+        const gridx::grid::v1::GridTransferRule& source);
 };
 
-} // namespace gridx::matching::adapters::kafka
+}  // namespace gridx::matching::adapters::kafka

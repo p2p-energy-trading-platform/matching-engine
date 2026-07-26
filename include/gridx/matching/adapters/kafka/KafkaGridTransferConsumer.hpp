@@ -10,26 +10,19 @@
 namespace RdKafka {
 class KafkaConsumer;
 class Message;
-}
+}  // namespace RdKafka
 
 namespace gridx::matching::adapters::kafka {
 
 class KafkaGridTransferConsumer {
 public:
-    KafkaGridTransferConsumer(
-        GridTransferConsumerConfig config,
-        config::GridTransferCache& cache
-    );
+    KafkaGridTransferConsumer(GridTransferConsumerConfig config, config::GridTransferCache& cache);
 
     ~KafkaGridTransferConsumer();
 
-    KafkaGridTransferConsumer(
-        const KafkaGridTransferConsumer&
-    ) = delete;
+    KafkaGridTransferConsumer(const KafkaGridTransferConsumer&) = delete;
 
-    KafkaGridTransferConsumer& operator=(
-        const KafkaGridTransferConsumer&
-    ) = delete;
+    KafkaGridTransferConsumer& operator=(const KafkaGridTransferConsumer&) = delete;
 
     // Performs startup bootstrap synchronously.
     // Returns only after the initial cache snapshot is complete.
@@ -54,4 +47,4 @@ private:
     std::thread worker_;
 };
 
-} // namespace gridx::matching::adapters::kafka
+}  // namespace gridx::matching::adapters::kafka

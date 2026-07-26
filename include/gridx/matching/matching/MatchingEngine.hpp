@@ -2,8 +2,8 @@
 
 #include <vector>
 
-#include "gridx/matching/domain/Order.hpp"
 #include "gridx/matching/domain/MatchingResult.hpp"
+#include "gridx/matching/domain/Order.hpp"
 
 namespace gridx::matching::matching {
 

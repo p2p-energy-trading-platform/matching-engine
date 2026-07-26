@@ -3,19 +3,17 @@
 namespace gridx::matching::adapters::kafka {
 
 std::optional<gridx::grid::v1::GridTransferRule> deserialize(
-    const std::span<const std::byte> payload
-)
-{
-    if (payload.empty())
-    {
+    const std::span<const std::byte> payload) {
+    if (payload.empty()) {
         return std::nullopt;
     }
-    
+
     gridx::grid::v1::GridTransferRule transferRule;
 
     // const auto data = reinterpret_cast<const void*>(payload.data());
 
-    const bool parsed = transferRule.ParseFromArray(payload.data(), static_cast<int>(payload.size()));
+    const bool parsed =
+        transferRule.ParseFromArray(payload.data(), static_cast<int>(payload.size()));
 
     if (!parsed) {
         return std::nullopt;
@@ -24,4 +22,4 @@ std::optional<gridx::grid::v1::GridTransferRule> deserialize(
     return transferRule;
 };
 
-}
+}  // namespace gridx::matching::adapters::kafka

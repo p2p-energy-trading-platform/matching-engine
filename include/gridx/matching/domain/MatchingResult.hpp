@@ -1,7 +1,7 @@
 #pragma once
 
-#include <vector>
 #include <memory>
+#include <vector>
 
 #include "gridx/matching/domain/Order.hpp"
 #include "gridx/matching/domain/Trade.hpp"

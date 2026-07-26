@@ -2,9 +2,9 @@
 
 #include <vector>
 
+#include "gridx/matching/domain/MatchingResult.hpp"
 #include "gridx/matching/domain/Order.hpp"
 #include "gridx/matching/domain/Trade.hpp"
-#include "gridx/matching/domain/MatchingResult.hpp"
 namespace gridx::matching::orderbook {
 
 class MarketBook;

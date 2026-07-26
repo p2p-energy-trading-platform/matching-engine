@@ -10,8 +10,7 @@ class ProtobufGridTransferCodec {
 public:
     [[nodiscard]]
     static std::optional<gridx::grid::v1::GridTransferRule> deserialize(
-        const std::span<const std::byte> payload
-    );
+        const std::span<const std::byte> payload);
 };
 
-} // namespace gridx::matching::adapters::kafka
+}  // namespace gridx::matching::adapters::kafka
