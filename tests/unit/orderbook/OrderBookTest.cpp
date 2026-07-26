@@ -275,7 +275,6 @@ TEST_F(BuyOrderBookTest, OrdersIteratorMaintainsPriceTimePriority) {
     EXPECT_EQ(it, book.ordersEnd());
 }
 
-
 TEST_F(SellOrderBookTest, OrdersIteratorMaintainsPriceTimePriority) {
     book.addOrder(makeOrder(1, 100));
     book.addOrder(makeOrder(2, 95));

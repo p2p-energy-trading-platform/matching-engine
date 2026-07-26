@@ -5,14 +5,15 @@
 namespace gridx::matching {
 
 struct GridTransferRule {
-    GridZoneId sellerGridZone;
-    GridZoneId buyerGridZone;
+    GridZoneId sellerGridZone{};
+    GridZoneId buyerGridZone{};
 
-    bool allowed;
+    bool allowed{0};
 
-    GridFee gridFee;
+    GridFee gridFeePerKwh{0};
 
-    GridRuleVersion version;
+    GridRuleVersion version{0};
+    Timestamp updatedAt{};
 };
 
 }  // namespace gridx::matching
