@@ -10,7 +10,7 @@ MatchingEngine::MatchingEngine(SameZoneMatcher& sameZoneMatcher)
     // Dependencies are injected during construction.
 }
 
-std::vector<Trade> MatchingEngine::match(Order incomingOrder) {
+MatchingResult MatchingEngine::match(Order incomingOrder) {
     // Delegate matching to the same-zone matcher.
     return m_sameZoneMatcher.match(std::move(incomingOrder));
 }
