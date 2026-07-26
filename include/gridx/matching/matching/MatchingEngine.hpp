@@ -3,7 +3,7 @@
 #include <vector>
 
 #include "gridx/matching/domain/Order.hpp"
-#include "gridx/matching/domain/Trade.hpp"
+#include "gridx/matching/domain/MatchingResult.hpp"
 
 namespace gridx::matching::matching {
 
@@ -21,7 +21,7 @@ public:
     ~MatchingEngine() = default;
 
     [[nodiscard]]
-    std::vector<Trade> match(Order incomingOrder);
+    MatchingResult match(Order incomingOrder);
 
 private:
     SameZoneMatcher& m_sameZoneMatcher;

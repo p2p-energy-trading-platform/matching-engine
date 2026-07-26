@@ -66,11 +66,11 @@ TEST_F(SameZoneMatcherTest, BuyOrderFullyMatchesSellOrder) {
     buyOrder.createdAt = std::chrono::system_clock::now();
     buyOrder.expiresAt = buyOrder.createdAt + std::chrono::hours(1);
 
-    const auto trades = matcher.match(buyOrder);
+    const auto result = matcher.match(buyOrder);
 
-    ASSERT_EQ(trades.size(), 1);
+    ASSERT_EQ(result.trades.size(), 1);
 
-    const auto& trade = trades.front();
+    const auto& trade = result.trades.front();
 
     EXPECT_EQ(trade.buyOrderId, buyOrder.orderId);
     EXPECT_EQ(trade.sellOrderId, sellOrder->orderId);
@@ -82,9 +82,15 @@ TEST_F(SameZoneMatcherTest, BuyOrderFullyMatchesSellOrder) {
     EXPECT_EQ(trade.quantity, 10);
     EXPECT_EQ(trade.gridFee, 0);
 
-    EXPECT_TRUE(marketBook.zoneOrderBook(kZone).sellBook().empty());
+    ASSERT_EQ(result.updatedOrders.size(), 1);
 
-    EXPECT_TRUE(marketBook.zoneOrderBook(kZone).buyBook().empty());
+    const auto& updatedOrder = result.updatedOrders.front();
+
+    EXPECT_EQ(updatedOrder.orderId, sellOrder->orderId);
+    EXPECT_EQ(updatedOrder.remainingQuantity, 0);
+    EXPECT_EQ(updatedOrder.status, OrderStatus::Filled);
+
+    EXPECT_EQ(result.incomingOrderToInsert, nullptr);
 }
 
 // Test that a SELL order fully matches a BUY order in the same grid zone.
@@ -121,11 +127,11 @@ TEST_F(SameZoneMatcherTest, SellOrderFullyMatchesBuyOrder) {
     sellOrder.createdAt = std::chrono::system_clock::now();
     sellOrder.expiresAt = sellOrder.createdAt + std::chrono::hours(1);
 
-    const auto trades = matcher.match(sellOrder);
+    const auto result = matcher.match(sellOrder);
 
-    ASSERT_EQ(trades.size(), 1);
+    ASSERT_EQ(result.trades.size(), 1);
 
-    const auto& trade = trades.front();
+    const auto& trade = result.trades.front();
 
     EXPECT_EQ(trade.buyOrderId, buyOrder->orderId);
     EXPECT_EQ(trade.sellOrderId, sellOrder.orderId);
@@ -137,9 +143,15 @@ TEST_F(SameZoneMatcherTest, SellOrderFullyMatchesBuyOrder) {
     EXPECT_EQ(trade.quantity, 10);
     EXPECT_EQ(trade.gridFee, 0);
 
-    EXPECT_TRUE(marketBook.zoneOrderBook(kZone).buyBook().empty());
+    ASSERT_EQ(result.updatedOrders.size(), 1);
 
-    EXPECT_TRUE(marketBook.zoneOrderBook(kZone).sellBook().empty());
+    const auto& updatedOrder = result.updatedOrders.front();
+
+    EXPECT_EQ(updatedOrder.orderId, buyOrder->orderId);
+    EXPECT_EQ(updatedOrder.remainingQuantity, 0);
+    EXPECT_EQ(updatedOrder.status, OrderStatus::Filled);
+
+    EXPECT_EQ(result.incomingOrderToInsert, nullptr);
 }
 
 // Test that a BUY order partially matches a SELL order in the same grid zone.
@@ -176,23 +188,24 @@ TEST_F(SameZoneMatcherTest, BuyOrderPartiallyMatchesSellOrder) {
     buyOrder.createdAt = std::chrono::system_clock::now();
     buyOrder.expiresAt = buyOrder.createdAt + std::chrono::hours(1);
 
-    const auto trades = matcher.match(buyOrder);
+    const auto result = matcher.match(buyOrder);
 
-    ASSERT_EQ(trades.size(), 1);
+    ASSERT_EQ(result.trades.size(), 1);
 
-    const auto& trade = trades.front();
+    const auto& trade = result.trades.front();
 
     EXPECT_EQ(trade.quantity, 10);
     EXPECT_EQ(trade.energyPrice, 100);
 
-    auto remainingSell = marketBook.zoneOrderBook(kZone).sellBook().bestOrder();
+    ASSERT_EQ(result.updatedOrders.size(), 1);
 
-    ASSERT_NE(remainingSell, nullptr);
+    const auto& updatedOrder = result.updatedOrders.front();
 
-    EXPECT_EQ(remainingSell->orderId, sellOrder->orderId);
-    EXPECT_EQ(remainingSell->remainingQuantity, 10);
+    EXPECT_EQ(updatedOrder.orderId, sellOrder->orderId);
+    EXPECT_EQ(updatedOrder.remainingQuantity, 10);
+    EXPECT_EQ(updatedOrder.status, OrderStatus::PartiallyFilled);
 
-    EXPECT_TRUE(marketBook.zoneOrderBook(kZone).buyBook().empty());
+    EXPECT_EQ(result.incomingOrderToInsert, nullptr);
 }
 
 // Test that a SELL order partially matches a BUY order in the same grid zone.
@@ -244,20 +257,27 @@ TEST_F(SameZoneMatcherTest, BuyOrderMatchesMultipleSellOrders) {
     buyOrder.remainingQuantity = 15;
     buyOrder.createdAt = std::chrono::system_clock::now();
     buyOrder.expiresAt = buyOrder.createdAt + std::chrono::hours(1);
+    const auto result = matcher.match(buyOrder);
 
-    const auto trades = matcher.match(buyOrder);
+    ASSERT_EQ(result.trades.size(), 2);
 
-    ASSERT_EQ(trades.size(), 2);
+    EXPECT_EQ(result.trades[0].sellOrderId, sellOrder1->orderId);
+    EXPECT_EQ(result.trades[0].quantity, 5);
 
-    EXPECT_EQ(trades[0].sellOrderId, sellOrder1->orderId);
-    EXPECT_EQ(trades[0].quantity, 5);
+    EXPECT_EQ(result.trades[1].sellOrderId, sellOrder2->orderId);
+    EXPECT_EQ(result.trades[1].quantity, 10);
 
-    EXPECT_EQ(trades[1].sellOrderId, sellOrder2->orderId);
-    EXPECT_EQ(trades[1].quantity, 10);
+    ASSERT_EQ(result.updatedOrders.size(), 2);
 
-    EXPECT_TRUE(marketBook.zoneOrderBook(kZone).sellBook().empty());
+    EXPECT_EQ(result.updatedOrders[0].orderId, sellOrder1->orderId);
+    EXPECT_EQ(result.updatedOrders[0].remainingQuantity, 0);
+    EXPECT_EQ(result.updatedOrders[0].status, OrderStatus::Filled);
 
-    EXPECT_TRUE(marketBook.zoneOrderBook(kZone).buyBook().empty());
+    EXPECT_EQ(result.updatedOrders[1].orderId, sellOrder2->orderId);
+    EXPECT_EQ(result.updatedOrders[1].remainingQuantity, 0);
+    EXPECT_EQ(result.updatedOrders[1].status, OrderStatus::Filled);
+
+    EXPECT_EQ(result.incomingOrderToInsert, nullptr);
 }
 
 // Test that a BUY order does not match a SELL order with a higher price in the same grid zone.
@@ -294,26 +314,18 @@ TEST_F(SameZoneMatcherTest, BuyOrderDoesNotMatchHigherSellPrice) {
     buyOrder.createdAt = std::chrono::system_clock::now();
     buyOrder.expiresAt = buyOrder.createdAt + std::chrono::hours(1);
 
-    const auto trades = matcher.match(buyOrder);
+    const auto result = matcher.match(buyOrder);
 
-    EXPECT_TRUE(trades.empty());
+    EXPECT_TRUE(result.trades.empty());
 
-    auto& zoneBook = marketBook.zoneOrderBook(kZone);
+    ASSERT_TRUE(result.updatedOrders.empty());
 
-    EXPECT_FALSE(zoneBook.sellBook().empty());
-    EXPECT_FALSE(zoneBook.buyBook().empty());
+    ASSERT_NE(result.incomingOrderToInsert, nullptr);
 
-    auto restingSell = zoneBook.sellBook().bestOrder();
-    auto restingBuy = zoneBook.buyBook().bestOrder();
-
-    ASSERT_NE(restingSell, nullptr);
-    ASSERT_NE(restingBuy, nullptr);
-
-    EXPECT_EQ(restingSell->orderId, sellOrder->orderId);
-    EXPECT_EQ(restingSell->remainingQuantity, 10);
-
-    EXPECT_EQ(restingBuy->orderId, buyOrder.orderId);
-    EXPECT_EQ(restingBuy->remainingQuantity, 10);
+    EXPECT_EQ(result.incomingOrderToInsert->orderId, buyOrder.orderId);
+    EXPECT_EQ(result.incomingOrderToInsert->remainingQuantity, 10);
+    EXPECT_EQ(result.incomingOrderToInsert->price, 100);
+    EXPECT_EQ(result.incomingOrderToInsert->side, Side::Buy);
 }
 
 // Test that a BUY order with remaining quantity is added to the order book after partial matching.
@@ -350,23 +362,26 @@ TEST_F(SameZoneMatcherTest, RemainingBuyOrderIsAddedToOrderBook) {
     buyOrder.createdAt = std::chrono::system_clock::now();
     buyOrder.expiresAt = buyOrder.createdAt + std::chrono::hours(1);
 
-    const auto trades = matcher.match(buyOrder);
+    const auto result = matcher.match(buyOrder);
 
-    ASSERT_EQ(trades.size(), 1);
+    ASSERT_EQ(result.trades.size(), 1);
 
-    EXPECT_EQ(trades.front().quantity, 5);
+    EXPECT_EQ(result.trades.front().quantity, 5);
 
-    auto& zoneBook = marketBook.zoneOrderBook(kZone);
+    ASSERT_EQ(result.updatedOrders.size(), 1);
 
-    EXPECT_TRUE(zoneBook.sellBook().empty());
+    const auto& updatedOrder = result.updatedOrders.front();
 
-    auto remainingBuy = zoneBook.buyBook().bestOrder();
+    EXPECT_EQ(updatedOrder.orderId, sellOrder->orderId);
+    EXPECT_EQ(updatedOrder.remainingQuantity, 0);
+    EXPECT_EQ(updatedOrder.status, OrderStatus::Filled);
 
-    ASSERT_NE(remainingBuy, nullptr);
+    ASSERT_NE(result.incomingOrderToInsert, nullptr);
 
-    EXPECT_EQ(remainingBuy->orderId, buyOrder.orderId);
-    EXPECT_EQ(remainingBuy->remainingQuantity, 5);
-    EXPECT_EQ(remainingBuy->price, 100);
+    EXPECT_EQ(result.incomingOrderToInsert->orderId, buyOrder.orderId);
+    EXPECT_EQ(result.incomingOrderToInsert->remainingQuantity, 5);
+    EXPECT_EQ(result.incomingOrderToInsert->price, 100);
+    EXPECT_EQ(result.incomingOrderToInsert->side, Side::Buy);
 }
 
 // Test that a trade between orders in the same grid zone has a grid fee of zero.
@@ -402,12 +417,11 @@ TEST_F(SameZoneMatcherTest, SameZoneTradeHasZeroGridFee) {
     buyOrder.remainingQuantity = 10;
     buyOrder.createdAt = std::chrono::system_clock::now();
     buyOrder.expiresAt = buyOrder.createdAt + std::chrono::hours(1);
+    const auto result = matcher.match(buyOrder);
 
-    const auto trades = matcher.match(buyOrder);
+    ASSERT_EQ(result.trades.size(), 1);
 
-    ASSERT_EQ(trades.size(), 1);
-
-    const auto& trade = trades.front();
+    const auto& trade = result.trades.front();
 
     EXPECT_EQ(trade.buyerGridZone, kZone);
     EXPECT_EQ(trade.sellerGridZone, kZone);

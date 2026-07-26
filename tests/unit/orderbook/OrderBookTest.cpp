@@ -209,3 +209,92 @@ TEST_F(SellOrderBookTest, MaintainsAscendingPriceOrder) {
     ++it;
     EXPECT_EQ(it->first, 110);
 }
+
+TEST_F(BuyOrderBookTest, OrdersBeginEqualsOrdersEndWhenEmpty) {
+    EXPECT_EQ(book.ordersBegin(), book.ordersEnd());
+}
+
+TEST_F(BuyOrderBookTest, OrdersIteratorReturnsSingleOrder) {
+    auto order = makeOrder(1, 100);
+
+    book.addOrder(order);
+
+    auto it = book.ordersBegin();
+
+    ASSERT_NE(it, book.ordersEnd());
+
+    EXPECT_EQ((*it)->orderId, 1);
+
+    ++it;
+
+    EXPECT_EQ(it, book.ordersEnd());
+}
+
+TEST_F(BuyOrderBookTest, OrdersIteratorMaintainsFIFOAtSamePrice) {
+    book.addOrder(makeOrder(1, 100));
+    book.addOrder(makeOrder(2, 100));
+    book.addOrder(makeOrder(3, 100));
+
+    auto it = book.ordersBegin();
+
+    ASSERT_NE(it, book.ordersEnd());
+    EXPECT_EQ((*it)->orderId, 1);
+
+    ++it;
+    ASSERT_NE(it, book.ordersEnd());
+    EXPECT_EQ((*it)->orderId, 2);
+
+    ++it;
+    ASSERT_NE(it, book.ordersEnd());
+    EXPECT_EQ((*it)->orderId, 3);
+
+    ++it;
+    EXPECT_EQ(it, book.ordersEnd());
+}
+
+TEST_F(BuyOrderBookTest, OrdersIteratorMaintainsPriceTimePriority) {
+    book.addOrder(makeOrder(1, 105));
+    book.addOrder(makeOrder(2, 100));
+    book.addOrder(makeOrder(3, 105));
+    book.addOrder(makeOrder(4, 95));
+
+    auto it = book.ordersBegin();
+
+    EXPECT_EQ((*it)->orderId, 1);
+
+    ++it;
+    EXPECT_EQ((*it)->orderId, 3);
+
+    ++it;
+    EXPECT_EQ((*it)->orderId, 2);
+
+    ++it;
+    EXPECT_EQ((*it)->orderId, 4);
+
+    ++it;
+    EXPECT_EQ(it, book.ordersEnd());
+}
+
+
+TEST_F(SellOrderBookTest, OrdersIteratorMaintainsPriceTimePriority) {
+    book.addOrder(makeOrder(1, 100));
+    book.addOrder(makeOrder(2, 95));
+    book.addOrder(makeOrder(3, 95));
+    book.addOrder(makeOrder(4, 105));
+
+    auto it = book.ordersBegin();
+
+    EXPECT_EQ((*it)->orderId, 2);
+
+    ++it;
+    EXPECT_EQ((*it)->orderId, 3);
+
+    ++it;
+    EXPECT_EQ((*it)->orderId, 1);
+
+    ++it;
+    EXPECT_EQ((*it)->orderId, 4);
+
+    ++it;
+    EXPECT_EQ(it, book.ordersEnd());
+}
