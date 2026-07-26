@@ -27,14 +27,30 @@ std::optional<GridTransferRule> GridTransferEventMapper::toDomain(
         return std::nullopt;
     }
 
-    const auto seconds = std::chrono::seconds{
-        source.updated_at().seconds()
-    };
+    // NOTE: Possible duplicate code in the other consumer
+    // REFACTOR LATER
+    const auto timestampSeconds =
+        source.updated_at().seconds();
 
-    const auto nanos = std::chrono::nanoseconds{
-        source.updated_at().nanos()
-    };
+    const auto timestampNanos =
+        source.updated_at().nanos();
 
+    // Protobuf Timestamp nanos must be in this range.
+    if (timestampNanos < 0 ||
+        timestampNanos >= 1'000'000'000) {
+        return std::nullopt;
+    }
+
+    const auto durationSinceEpoch =
+        std::chrono::seconds{timestampSeconds} +
+        std::chrono::nanoseconds{timestampNanos};
+
+    const Timestamp updatedAt{
+        std::chrono::duration_cast<Timestamp::duration>(
+            durationSinceEpoch
+        )
+    };
+    
     return GridTransferRule{
         .sellerGridZone = source.seller_grid_zone_id(),
         .buyerGridZone = source.buyer_grid_zone_id(),
@@ -42,7 +58,7 @@ std::optional<GridTransferRule> GridTransferEventMapper::toDomain(
         .gridFeePerKwh =
             source.grid_fee_per_kwh(),
         .version = source.version(),
-        .updatedAt = Timestamp{seconds + nanos},
+        .updatedAt = updatedAt,
     };
 }
 } // namespace gridx::matching::adapters::kafka
