@@ -40,7 +40,7 @@ FetchContent_Declare(
     GIT_REPOSITORY
         https://github.com/p2p-energy-trading-platform/cpp-sdk.git
     GIT_TAG
-        v0.6.1
+        v1.0.0
     GIT_SHALLOW
         TRUE
 )
@@ -102,6 +102,10 @@ target_sources(
      src/expiry/ExpiryManager.cpp
      src/adapters/kafka/KafkaProducer.cpp
      src/orderbook/MarketBookManager.cpp
+     src/config/GridTransferCache.cpp
+     src/adapters/kafka/ProtobufGridTransferCodec.cpp
+     src/adapters/kafka/GridTransferEventMapper.cpp
+    #  src/adapters/kafka/KafkaGridTransferConsumer.cpp
     # or we can use file(GLOB ...) to automatically include all .cpp files in the src directory
 )
 
