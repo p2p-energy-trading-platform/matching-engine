@@ -16,6 +16,17 @@ namespace gridx::matching::orderbook {
  */
 class MarketBookManager {
 public:
+
+   
+    MarketBookManager() = default;
+    ~MarketBookManager() = default;
+
+    MarketBookManager(const MarketBookManager&) = delete;
+    MarketBookManager& operator=(const MarketBookManager&) = delete;
+
+    MarketBookManager(MarketBookManager&&) = delete;
+    MarketBookManager& operator=(MarketBookManager&&) = delete;
+
     /**
      * Returns the Market Book for the specified market.
      *
@@ -63,4 +74,4 @@ private:
     std::map<MarketId, MarketBook> marketBooks_;
 };
 
-} // namespace gridx::matching::orderbook
+}  // namespace gridx::matching::orderbook
