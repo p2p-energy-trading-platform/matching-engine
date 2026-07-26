@@ -4,7 +4,7 @@
 
 #include "gridx/matching/domain/Order.hpp"
 #include "gridx/matching/domain/Trade.hpp"
-
+#include "gridx/matching/domain/MatchingResult.hpp"
 namespace gridx::matching::orderbook {
 
 class MarketBook;
@@ -32,20 +32,20 @@ public:
      * within the same grid zone.
      */
     [[nodiscard]]
-    std::vector<Trade> match(Order incomingOrder);
+    MatchingResult match(Order incomingOrder);
 
 private:
     /**
      * Matches an incoming BUY order against the SELL book.
      */
     [[nodiscard]]
-    std::vector<Trade> matchBuy(Order& incomingBuy, orderbook::ZoneOrderBook& zoneBook);
+    MatchingResult matchBuy(Order& incomingBuy, orderbook::ZoneOrderBook& zoneBook);
 
     /**
      * Matches an incoming SELL order against the BUY book.
      */
     [[nodiscard]]
-    std::vector<Trade> matchSell(Order& incomingSell, orderbook::ZoneOrderBook& zoneBook);
+    MatchingResult matchSell(Order& incomingSell, orderbook::ZoneOrderBook& zoneBook);
 
 private:
     /// Market order books used during matching.
