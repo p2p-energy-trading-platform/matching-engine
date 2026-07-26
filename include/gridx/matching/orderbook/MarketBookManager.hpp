@@ -16,8 +16,6 @@ namespace gridx::matching::orderbook {
  */
 class MarketBookManager {
 public:
-
-   
     MarketBookManager() = default;
     ~MarketBookManager() = default;
 

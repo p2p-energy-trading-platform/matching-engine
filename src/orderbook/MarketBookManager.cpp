@@ -3,8 +3,7 @@
 namespace gridx::matching::orderbook {
 
 MarketBook& MarketBookManager::getOrCreate(const MarketId& marketId) {
-    auto [iterator, inserted] =
-        marketBooks_.try_emplace(marketId, marketId);
+    auto [iterator, inserted] = marketBooks_.try_emplace(marketId, marketId);
 
     return iterator->second;
 }
