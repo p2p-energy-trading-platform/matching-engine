@@ -6,6 +6,7 @@
 #include <memory>
 
 #include "gridx/matching/domain/Order.hpp"
+#include "gridx/matching/orderbook/RestingOrderIterator.hpp"
 
 namespace gridx::matching::orderbook {
 
@@ -17,6 +18,8 @@ class OrderBook {
 public:
     using PriceLevels = std::map<Price, OrderQueue, Comparator>;
 
+using ConstOrderIterator = RestingOrderIterator<Comparator>;
+
     OrderBook() = default;
     ~OrderBook() = default;
 
@@ -25,6 +28,18 @@ public:
 
     OrderBook(OrderBook&&) noexcept = default;
     OrderBook& operator=(OrderBook&&) noexcept = default;
+
+    /**
+     * Returns an iterator to the beginning of the order book.
+     */
+    [[nodiscard]]
+    ConstOrderIterator ordersBegin() const;
+
+    /**
+     * Returns an iterator to the end of the order book.
+     */
+    [[nodiscard]]
+    ConstOrderIterator ordersEnd() const;
 
     /**
      * Inserts an order into the appropriate price level.

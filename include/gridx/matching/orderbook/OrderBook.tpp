@@ -3,6 +3,16 @@
 namespace gridx::matching::orderbook {
 
 template <typename Comparator>
+typename OrderBook<Comparator>::ConstOrderIterator OrderBook<Comparator>::ordersBegin() const {
+    return ConstOrderIterator(priceLevels_.cbegin(), priceLevels_.cend());
+}
+
+template <typename Comparator>
+typename OrderBook<Comparator>::ConstOrderIterator OrderBook<Comparator>::ordersEnd() const {
+    return ConstOrderIterator(priceLevels_.cend(), priceLevels_.cend());
+}
+
+template <typename Comparator>
 void OrderBook<Comparator>::addOrder(const OrderPtr& order) {
     priceLevels_[order->price].push_back(order);
 }
