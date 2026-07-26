@@ -32,7 +32,6 @@ public:
      *
      * If the Market Book does not already exist, a new one is created.
      */
-    [[nodiscard]]
     MarketBook& getOrCreate(const MarketId& marketId);
 
     /**
