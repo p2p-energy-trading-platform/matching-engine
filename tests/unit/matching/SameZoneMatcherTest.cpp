@@ -259,20 +259,23 @@ TEST_F(SameZoneMatcherTest, BuyOrderMatchesMultipleSellOrders) {
     buyOrder.expiresAt = buyOrder.createdAt + std::chrono::hours(1);
     const auto result = matcher.match(buyOrder);
 
-    ASSERT_EQ(result.trades.size(), 1);
+    ASSERT_EQ(result.trades.size(), 2);
 
-    const auto& trade = result.trades.front();
+    EXPECT_EQ(result.trades[0].sellOrderId, sellOrder1->orderId);
+    EXPECT_EQ(result.trades[0].quantity, 5);
 
-    EXPECT_EQ(trade.quantity, 10);
-    EXPECT_EQ(trade.energyPrice, 100);
+    EXPECT_EQ(result.trades[1].sellOrderId, sellOrder2->orderId);
+    EXPECT_EQ(result.trades[1].quantity, 10);
 
-    ASSERT_EQ(result.updatedOrders.size(), 1);
+    ASSERT_EQ(result.updatedOrders.size(), 2);
 
-    const auto& updatedOrder = result.updatedOrders.front();
+    EXPECT_EQ(result.updatedOrders[0].orderId, sellOrder1->orderId);
+    EXPECT_EQ(result.updatedOrders[0].remainingQuantity, 0);
+    EXPECT_EQ(result.updatedOrders[0].status, OrderStatus::Filled);
 
-    EXPECT_EQ(updatedOrder.orderId, sellOrder->orderId);
-    EXPECT_EQ(updatedOrder.remainingQuantity, 10);
-    EXPECT_EQ(updatedOrder.status, OrderStatus::PartiallyFilled);
+    EXPECT_EQ(result.updatedOrders[1].orderId, sellOrder2->orderId);
+    EXPECT_EQ(result.updatedOrders[1].remainingQuantity, 0);
+    EXPECT_EQ(result.updatedOrders[1].status, OrderStatus::Filled);
 
     EXPECT_EQ(result.incomingOrderToInsert, nullptr);
 }
