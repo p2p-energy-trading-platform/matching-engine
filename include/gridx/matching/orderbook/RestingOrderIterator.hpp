@@ -18,8 +18,7 @@ public:
     using PriceLevelIterator = typename PriceLevels::const_iterator;
     using QueueIterator = typename OrderQueue::const_iterator;
 
-    RestingOrderIterator(PriceLevelIterator levelIt,
-                         PriceLevelIterator levelEnd);
+    RestingOrderIterator(PriceLevelIterator levelIt, PriceLevelIterator levelEnd);
 
     ~RestingOrderIterator() = default;
 

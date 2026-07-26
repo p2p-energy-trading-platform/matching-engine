@@ -79,14 +79,14 @@ MatchingResult SameZoneMatcher::matchSell(Order incomingSell,
         const auto& restingOrder = *it;
 
         if (restingOrder->price < incomingSell.price) {
-    break;
-}
+            break;
+        }
 
         const Quantity tradedQuantity =
             std::min(incomingSell.remainingQuantity, restingOrder->remainingQuantity);
 
         result.trades.push_back(m_tradeManager.createTrade(
-             *restingOrder, incomingSell,tradedQuantity, restingOrder->price, kSameZoneGridFee));
+            *restingOrder, incomingSell, tradedQuantity, restingOrder->price, kSameZoneGridFee));
 
         incomingSell.remainingQuantity -= tradedQuantity;
 
