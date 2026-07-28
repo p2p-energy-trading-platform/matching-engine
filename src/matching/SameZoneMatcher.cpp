@@ -53,7 +53,7 @@ MatchingResult SameZoneMatcher::matchBuy(Order incomingBuy,
         updatedOrder.status = updatedOrder.remainingQuantity == 0 ? OrderStatus::Filled
                                                                   : OrderStatus::PartiallyFilled;
 
-        result.updatedOrders.push_back(std::move(updatedOrder));
+        result.updatedOrders.push_back(restingOrder);
     }
 
     if (incomingBuy.remainingQuantity > 0) {
@@ -96,7 +96,7 @@ MatchingResult SameZoneMatcher::matchSell(Order incomingSell,
         updatedOrder.status = updatedOrder.remainingQuantity == 0 ? OrderStatus::Filled
                                                                   : OrderStatus::PartiallyFilled;
 
-        result.updatedOrders.push_back(std::move(updatedOrder));
+        result.updatedOrders.push_back(restingOrder);
     }
 
     if (incomingSell.remainingQuantity > 0) {
