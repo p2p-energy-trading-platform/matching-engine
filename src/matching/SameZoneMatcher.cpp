@@ -53,7 +53,11 @@ MatchingResult SameZoneMatcher::matchBuy(Order incomingBuy,
         updatedOrder.status = updatedOrder.remainingQuantity == 0 ? OrderStatus::Filled
                                                                   : OrderStatus::PartiallyFilled;
 
-        result.updatedOrders.push_back(restingOrder);
+        result.orderUpdates.push_back(OrderUpdate{
+            .originalOrder = restingOrder,
+            .updatedOrder = updatedOrder,
+            .action = OrderUpdateAction::Modify
+        });
     }
 
     if (incomingBuy.remainingQuantity > 0) {
@@ -96,7 +100,11 @@ MatchingResult SameZoneMatcher::matchSell(Order incomingSell,
         updatedOrder.status = updatedOrder.remainingQuantity == 0 ? OrderStatus::Filled
                                                                   : OrderStatus::PartiallyFilled;
 
-        result.updatedOrders.push_back(restingOrder);
+        result.orderUpdates.push_back(OrderUpdate{
+            .originalOrder = restingOrder,
+            .updatedOrder = updatedOrder,
+            .action = OrderUpdateAction::Modify
+        });
     }
 
     if (incomingSell.remainingQuantity > 0) {
