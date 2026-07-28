@@ -8,11 +8,13 @@
 
 namespace gridx::matching {
 
+using OrderPtr = std::shared_ptr<Order>;
+
 struct MatchingResult {
     std::vector<Trade> trades;
 
     // Resting orders whose state changed during matching.
-    std::vector<Order> updatedOrders;
+    std::vector<OrderPtr> updatedOrders;
 
     // Incoming order to insert into the order book if it was not fully matched.
     // nullptr indicates the incoming order was completely filled.
