@@ -82,13 +82,14 @@ TEST_F(SameZoneMatcherTest, BuyOrderFullyMatchesSellOrder) {
     EXPECT_EQ(trade.quantity, 10);
     EXPECT_EQ(trade.gridFee, 0);
 
-    ASSERT_EQ(result.updatedOrders.size(), 1);
+    ASSERT_EQ(result.orderUpdates.size(), 1);
 
-    const auto& updatedOrder = result.updatedOrders.front();
-
-    EXPECT_EQ(updatedOrder.orderId, sellOrder->orderId);
-    EXPECT_EQ(updatedOrder.remainingQuantity, 0);
-    EXPECT_EQ(updatedOrder.status, OrderStatus::Filled);
+    const auto& update = result.orderUpdates.front();
+    ASSERT_NE(update.order, nullptr);
+    EXPECT_EQ(update.order->orderId, sellOrder->orderId);
+    EXPECT_EQ(update.remainingQuantity, 0);
+    EXPECT_EQ(update.status, OrderStatus::Filled);
+    EXPECT_EQ(update.action, OrderUpdateAction::Remove);
 
     EXPECT_EQ(result.incomingOrderToInsert, nullptr);
 }
@@ -143,13 +144,16 @@ TEST_F(SameZoneMatcherTest, SellOrderFullyMatchesBuyOrder) {
     EXPECT_EQ(trade.quantity, 10);
     EXPECT_EQ(trade.gridFee, 0);
 
-    ASSERT_EQ(result.updatedOrders.size(), 1);
+    ASSERT_EQ(result.orderUpdates.size(), 1);
 
-    const auto& updatedOrder = result.updatedOrders.front();
+    const auto& update = result.orderUpdates.front();
 
-    EXPECT_EQ(updatedOrder.orderId, buyOrder->orderId);
-    EXPECT_EQ(updatedOrder.remainingQuantity, 0);
-    EXPECT_EQ(updatedOrder.status, OrderStatus::Filled);
+    ASSERT_NE(update.order, nullptr);
+
+    EXPECT_EQ(update.order->orderId, buyOrder->orderId);
+    EXPECT_EQ(update.remainingQuantity, 0);
+    EXPECT_EQ(update.status, OrderStatus::Filled);
+    EXPECT_EQ(update.action, OrderUpdateAction::Remove);
 
     EXPECT_EQ(result.incomingOrderToInsert, nullptr);
 }
@@ -197,18 +201,19 @@ TEST_F(SameZoneMatcherTest, BuyOrderPartiallyMatchesSellOrder) {
     EXPECT_EQ(trade.quantity, 10);
     EXPECT_EQ(trade.energyPrice, 100);
 
-    ASSERT_EQ(result.updatedOrders.size(), 1);
+    ASSERT_EQ(result.orderUpdates.size(), 1);
+    const auto& update = result.orderUpdates.front();
 
-    const auto& updatedOrder = result.updatedOrders.front();
-
-    EXPECT_EQ(updatedOrder.orderId, sellOrder->orderId);
-    EXPECT_EQ(updatedOrder.remainingQuantity, 10);
-    EXPECT_EQ(updatedOrder.status, OrderStatus::PartiallyFilled);
+    ASSERT_NE(update.order, nullptr);
+    EXPECT_EQ(update.order->orderId, sellOrder->orderId);
+    EXPECT_EQ(update.remainingQuantity, 10);
+    EXPECT_EQ(update.status, OrderStatus::PartiallyFilled);
+    EXPECT_EQ(update.action, OrderUpdateAction::Update);
 
     EXPECT_EQ(result.incomingOrderToInsert, nullptr);
 }
 
-// Test that a SELL order partially matches a BUY order in the same grid zone.
+// Test that a BUY order matches multiple SELL orders in the same grid zone.
 TEST_F(SameZoneMatcherTest, BuyOrderMatchesMultipleSellOrders) {
     auto sellOrder1 = std::make_shared<Order>();
 
@@ -267,15 +272,21 @@ TEST_F(SameZoneMatcherTest, BuyOrderMatchesMultipleSellOrders) {
     EXPECT_EQ(result.trades[1].sellOrderId, sellOrder2->orderId);
     EXPECT_EQ(result.trades[1].quantity, 10);
 
-    ASSERT_EQ(result.updatedOrders.size(), 2);
+    ASSERT_EQ(result.orderUpdates.size(), 2);
 
-    EXPECT_EQ(result.updatedOrders[0].orderId, sellOrder1->orderId);
-    EXPECT_EQ(result.updatedOrders[0].remainingQuantity, 0);
-    EXPECT_EQ(result.updatedOrders[0].status, OrderStatus::Filled);
+    const auto& update1 = result.orderUpdates.front();
+    ASSERT_NE(update1.order, nullptr);
+    EXPECT_EQ(update1.order->orderId, sellOrder1->orderId);
+    EXPECT_EQ(update1.remainingQuantity, 0);
+    EXPECT_EQ(update1.status, OrderStatus::Filled);
+    EXPECT_EQ(update1.action, OrderUpdateAction::Remove);
 
-    EXPECT_EQ(result.updatedOrders[1].orderId, sellOrder2->orderId);
-    EXPECT_EQ(result.updatedOrders[1].remainingQuantity, 0);
-    EXPECT_EQ(result.updatedOrders[1].status, OrderStatus::Filled);
+    const auto& update2 = result.orderUpdates.back();
+    ASSERT_NE(update2.order, nullptr);
+    EXPECT_EQ(update2.order->orderId, sellOrder2->orderId);
+    EXPECT_EQ(update2.remainingQuantity, 0);
+    EXPECT_EQ(update2.status, OrderStatus::Filled);
+    EXPECT_EQ(update2.action, OrderUpdateAction::Remove);
 
     EXPECT_EQ(result.incomingOrderToInsert, nullptr);
 }
@@ -318,7 +329,7 @@ TEST_F(SameZoneMatcherTest, BuyOrderDoesNotMatchHigherSellPrice) {
 
     EXPECT_TRUE(result.trades.empty());
 
-    ASSERT_TRUE(result.updatedOrders.empty());
+    ASSERT_TRUE(result.orderUpdates.empty());
 
     ASSERT_NE(result.incomingOrderToInsert, nullptr);
 
@@ -368,13 +379,14 @@ TEST_F(SameZoneMatcherTest, RemainingBuyOrderIsAddedToOrderBook) {
 
     EXPECT_EQ(result.trades.front().quantity, 5);
 
-    ASSERT_EQ(result.updatedOrders.size(), 1);
+    ASSERT_EQ(result.orderUpdates.size(), 1);
 
-    const auto& updatedOrder = result.updatedOrders.front();
-
-    EXPECT_EQ(updatedOrder.orderId, sellOrder->orderId);
-    EXPECT_EQ(updatedOrder.remainingQuantity, 0);
-    EXPECT_EQ(updatedOrder.status, OrderStatus::Filled);
+    const auto& update = result.orderUpdates.front();
+    ASSERT_NE(update.order, nullptr);
+    EXPECT_EQ(update.order->orderId, sellOrder->orderId);
+    EXPECT_EQ(update.remainingQuantity, 0);
+    EXPECT_EQ(update.status, OrderStatus::Filled);
+    EXPECT_EQ(update.action, OrderUpdateAction::Remove);
 
     ASSERT_NE(result.incomingOrderToInsert, nullptr);
 
