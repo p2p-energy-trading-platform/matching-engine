@@ -8,14 +8,15 @@ namespace gridx::matching {
 
 using OrderPtr = std::shared_ptr<Order>;
 
-enum class OrderUpdateAction { Modify, Remove };
+enum class OrderUpdateAction { Update, Remove };
 
 struct OrderUpdate {
     // Order currently stored in the order book.
-    OrderPtr originalOrder;
+    OrderPtr order;
 
-    // Updated state after matching.
-    Order updatedOrder;
+    // New state after matching.
+    Quantity remainingQuantity;
+    OrderStatus status;
 
     // Action to apply to the order book.
     OrderUpdateAction action;
