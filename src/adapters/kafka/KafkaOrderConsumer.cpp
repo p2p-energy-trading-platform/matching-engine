@@ -98,7 +98,8 @@ void KafkaOrderConsumer::stop() noexcept {
 
 void KafkaOrderConsumer::consumeLoop() {
     while (running_.load()) {
-        std::unique_ptr<RdKafka::Message> message{consumer_->consume(static_cast<int>(config_.pollTimeout.count()))};
+        std::unique_ptr<RdKafka::Message> message{
+            consumer_->consume(static_cast<int>(config_.pollTimeout.count()))};
 
         if (!message) {
             spdlog::warn("Kafka consumer returned a null message");

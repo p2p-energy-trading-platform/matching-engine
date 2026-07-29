@@ -7,8 +7,7 @@ namespace gridx::matching::engine {
 
 class OrderProcessor {
 public:
-    OrderProcessor(adapters::kafka::OrderEventMapper mapper,
-                   validation::OrderValidator& validator);
+    OrderProcessor(adapters::kafka::OrderEventMapper mapper, validation::OrderValidator& validator);
 
     void process(const std::span<const std::byte> payload);
 

@@ -16,7 +16,6 @@ public:
     template <typename T>
     [[nodiscard]]
     static std::optional<T> deserialize(const std::span<const std::byte> payload) {
-
         if (payload.empty()) {
             // spdlog::error("Cannot deserialize an empty Kafka payload");
             return std::nullopt;

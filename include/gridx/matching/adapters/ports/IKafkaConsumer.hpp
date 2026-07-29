@@ -11,4 +11,4 @@ public:
     virtual void stop() noexcept = 0;
 };
 
-} // namespace gridx::matching::adapters::kafka
+}  // namespace gridx::matching::adapters::ports

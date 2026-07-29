@@ -13,7 +13,7 @@ class KafkaConsumer;
 
 namespace gridx::matching::adapters::kafka {
 
-class KafkaOrderConsumer final : public ports::IKafkaConsumer  {
+class KafkaOrderConsumer final : public ports::IKafkaConsumer {
 public:
     KafkaOrderConsumer(KafkaConsumerConfig config, engine::OrderProcessor& orderProcessor);
 

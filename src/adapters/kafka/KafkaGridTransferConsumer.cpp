@@ -68,13 +68,11 @@ std::optional<ParsedGridTransferKey> parseGridTransferKey(const std::string_view
     };
 }
 
-// Checks all partitions reached 
+// Checks all partitions reached
 // required offsets (targetOffsets ≤ consumedPositions)
 [[nodiscard]]
-bool allBootstrapTargetsReached(
-    const PartitionOffsetMap& targetOffsets,
-    const PartitionOffsetMap& consumedPositions
-) {
+bool allBootstrapTargetsReached(const PartitionOffsetMap& targetOffsets,
+                                const PartitionOffsetMap& consumedPositions) {
     for (const auto& [partition, targetOffset] : targetOffsets) {
         const auto position = consumedPositions.find(partition);
 
@@ -95,11 +93,8 @@ void destroyTopicPartitions(std::vector<RdKafka::TopicPartition*>& partitions) n
 }
 
 [[nodiscard]]
-std::vector<std::int32_t> discoverPartitions(
-    RdKafka::KafkaConsumer& consumer,
-    const std::string& topic,
-    const int timeoutMs
-) {
+std::vector<std::int32_t> discoverPartitions(RdKafka::KafkaConsumer& consumer,
+                                             const std::string& topic, const int timeoutMs) {
     RdKafka::Metadata* rawMetadata = nullptr;
 
     const auto error = consumer.metadata(false, nullptr, &rawMetadata, timeoutMs);
@@ -107,10 +102,8 @@ std::vector<std::int32_t> discoverPartitions(
     std::unique_ptr<RdKafka::Metadata> metadata{rawMetadata};
 
     if (error != RdKafka::ERR_NO_ERROR || !metadata) {
-        throw std::runtime_error{
-            "Failed to read Kafka metadata for topic '" + topic +
-            "': " + RdKafka::err2str(error)
-        };
+        throw std::runtime_error{"Failed to read Kafka metadata for topic '" + topic +
+                                 "': " + RdKafka::err2str(error)};
     }
 
     const RdKafka::TopicMetadata* selectedTopic = nullptr;
@@ -127,9 +120,8 @@ std::vector<std::int32_t> discoverPartitions(
     }
 
     if (selectedTopic->err() != RdKafka::ERR_NO_ERROR) {
-        throw std::runtime_error{
-            "Kafka topic '" + topic + "' is unavailable: " + RdKafka::err2str(selectedTopic->err())
-        };
+        throw std::runtime_error{"Kafka topic '" + topic +
+                                 "' is unavailable: " + RdKafka::err2str(selectedTopic->err())};
     }
 
     std::vector<std::int32_t> partitions;
@@ -150,10 +142,9 @@ std::vector<std::int32_t> discoverPartitions(
 
 }  // namespace
 
-KafkaGridTransferConsumer::KafkaGridTransferConsumer(
-    KafkaConsumerConfig config,
-    config::GridTransferCache& cache
-) : config_{std::move(config)}, cache_{cache} {}
+KafkaGridTransferConsumer::KafkaGridTransferConsumer(KafkaConsumerConfig config,
+                                                     config::GridTransferCache& cache)
+    : config_{std::move(config)}, cache_{cache} {}
 
 KafkaGridTransferConsumer::~KafkaGridTransferConsumer() {
     stop();
@@ -176,9 +167,8 @@ void KafkaGridTransferConsumer::initializeConsumer() {
 
     const auto setConfig = [&](const std::string& name, const std::string& value) {
         if (globalConfig->set(name, value, errorMessage) != RdKafka::Conf::CONF_OK) {
-            throw std::runtime_error{
-                "Failed to set Kafka configuration '" + name + "': " + errorMessage
-            };
+            throw std::runtime_error{"Failed to set Kafka configuration '" + name +
+                                     "': " + errorMessage};
         }
     };
 
@@ -348,9 +338,7 @@ void KafkaGridTransferConsumer::runtimeLoop() {
             consumer_->consume(static_cast<int>(config_.pollTimeout.count()))};
 
         if (!message) {
-            spdlog::error(
-                "librdkafka returned a null "
-            );
+            spdlog::error("librdkafka returned a null ");
             continue;
         }
 

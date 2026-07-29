@@ -2,8 +2,8 @@
 
 // #include "gridx/matching/adapters/kafka/GridTransferConsumerConfig.hpp"
 #include "gridx/matching/adapters/kafka/KafkaConsumerConfig.hpp"
-#include "gridx/matching/config/GridTransferCache.hpp"
 #include "gridx/matching/adapters/ports/IKafkaConsumer.hpp"
+#include "gridx/matching/config/GridTransferCache.hpp"
 
 #include <atomic>
 #include <memory>
