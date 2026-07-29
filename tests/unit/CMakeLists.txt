@@ -11,6 +11,8 @@ add_executable(
     matching/SameZoneMatcherTest.cpp
     adapters/kafka/OrderEventMapperTest.cpp
     adapters/kafka/ProtobufOrderCodecTest.cpp
+    adapters/kafka/ProtobufGridTransferCodecTest.cpp
+    adapters/kafka/GridTransferEventMapperTest.cpp
     expiry/ExpiryManagerTest.cpp
     orderbook/MarketBookManagerTest.cpp
 
