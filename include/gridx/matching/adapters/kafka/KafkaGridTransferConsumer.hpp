@@ -3,6 +3,7 @@
 // #include "gridx/matching/adapters/kafka/GridTransferConsumerConfig.hpp"
 #include "gridx/matching/adapters/kafka/KafkaConsumerConfig.hpp"
 #include "gridx/matching/config/GridTransferCache.hpp"
+#include "gridx/matching/adapters/ports/IKafkaConsumer.hpp"
 
 #include <atomic>
 #include <memory>
@@ -15,7 +16,7 @@ class Message;
 
 namespace gridx::matching::adapters::kafka {
 
-class KafkaGridTransferConsumer {
+class KafkaGridTransferConsumer final : public ports::IKafkaConsumer {
 public:
     KafkaGridTransferConsumer(KafkaConsumerConfig config, config::GridTransferCache& cache);
 
@@ -27,7 +28,7 @@ public:
 
     // Performs startup bootstrap synchronously.
     // Returns only after the initial cache snapshot is complete.
-    void bootstrap();
+    void start();
 
     // Continues consuming future rule changes.
     void startRuntimeUpdates();
