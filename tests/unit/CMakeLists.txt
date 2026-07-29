@@ -15,6 +15,7 @@ add_executable(
     adapters/kafka/GridTransferEventMapperTest.cpp
     expiry/ExpiryManagerTest.cpp
     orderbook/MarketBookManagerTest.cpp
+    orderbook/OrderBookUpdaterTest.cpp
 
 )
 
