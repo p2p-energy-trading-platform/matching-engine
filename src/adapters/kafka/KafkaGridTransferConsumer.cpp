@@ -205,7 +205,7 @@ void KafkaGridTransferConsumer::initializeConsumer() {
         config_.topic);
 }
 
-void KafkaGridTransferConsumer::bootstrap() {
+void KafkaGridTransferConsumer::start() {
     if (cache_.isReady()) {
         throw std::logic_error{
             "GridTransferCache has already been "
