@@ -47,17 +47,17 @@ MatchingResult SameZoneMatcher::matchBuy(Order incomingBuy,
 
         incomingBuy.remainingQuantity -= tradedQuantity;
 
-        Order updatedOrder = *restingOrder;
+        const Quantity remainingQuantity = restingOrder->remainingQuantity - tradedQuantity;
 
-        updatedOrder.remainingQuantity -= tradedQuantity;
-        updatedOrder.status = updatedOrder.remainingQuantity == 0 ? OrderStatus::Filled
-                                                                  : OrderStatus::PartiallyFilled;
+        const OrderStatus status =
+            remainingQuantity == 0 ? OrderStatus::Filled : OrderStatus::PartiallyFilled;
 
-        result.orderUpdates.push_back(OrderUpdate{
-            .originalOrder = restingOrder,
-            .updatedOrder = updatedOrder,
-            .action = OrderUpdateAction::Modify
-        });
+        result.orderUpdates.push_back(OrderUpdate{.order = restingOrder,
+                                                  .remainingQuantity = remainingQuantity,
+                                                  .status = status,
+                                                  .action = remainingQuantity == 0
+                                                                ? OrderUpdateAction::Remove
+                                                                : OrderUpdateAction::Update});
     }
 
     if (incomingBuy.remainingQuantity > 0) {
@@ -94,17 +94,17 @@ MatchingResult SameZoneMatcher::matchSell(Order incomingSell,
 
         incomingSell.remainingQuantity -= tradedQuantity;
 
-        Order updatedOrder = *restingOrder;
+        const Quantity remainingQuantity = restingOrder->remainingQuantity - tradedQuantity;
 
-        updatedOrder.remainingQuantity -= tradedQuantity;
-        updatedOrder.status = updatedOrder.remainingQuantity == 0 ? OrderStatus::Filled
-                                                                  : OrderStatus::PartiallyFilled;
+        const OrderStatus status =
+            remainingQuantity == 0 ? OrderStatus::Filled : OrderStatus::PartiallyFilled;
 
-        result.orderUpdates.push_back(OrderUpdate{
-            .originalOrder = restingOrder,
-            .updatedOrder = updatedOrder,
-            .action = OrderUpdateAction::Modify
-        });
+        result.orderUpdates.push_back(OrderUpdate{.order = restingOrder,
+                                                  .remainingQuantity = remainingQuantity,
+                                                  .status = status,
+                                                  .action = remainingQuantity == 0
+                                                                ? OrderUpdateAction::Remove
+                                                                : OrderUpdateAction::Update});
     }
 
     if (incomingSell.remainingQuantity > 0) {
