@@ -13,12 +13,7 @@ protected:
     OrderBookUpdater updater;
     ZoneOrderBook zoneOrderBook{ZoneId};
 
-    static OrderPtr createBuyOrder(
-        OrderId id,
-        Price price,
-        Quantity quantity,
-        Quantity remaining)
-    {
+    static OrderPtr createBuyOrder(OrderId id, Price price, Quantity quantity, Quantity remaining) {
         auto order = std::make_shared<Order>();
 
         order->orderId = id;
@@ -31,12 +26,8 @@ protected:
         return order;
     }
 
-    static OrderPtr createSellOrder(
-        OrderId id,
-        Price price,
-        Quantity quantity,
-        Quantity remaining)
-    {
+    static OrderPtr createSellOrder(OrderId id, Price price, Quantity quantity,
+                                    Quantity remaining) {
         auto order = std::make_shared<Order>();
 
         order->orderId = id;
@@ -51,20 +42,17 @@ protected:
 };
 
 // Verify that a fully matched order is removed from the order book.
-TEST_F(OrderBookUpdaterTest, UpdatesPartiallyMatchedOrder)
-{
+TEST_F(OrderBookUpdaterTest, UpdatesPartiallyMatchedOrder) {
     auto order = createBuyOrder(1, 100, 10, 10);
 
     zoneOrderBook.addOrder(order);
 
     MatchingResult result;
 
-    result.orderUpdates.push_back(OrderUpdate{
-        .order = order,
-        .remainingQuantity = 4,
-        .status = OrderStatus::PartiallyFilled,
-        .action = OrderUpdateAction::Update
-    });
+    result.orderUpdates.push_back(OrderUpdate{.order = order,
+                                              .remainingQuantity = 4,
+                                              .status = OrderStatus::PartiallyFilled,
+                                              .action = OrderUpdateAction::Update});
 
     updater.apply(result, zoneOrderBook);
 
@@ -73,40 +61,34 @@ TEST_F(OrderBookUpdaterTest, UpdatesPartiallyMatchedOrder)
 }
 
 // Verify that a fully matched BUY order is removed from the order book.
-TEST_F(OrderBookUpdaterTest, RemovesFilledBuyOrder)
-{
+TEST_F(OrderBookUpdaterTest, RemovesFilledBuyOrder) {
     auto order = createBuyOrder(1, 100, 10, 10);
 
     zoneOrderBook.addOrder(order);
 
     MatchingResult result;
 
-    result.orderUpdates.push_back(OrderUpdate{
-        .order = order,
-        .remainingQuantity = 0,
-        .status = OrderStatus::Filled,
-        .action = OrderUpdateAction::Remove
-    });
+    result.orderUpdates.push_back(OrderUpdate{.order = order,
+                                              .remainingQuantity = 0,
+                                              .status = OrderStatus::Filled,
+                                              .action = OrderUpdateAction::Remove});
 
     updater.apply(result, zoneOrderBook);
 
     EXPECT_TRUE(zoneOrderBook.buyBook().empty());
 }
 // Verify that a fully matched order is removed from the order book.
-TEST_F(OrderBookUpdaterTest, RemovesFilledSellOrder)
-{
+TEST_F(OrderBookUpdaterTest, RemovesFilledSellOrder) {
     auto order = createSellOrder(1, 100, 10, 10);
 
     zoneOrderBook.addOrder(order);
 
     MatchingResult result;
 
-    result.orderUpdates.push_back(OrderUpdate{
-        .order = order,
-        .remainingQuantity = 0,
-        .status = OrderStatus::Filled,
-        .action = OrderUpdateAction::Remove
-    });
+    result.orderUpdates.push_back(OrderUpdate{.order = order,
+                                              .remainingQuantity = 0,
+                                              .status = OrderStatus::Filled,
+                                              .action = OrderUpdateAction::Remove});
 
     updater.apply(result, zoneOrderBook);
 
@@ -114,12 +96,10 @@ TEST_F(OrderBookUpdaterTest, RemovesFilledSellOrder)
 }
 
 // Verify that a remaining incoming order is added to the order book.
-TEST_F(OrderBookUpdaterTest, InsertsRemainingIncomingOrder)
-{
+TEST_F(OrderBookUpdaterTest, InsertsRemainingIncomingOrder) {
     MatchingResult result;
 
-    result.incomingOrderToInsert =
-        createBuyOrder(2, 110, 10, 5);
+    result.incomingOrderToInsert = createBuyOrder(2, 110, 10, 5);
 
     updater.apply(result, zoneOrderBook);
 
@@ -127,23 +107,19 @@ TEST_F(OrderBookUpdaterTest, InsertsRemainingIncomingOrder)
 }
 
 // Verify that an existing order is updated and a new incoming order is inserted.
-TEST_F(OrderBookUpdaterTest, UpdatesExistingOrderAndInsertsIncomingOrder)
-{
+TEST_F(OrderBookUpdaterTest, UpdatesExistingOrderAndInsertsIncomingOrder) {
     auto existing = createSellOrder(1, 100, 10, 10);
 
     zoneOrderBook.addOrder(existing);
 
     MatchingResult result;
 
-    result.orderUpdates.push_back(OrderUpdate{
-        .order = existing,
-        .remainingQuantity = 3,
-        .status = OrderStatus::PartiallyFilled,
-        .action = OrderUpdateAction::Update
-    });
+    result.orderUpdates.push_back(OrderUpdate{.order = existing,
+                                              .remainingQuantity = 3,
+                                              .status = OrderStatus::PartiallyFilled,
+                                              .action = OrderUpdateAction::Update});
 
-    result.incomingOrderToInsert =
-        createBuyOrder(2, 100, 7, 7);
+    result.incomingOrderToInsert = createBuyOrder(2, 100, 7, 7);
 
     updater.apply(result, zoneOrderBook);
 
@@ -154,10 +130,8 @@ TEST_F(OrderBookUpdaterTest, UpdatesExistingOrderAndInsertsIncomingOrder)
 }
 
 // Verify that an empty MatchingResult does not cause any errors.
-TEST_F(OrderBookUpdaterTest, DoesNothingWhenMatchingResultIsEmpty)
-{
+TEST_F(OrderBookUpdaterTest, DoesNothingWhenMatchingResultIsEmpty) {
     MatchingResult result;
 
-    EXPECT_NO_THROW(
-        updater.apply(result, zoneOrderBook));
+    EXPECT_NO_THROW(updater.apply(result, zoneOrderBook));
 }

@@ -24,9 +24,7 @@ void updateOrder(const OrderUpdate& update) {
 void OrderBookUpdater::apply(const MatchingResult& matchingResult,
                              ZoneOrderBook& zoneOrderBook) const {
     for (const auto& update : matchingResult.orderUpdates) {
-
         switch (update.action) {
-
             case OrderUpdateAction::Update:
                 updateOrder(update);
                 break;

@@ -4,13 +4,12 @@
 #include <vector>
 
 #include "gridx/matching/domain/Order.hpp"
-#include "gridx/matching/domain/Trade.hpp"
 #include "gridx/matching/domain/OrderUpdate.hpp"
+#include "gridx/matching/domain/Trade.hpp"
 
 namespace gridx::matching {
 
-    using OrderPtr = std::shared_ptr<Order>;
-
+using OrderPtr = std::shared_ptr<Order>;
 
 struct MatchingResult {
     // Trades generated during matching.
@@ -23,6 +22,5 @@ struct MatchingResult {
     // nullptr indicates the incoming order was completely filled.
     OrderPtr incomingOrderToInsert;
 };
-
 
 }  // namespace gridx::matching
