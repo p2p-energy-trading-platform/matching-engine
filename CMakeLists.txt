@@ -105,7 +105,7 @@ target_sources(
      src/config/GridTransferCache.cpp
      src/adapters/kafka/ProtobufGridTransferCodec.cpp
      src/adapters/kafka/GridTransferEventMapper.cpp
-    #  src/adapters/kafka/KafkaGridTransferConsumer.cpp
+     src/adapters/kafka/KafkaGridTransferConsumer.cpp
     # or we can use file(GLOB ...) to automatically include all .cpp files in the src directory
 )
 
