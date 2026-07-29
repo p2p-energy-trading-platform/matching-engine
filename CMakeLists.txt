@@ -91,7 +91,6 @@ target_sources(
      src/common/Version.cpp
      src/validation/OrderValidator.cpp
      src/adapters/kafka/OrderEventMapper.cpp
-     src/adapters/kafka/ProtobufOrderCodec.cpp
      src/orderbook/MarketBook.cpp
      src/orderbook/ZoneOrderBook.cpp
      src/matching/SameZoneMatcher.cpp
@@ -103,10 +102,9 @@ target_sources(
      src/adapters/kafka/KafkaProducer.cpp
      src/orderbook/MarketBookManager.cpp
      src/config/GridTransferCache.cpp
-     src/adapters/kafka/ProtobufGridTransferCodec.cpp
      src/adapters/kafka/GridTransferEventMapper.cpp
      src/orderbook/OrderBookUpdater.cpp
-    #  src/adapters/kafka/KafkaGridTransferConsumer.cpp
+     src/adapters/kafka/KafkaGridTransferConsumer.cpp
     # or we can use file(GLOB ...) to automatically include all .cpp files in the src directory
 )
 

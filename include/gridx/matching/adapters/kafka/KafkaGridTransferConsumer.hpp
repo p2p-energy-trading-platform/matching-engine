@@ -1,6 +1,8 @@
 #pragma once
 
-#include "gridx/matching/adapters/kafka/GridTransferConsumerConfig.hpp"
+// #include "gridx/matching/adapters/kafka/GridTransferConsumerConfig.hpp"
+#include "gridx/matching/adapters/kafka/KafkaConsumerConfig.hpp"
+#include "gridx/matching/adapters/ports/IKafkaConsumer.hpp"
 #include "gridx/matching/config/GridTransferCache.hpp"
 
 #include <atomic>
@@ -14,9 +16,9 @@ class Message;
 
 namespace gridx::matching::adapters::kafka {
 
-class KafkaGridTransferConsumer {
+class KafkaGridTransferConsumer final : public ports::IKafkaConsumer {
 public:
-    KafkaGridTransferConsumer(GridTransferConsumerConfig config, config::GridTransferCache& cache);
+    KafkaGridTransferConsumer(KafkaConsumerConfig config, config::GridTransferCache& cache);
 
     ~KafkaGridTransferConsumer();
 
@@ -26,7 +28,7 @@ public:
 
     // Performs startup bootstrap synchronously.
     // Returns only after the initial cache snapshot is complete.
-    void bootstrap();
+    void start();
 
     // Continues consuming future rule changes.
     void startRuntimeUpdates();
@@ -38,7 +40,7 @@ private:
     void runtimeLoop();
     void processMessage(const RdKafka::Message& message);
 
-    GridTransferConsumerConfig config_;
+    KafkaConsumerConfig config_;
     config::GridTransferCache& cache_;
 
     std::unique_ptr<RdKafka::KafkaConsumer> consumer_;

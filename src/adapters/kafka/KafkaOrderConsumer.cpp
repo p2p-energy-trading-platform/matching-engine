@@ -76,14 +76,14 @@ void KafkaOrderConsumer::start() {
     try {
         initializeConsumer();
 
-        const auto result = consumer_->subscribe(std::vector<std::string>{config_.orderTopic});
+        const auto result = consumer_->subscribe(std::vector<std::string>{config_.topic});
 
         if (result != RdKafka::ERR_NO_ERROR) {
-            throw std::runtime_error("Failed to subscribe to Kafka topic '" + config_.orderTopic +
+            throw std::runtime_error("Failed to subscribe to Kafka topic '" + config_.topic +
                                      "': " + RdKafka::err2str(result));
         }
 
-        spdlog::info("Subscribed to Kafka order topic '{}'", config_.orderTopic);
+        spdlog::info("Subscribed to Kafka order topic '{}'", config_.topic);
 
         consumeLoop();
     } catch (...) {
@@ -98,7 +98,8 @@ void KafkaOrderConsumer::stop() noexcept {
 
 void KafkaOrderConsumer::consumeLoop() {
     while (running_.load()) {
-        std::unique_ptr<RdKafka::Message> message{consumer_->consume(config_.pollTimeoutMs)};
+        std::unique_ptr<RdKafka::Message> message{
+            consumer_->consume(static_cast<int>(config_.pollTimeout.count()))};
 
         if (!message) {
             spdlog::warn("Kafka consumer returned a null message");

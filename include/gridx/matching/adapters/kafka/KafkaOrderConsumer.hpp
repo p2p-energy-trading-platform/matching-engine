@@ -1,6 +1,7 @@
 #pragma once
 
 #include "gridx/matching/adapters/kafka/KafkaConsumerConfig.hpp"
+#include "gridx/matching/adapters/ports/IKafkaConsumer.hpp"
 #include "gridx/matching/engine/OrderProcessor.hpp"
 
 #include <atomic>
@@ -12,7 +13,7 @@ class KafkaConsumer;
 
 namespace gridx::matching::adapters::kafka {
 
-class KafkaOrderConsumer {
+class KafkaOrderConsumer final : public ports::IKafkaConsumer {
 public:
     KafkaOrderConsumer(KafkaConsumerConfig config, engine::OrderProcessor& orderProcessor);
 
