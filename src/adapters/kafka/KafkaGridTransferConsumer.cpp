@@ -2,7 +2,8 @@
 
 #include "gridx/matching/adapters/kafka/GridTransferEventMapper.hpp"
 #include "gridx/matching/adapters/kafka/KafkaConsumerConfig.hpp"
-#include "gridx/matching/adapters/kafka/ProtobufGridTransferCodec.hpp"
+#include "gridx/matching/adapters/kafka/ProtobufCodec.hpp"
+#include "gridx/matching/domain/GridTransferRule.hpp"
 
 #include <librdkafka/rdkafkacpp.h>
 #include <spdlog/spdlog.h>
@@ -421,7 +422,7 @@ void KafkaGridTransferConsumer::processMessage(const RdKafka::Message& message) 
 
     const auto* payloadBytes = static_cast<const std::byte*>(message.payload());
 
-    const auto protobufRule = ProtobufGridTransferCodec::deserialize(
+    const auto protobufRule = ProtobufCodec::deserialize<gridx::grid::v1::GridTransferRule>(
         std::span<const std::byte>{payloadBytes, message.len()});
 
     if (!protobufRule.has_value()) {

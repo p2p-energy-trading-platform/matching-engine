@@ -1,17 +1,25 @@
 #include "gridx/matching/engine/OrderProcessor.hpp"
 
 #include <utility>
+#include "gridx/matching/adapters/kafka/ProtobufCodec.hpp"
+#include "gridx/order/v1/order_events.pb.h"
+#include <spdlog/spdlog.h>
 
 namespace gridx::matching::engine {
 
 OrderProcessor::OrderProcessor(adapters::kafka::OrderEventMapper mapper,
-                               adapters::kafka::ProtobufOrderCodec codec,
                                validation::OrderValidator& validator)
-    : mapper_{std::move(mapper)}, codec_{std::move(codec)}, validator_{validator} {}
+    : mapper_{std::move(mapper)}, validator_{validator} {}
 
 void OrderProcessor::process(const std::span<const std::byte> payload) {
-    const auto event = codec_.deserialize(payload);
-    const auto order = mapper_.toDomain(event);
+    const auto event = adapters::kafka::ProtobufCodec::deserialize<order::v1::OrderAccepted>(payload);
+
+    if (!event) {
+        spdlog::debug("Invalid order payload");
+        return;
+    }
+
+    const auto order = mapper_.toDomain(*event);
 
     validator_.validate(order);
 
