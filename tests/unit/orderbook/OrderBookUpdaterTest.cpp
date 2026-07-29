@@ -8,8 +8,10 @@ using namespace gridx::matching::orderbook;
 
 class OrderBookUpdaterTest : public ::testing::Test {
 protected:
+    static constexpr GridZoneId ZoneId = 1;
+
     OrderBookUpdater updater;
-    ZoneOrderBook zoneOrderBook;
+    ZoneOrderBook zoneOrderBook{ZoneId};
 
     static OrderPtr createBuyOrder(
         OrderId id,
