@@ -1,14 +1,16 @@
 #pragma once
 
 #include <string>
+#include <chrono>
 
 namespace gridx::matching::adapters::kafka {
 
 struct KafkaConsumerConfig {
     std::string bootstrapServers;
     std::string consumerGroup;
-    std::string orderTopic;
-    int pollTimeoutMs{100};
+    std::string topic;
+    std::chrono::milliseconds pollTimeout{100};
+    std::chrono::seconds bootstrapTimeout{30};
 };
 
 }  // namespace gridx::matching::adapters::kafka
