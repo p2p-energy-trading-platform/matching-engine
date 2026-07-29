@@ -1,6 +1,7 @@
 #pragma once
 
-#include "gridx/matching/adapters/kafka/GridTransferConsumerConfig.hpp"
+// #include "gridx/matching/adapters/kafka/GridTransferConsumerConfig.hpp"
+#include "gridx/matching/adapters/kafka/KafkaConsumerConfig.hpp"
 #include "gridx/matching/config/GridTransferCache.hpp"
 
 #include <atomic>
@@ -16,7 +17,7 @@ namespace gridx::matching::adapters::kafka {
 
 class KafkaGridTransferConsumer {
 public:
-    KafkaGridTransferConsumer(GridTransferConsumerConfig config, config::GridTransferCache& cache);
+    KafkaGridTransferConsumer(KafkaConsumerConfig config, config::GridTransferCache& cache);
 
     ~KafkaGridTransferConsumer();
 
@@ -38,7 +39,7 @@ private:
     void runtimeLoop();
     void processMessage(const RdKafka::Message& message);
 
-    GridTransferConsumerConfig config_;
+    KafkaConsumerConfig config_;
     config::GridTransferCache& cache_;
 
     std::unique_ptr<RdKafka::KafkaConsumer> consumer_;
