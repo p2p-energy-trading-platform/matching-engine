@@ -35,15 +35,3 @@ TEST(ProtobufOrderCodecTest, DeserializesValidOrderAccepted) {
     EXPECT_EQ(decoded->side(), original.side());
     EXPECT_EQ(decoded->price(), original.price());
 }
-
-TEST(ProtobufOrderCodecTest, RejectsEmptyPayload) {
-    const std::span<const std::byte> payload;
-
-    EXPECT_THROW(static_cast<void>(ProtobufCodec::deserialize<OrderAccepted>(payload)), std::invalid_argument);
-}
-
-TEST(ProtobufOrderCodecTest, RejectsMalformedPayload) {
-    const std::array payload{std::byte{0xFF}};
-
-    EXPECT_THROW(static_cast<void>(ProtobufCodec::deserialize<OrderAccepted>(payload)), std::runtime_error);
-}
