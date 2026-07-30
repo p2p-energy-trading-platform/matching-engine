@@ -25,7 +25,9 @@ MatchingResult CrossZoneMatcher::match(Order incomingOrder) {
     return matchSell(std::move(incomingOrder));
 }
 
-
+/*
+ * Creates a GridTransferRule for same-zone trades.
+ */
 GridTransferRule createSameZoneRule(const GridZoneId& sellerZone, const GridZoneId& buyerZone) {
     return {.sellerGridZone = sellerZone,
             .buyerGridZone = buyerZone,
@@ -34,6 +36,9 @@ GridTransferRule createSameZoneRule(const GridZoneId& sellerZone, const GridZone
             .version = 0};
 }
 
+/*
+ * Determines if a candidate order is better than the current best order.
+ */
 bool CrossZoneMatcher::isBetterCandidate(const OrderPtr& candidateOrder,
                                          Price candidateEffectivePrice,
                                          const GridZoneId& candidateZone,
@@ -63,6 +68,7 @@ bool CrossZoneMatcher::isBetterCandidate(const OrderPtr& candidateOrder,
     return candidateSameZone && !currentSameZone;
 }
 
+
 MatchingResult CrossZoneMatcher::matchBuy(Order incomingBuy) const {
     MatchingResult result;
 
@@ -71,6 +77,7 @@ MatchingResult CrossZoneMatcher::matchBuy(Order incomingBuy) const {
         GridTransferRule bestRule{};
         Price bestEffectivePrice{};
 
+        // Iterate through all grid zones to find the best matching SELL order.
         for (const auto& [zoneId, zoneBook] : m_marketBook.zoneOrderBooks()) {
             const auto& sellBook = zoneBook.sellBook();
 
@@ -151,6 +158,7 @@ MatchingResult CrossZoneMatcher::matchSell(Order incomingSell) const {
         GridTransferRule bestRule{};
         Price bestEffectiveBid{};
 
+        // Iterate through all grid zones to find the best matching BUY order.
         for (const auto& [zoneId, zoneBook] : m_marketBook.zoneOrderBooks()) {
             const auto& buyBook = zoneBook.buyBook();
 
