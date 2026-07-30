@@ -16,6 +16,7 @@ add_executable(
     expiry/ExpiryManagerTest.cpp
     orderbook/MarketBookManagerTest.cpp
     orderbook/OrderBookUpdaterTest.cpp
+    matching/CrossZoneMatcherTest.cpp
 
 )
 
