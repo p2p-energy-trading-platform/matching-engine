@@ -26,8 +26,7 @@ Trade TradeManager::createTrade(const Order& buyOrder, const Order& sellOrder,
 
     trade.quantity = tradedQuantity;
 
-    // Same-zone trades currently don't require grid transfer rules.
-    // TODO: Populate from Grid Rule Service once cross-zone matching is implemented.
+    // Grid transfer rule version applied when the trade was executed.
     trade.gridRuleVersion = rule.version;
 
     // TODO: Replace with injectable clock if deterministic timestamps are required.
