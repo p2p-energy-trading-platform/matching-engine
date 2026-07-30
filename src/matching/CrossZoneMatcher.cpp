@@ -1,11 +1,13 @@
+#include <algorithm>
+#include <utility>
+
 #include "gridx/matching/matching/CrossZoneMatcher.hpp"
+
 #include "gridx/matching/config/GridTransferCache.hpp"
 #include "gridx/matching/domain/GridTransferRule.hpp"
 #include "gridx/matching/matching/TradeManager.hpp"
 #include "gridx/matching/orderbook/MarketBook.hpp"
 #include "gridx/matching/orderbook/ZoneOrderBook.hpp"
-
-#include <algorithm>
 
 namespace gridx::matching::matching {
 
@@ -23,6 +25,38 @@ MatchingResult CrossZoneMatcher::match(Order incomingOrder) {
     return matchSell(std::move(incomingOrder));
 }
 
+bool CrossZoneMatcher::isBetterCandidate(const OrderPtr& candidateOrder,
+                                         Price candidateEffectivePrice,
+                                         const GridZoneId& candidateZone,
+                                         const OrderPtr& currentBestOrder,
+                                         Price currentBestEffectivePrice,
+                                         const GridZoneId& incomingZone,
+                                         bool higherPriceWins) {
+    if (!currentBestOrder) {
+        return true;
+    }
+
+    // Better effective price.
+    if (candidateEffectivePrice != currentBestEffectivePrice)
+{
+    return higherPriceWins
+        ? candidateEffectivePrice > currentBestEffectivePrice
+        : candidateEffectivePrice < currentBestEffectivePrice;
+}
+
+    // Earlier order wins.
+    if (candidateOrder->createdAt != currentBestOrder->createdAt) {
+        return candidateOrder->createdAt < currentBestOrder->createdAt;
+    }
+
+    // Prefer same-zone when everything else is equal.
+    const bool candidateSameZone = candidateZone == incomingZone;
+
+    const bool currentSameZone = currentBestOrder->gridZone == incomingZone;
+
+    return candidateSameZone && !currentSameZone;
+}
+
 MatchingResult CrossZoneMatcher::matchBuy(Order incomingBuy) const {
     MatchingResult result;
 
@@ -38,7 +72,7 @@ MatchingResult CrossZoneMatcher::matchBuy(Order incomingBuy) const {
                 continue;
             }
 
-            const auto& restingOrder = sellBook.bestOrder();
+           OrderPtr restingOrder = sellBook.bestOrder();
 
             GridTransferRule rule;
 
@@ -62,23 +96,8 @@ MatchingResult CrossZoneMatcher::matchBuy(Order incomingBuy) const {
                 continue;
             }
 
-            bool better = false;
-
-            if (!bestOrder) {
-                better = true;
-            } else if (effectiveAsk < bestEffectivePrice) {
-                better = true;
-            } else if (effectiveAsk == bestEffectivePrice) {
-                if (restingOrder->createdAt < bestOrder->createdAt) {
-                    better = true;
-                } else if (restingOrder->createdAt == bestOrder->createdAt &&
-                           zoneId == incomingBuy.gridZone &&
-                           bestOrder->gridZone != incomingBuy.gridZone) {
-                    better = true;
-                }
-            }
-
-            if (!better) {
+            if (!isBetterCandidate(restingOrder, effectiveAsk, zoneId, bestOrder,
+                                   bestEffectivePrice, incomingBuy.gridZone,false)) {
                 continue;
             }
 
@@ -101,10 +120,13 @@ MatchingResult CrossZoneMatcher::matchBuy(Order incomingBuy) const {
 
         const Quantity remainingQuantity = bestOrder->remainingQuantity - tradedQuantity;
 
+         const OrderStatus status =
+            remainingQuantity == 0 ? OrderStatus::Filled : OrderStatus::PartiallyFilled;
+
         result.orderUpdates.push_back(OrderUpdate{
             .order = bestOrder,
             .remainingQuantity = remainingQuantity,
-            .status = remainingQuantity == 0 ? OrderStatus::Filled : OrderStatus::PartiallyFilled,
+            .status = status,
             .action =
                 remainingQuantity == 0 ? OrderUpdateAction::Remove : OrderUpdateAction::Update});
     }
@@ -135,7 +157,7 @@ MatchingResult CrossZoneMatcher::matchSell(Order incomingSell) const {
                 continue;
             }
 
-            const auto& restingOrder = buyBook.bestOrder();
+            OrderPtr restingOrder = buyBook.bestOrder();
 
             GridTransferRule rule{};
 
@@ -160,23 +182,8 @@ MatchingResult CrossZoneMatcher::matchSell(Order incomingSell) const {
                 continue;
             }
 
-            bool better = false;
-
-            if (!bestOrder) {
-                better = true;
-            } else if (effectiveBid > bestEffectiveBid) {
-                better = true;
-            } else if (effectiveBid == bestEffectiveBid) {
-                if (restingOrder->createdAt < bestOrder->createdAt) {
-                    better = true;
-                } else if (restingOrder->createdAt == bestOrder->createdAt &&
-                           zoneId == incomingSell.gridZone &&
-                           bestOrder->gridZone != incomingSell.gridZone) {
-                    better = true;
-                }
-            }
-
-            if (!better) {
+            if (!isBetterCandidate(restingOrder, effectiveBid, zoneId, bestOrder,
+                                   bestEffectiveBid, incomingSell.gridZone,true)) {
                 continue;
             }
 
@@ -199,10 +206,13 @@ MatchingResult CrossZoneMatcher::matchSell(Order incomingSell) const {
 
         const Quantity remainingQuantity = bestOrder->remainingQuantity - tradedQuantity;
 
+        const OrderStatus status =
+            remainingQuantity == 0 ? OrderStatus::Filled : OrderStatus::PartiallyFilled;
+
         result.orderUpdates.push_back(OrderUpdate{
             .order = bestOrder,
             .remainingQuantity = remainingQuantity,
-            .status = remainingQuantity == 0 ? OrderStatus::Filled : OrderStatus::PartiallyFilled,
+            .status = status,
             .action =
                 remainingQuantity == 0 ? OrderUpdateAction::Remove : OrderUpdateAction::Update});
     }
