@@ -25,24 +25,30 @@ MatchingResult CrossZoneMatcher::match(Order incomingOrder) {
     return matchSell(std::move(incomingOrder));
 }
 
+
+GridTransferRule createSameZoneRule(const GridZoneId& sellerZone, const GridZoneId& buyerZone) {
+    return {.sellerGridZone = sellerZone,
+            .buyerGridZone = buyerZone,
+            .allowed = true,
+            .gridFeePerKwh = 0,
+            .version = 0};
+}
+
 bool CrossZoneMatcher::isBetterCandidate(const OrderPtr& candidateOrder,
                                          Price candidateEffectivePrice,
                                          const GridZoneId& candidateZone,
                                          const OrderPtr& currentBestOrder,
                                          Price currentBestEffectivePrice,
-                                         const GridZoneId& incomingZone,
-                                         bool higherPriceWins) {
+                                         const GridZoneId& incomingZone, bool higherPriceWins) {
     if (!currentBestOrder) {
         return true;
     }
 
     // Better effective price.
-    if (candidateEffectivePrice != currentBestEffectivePrice)
-{
-    return higherPriceWins
-        ? candidateEffectivePrice > currentBestEffectivePrice
-        : candidateEffectivePrice < currentBestEffectivePrice;
-}
+    if (candidateEffectivePrice != currentBestEffectivePrice) {
+        return higherPriceWins ? candidateEffectivePrice > currentBestEffectivePrice
+                               : candidateEffectivePrice < currentBestEffectivePrice;
+    }
 
     // Earlier order wins.
     if (candidateOrder->createdAt != currentBestOrder->createdAt) {
@@ -72,16 +78,11 @@ MatchingResult CrossZoneMatcher::matchBuy(Order incomingBuy) const {
                 continue;
             }
 
-           OrderPtr restingOrder = sellBook.bestOrder();
+            OrderPtr restingOrder = sellBook.bestOrder();
 
-            GridTransferRule rule;
-
+            GridTransferRule rule{};
             if (zoneId == incomingBuy.gridZone) {
-                rule = {.sellerGridZone = zoneId,
-                        .buyerGridZone = incomingBuy.gridZone,
-                        .allowed = true,
-                        .gridFeePerKwh = 0,
-                        .version = 0};
+                rule = createSameZoneRule(zoneId, incomingBuy.gridZone);
             } else {
                 rule = m_gridTransferCache.resolve(zoneId, incomingBuy.gridZone);
 
@@ -97,7 +98,7 @@ MatchingResult CrossZoneMatcher::matchBuy(Order incomingBuy) const {
             }
 
             if (!isBetterCandidate(restingOrder, effectiveAsk, zoneId, bestOrder,
-                                   bestEffectivePrice, incomingBuy.gridZone,false)) {
+                                   bestEffectivePrice, incomingBuy.gridZone, false)) {
                 continue;
             }
 
@@ -120,15 +121,15 @@ MatchingResult CrossZoneMatcher::matchBuy(Order incomingBuy) const {
 
         const Quantity remainingQuantity = bestOrder->remainingQuantity - tradedQuantity;
 
-         const OrderStatus status =
+        const OrderStatus status =
             remainingQuantity == 0 ? OrderStatus::Filled : OrderStatus::PartiallyFilled;
 
-        result.orderUpdates.push_back(OrderUpdate{
-            .order = bestOrder,
-            .remainingQuantity = remainingQuantity,
-            .status = status,
-            .action =
-                remainingQuantity == 0 ? OrderUpdateAction::Remove : OrderUpdateAction::Update});
+        result.orderUpdates.push_back(OrderUpdate{.order = bestOrder,
+                                                  .remainingQuantity = remainingQuantity,
+                                                  .status = status,
+                                                  .action = remainingQuantity == 0
+                                                                ? OrderUpdateAction::Remove
+                                                                : OrderUpdateAction::Update});
     }
 
     if (incomingBuy.remainingQuantity > Quantity{0}) {
@@ -162,11 +163,7 @@ MatchingResult CrossZoneMatcher::matchSell(Order incomingSell) const {
             GridTransferRule rule{};
 
             if (zoneId == incomingSell.gridZone) {
-                rule = {.sellerGridZone = incomingSell.gridZone,
-                        .buyerGridZone = zoneId,
-                        .allowed = true,
-                        .gridFeePerKwh = 0,
-                        .version = 0};
+                rule = createSameZoneRule(incomingSell.gridZone, zoneId);
             } else {
                 rule = m_gridTransferCache.resolve(incomingSell.gridZone, zoneId);
 
@@ -182,8 +179,8 @@ MatchingResult CrossZoneMatcher::matchSell(Order incomingSell) const {
                 continue;
             }
 
-            if (!isBetterCandidate(restingOrder, effectiveBid, zoneId, bestOrder,
-                                   bestEffectiveBid, incomingSell.gridZone,true)) {
+            if (!isBetterCandidate(restingOrder, effectiveBid, zoneId, bestOrder, bestEffectiveBid,
+                                   incomingSell.gridZone, true)) {
                 continue;
             }
 
@@ -209,12 +206,12 @@ MatchingResult CrossZoneMatcher::matchSell(Order incomingSell) const {
         const OrderStatus status =
             remainingQuantity == 0 ? OrderStatus::Filled : OrderStatus::PartiallyFilled;
 
-        result.orderUpdates.push_back(OrderUpdate{
-            .order = bestOrder,
-            .remainingQuantity = remainingQuantity,
-            .status = status,
-            .action =
-                remainingQuantity == 0 ? OrderUpdateAction::Remove : OrderUpdateAction::Update});
+        result.orderUpdates.push_back(OrderUpdate{.order = bestOrder,
+                                                  .remainingQuantity = remainingQuantity,
+                                                  .status = status,
+                                                  .action = remainingQuantity == 0
+                                                                ? OrderUpdateAction::Remove
+                                                                : OrderUpdateAction::Update});
     }
 
     if (incomingSell.remainingQuantity > Quantity{0}) {
