@@ -1,6 +1,5 @@
 #pragma once
 
-#include "gridx/matching/config/GridTransferCache.hpp"
 #include "gridx/matching/domain/MatchingResult.hpp"
 #include "gridx/matching/domain/Order.hpp"
 
@@ -11,14 +10,17 @@ class ZoneOrderBook;
 
 }  // namespace gridx::matching::orderbook
 
+namespace gridx::matching::config {
+class GridTransferCache;
+}  // namespace gridx::matching::config
+
 namespace gridx::matching::matching {
 
 class TradeManager;
 
 class CrossZoneMatcher {
 public:
-    CrossZoneMatcher(orderbook::MarketBook& marketBook,
-                     TradeManager& tradeManager,
+    CrossZoneMatcher(orderbook::MarketBook& marketBook, TradeManager& tradeManager,
                      const config::GridTransferCache& gridTransferCache);
 
     ~CrossZoneMatcher() = default;
