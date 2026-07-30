@@ -6,13 +6,13 @@
 
 namespace {
 
+using gridx::matching::GridFee;
 using gridx::matching::GridTransferRule;
 using gridx::matching::GridZoneId;
-using gridx::matching::matching::EffectivePriceCalculator;
 using gridx::matching::Price;
-using gridx::matching::GridFee;
+using gridx::matching::matching::EffectivePriceCalculator;
 
-class EffectivePriceCalculatorTest : public::testing::Test {
+class EffectivePriceCalculatorTest : public ::testing::Test {
 protected:
     const GridZoneId zoneA{1};
     const GridZoneId zoneB{2};
@@ -76,7 +76,7 @@ TEST_F(EffectivePriceCalculatorTest, EffectiveAskCrossZoneAllowed) {
     auto result = EffectivePriceCalculator::calculateEffectiveAsk(sellerPrice, zoneA, zoneB, cache);
 
     ASSERT_TRUE(result.has_value());
-    EXPECT_EQ(result.value(), 50); // 45 + 5
+    EXPECT_EQ(result.value(), 50);  // 45 + 5
 }
 
 TEST_F(EffectivePriceCalculatorTest, EffectiveAskCrossZoneNotAllowed) {
@@ -93,7 +93,8 @@ TEST_F(EffectivePriceCalculatorTest, EffectiveAskCrossZoneMissingRule) {
     const GridZoneId unknownZone{99};
 
     // Rule does not exist in cache
-    auto result = EffectivePriceCalculator::calculateEffectiveAsk(sellerPrice, zoneA, unknownZone, cache);
+    auto result =
+        EffectivePriceCalculator::calculateEffectiveAsk(sellerPrice, zoneA, unknownZone, cache);
 
     EXPECT_FALSE(result.has_value());
 }
@@ -115,7 +116,7 @@ TEST_F(EffectivePriceCalculatorTest, EffectiveBidCrossZoneAllowed) {
     auto result = EffectivePriceCalculator::calculateEffectiveBid(buyerPrice, zoneA, zoneB, cache);
 
     ASSERT_TRUE(result.has_value());
-    EXPECT_EQ(result.value(), 45); // 50 - 5
+    EXPECT_EQ(result.value(), 45);  // 50 - 5
 }
 
 TEST_F(EffectivePriceCalculatorTest, EffectiveBidCrossZoneNotAllowed) {
@@ -132,9 +133,10 @@ TEST_F(EffectivePriceCalculatorTest, EffectiveBidCrossZoneMissingRule) {
     const GridZoneId unknownZone{99};
 
     // Rule does not exist in cache
-    auto result = EffectivePriceCalculator::calculateEffectiveBid(buyerPrice, zoneA, unknownZone, cache);
+    auto result =
+        EffectivePriceCalculator::calculateEffectiveBid(buyerPrice, zoneA, unknownZone, cache);
 
     EXPECT_FALSE(result.has_value());
 }
 
-} // namespace
+}  // namespace
