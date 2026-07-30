@@ -8,7 +8,8 @@
 
 namespace gridx::matching::matching {
 
-constexpr GridFee kSameZoneGridFee{0};
+constexpr GridTransferRule kSameZoneRule{.allowed = true, .gridFeePerKwh = 0, .version = 0};
+
 
 SameZoneMatcher::SameZoneMatcher(orderbook::MarketBook& marketBook, TradeManager& tradeManager)
     : m_marketBook(marketBook), m_tradeManager(tradeManager) {}
@@ -43,7 +44,7 @@ MatchingResult SameZoneMatcher::matchBuy(Order incomingBuy,
             std::min(incomingBuy.remainingQuantity, restingOrder->remainingQuantity);
 
         result.trades.push_back(m_tradeManager.createTrade(
-            incomingBuy, *restingOrder, tradedQuantity, restingOrder->price, kSameZoneGridFee));
+            incomingBuy, *restingOrder, tradedQuantity, restingOrder->price, kSameZoneRule));
 
         incomingBuy.remainingQuantity -= tradedQuantity;
 
@@ -90,7 +91,7 @@ MatchingResult SameZoneMatcher::matchSell(Order incomingSell,
             std::min(incomingSell.remainingQuantity, restingOrder->remainingQuantity);
 
         result.trades.push_back(m_tradeManager.createTrade(
-            *restingOrder, incomingSell, tradedQuantity, restingOrder->price, kSameZoneGridFee));
+            *restingOrder, incomingSell, tradedQuantity, restingOrder->price, kSameZoneRule));
 
         incomingSell.remainingQuantity -= tradedQuantity;
 
