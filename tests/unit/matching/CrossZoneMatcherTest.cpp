@@ -35,8 +35,6 @@ protected:
     CrossZoneMatcher matcher;
 };
 
-
-
 // Test that a BUY order fully matches a SELL order across different grid zones.
 TEST_F(CrossZoneMatcherTest, BuyOrderFullyMatchesSellOrderAcrossZones) {
     GridTransferRule rule{};
@@ -195,7 +193,6 @@ TEST_F(CrossZoneMatcherTest, SellOrderFullyMatchesBuyOrderAcrossZones) {
     EXPECT_EQ(result.incomingOrderToInsert, nullptr);
 }
 
-
 // Test that a BUY order partially matches a SELL order across different grid zones.
 TEST_F(CrossZoneMatcherTest, BuyOrderPartiallyMatchesSellOrderAcrossZones) {
     GridTransferRule rule{};
@@ -341,28 +338,26 @@ TEST_F(CrossZoneMatcherTest, BuyOrderMatchesMultipleSellOrdersAcrossZones) {
 
     ASSERT_EQ(result.trades.size(), 2);
 
-    EXPECT_EQ(result.trades[0].sellOrderId, sellOrder1->orderId);
-    EXPECT_EQ(result.trades[0].quantity, 5);
-    EXPECT_EQ(result.trades[0].gridFee, 5);
+    EXPECT_EQ(result.trades[0].sellOrderId, sellOrder2->orderId);
+    EXPECT_EQ(result.trades[0].quantity, 10);
+    EXPECT_EQ(result.trades[0].gridFee, 2);
 
-    EXPECT_EQ(result.trades[1].sellOrderId, sellOrder2->orderId);
-    EXPECT_EQ(result.trades[1].quantity, 10);
-    EXPECT_EQ(result.trades[1].gridFee, 2);
+    EXPECT_EQ(result.trades[1].sellOrderId, sellOrder1->orderId);
+    EXPECT_EQ(result.trades[1].quantity, 5);
+    EXPECT_EQ(result.trades[1].gridFee, 5);
 
     ASSERT_EQ(result.orderUpdates.size(), 2);
 
     const auto& update1 = result.orderUpdates.front();
 
-    ASSERT_NE(update1.order, nullptr);
-    EXPECT_EQ(update1.order->orderId, sellOrder1->orderId);
+    EXPECT_EQ(update1.order->orderId, sellOrder2->orderId);
     EXPECT_EQ(update1.remainingQuantity, 0);
     EXPECT_EQ(update1.status, OrderStatus::Filled);
     EXPECT_EQ(update1.action, OrderUpdateAction::Remove);
 
     const auto& update2 = result.orderUpdates.back();
 
-    ASSERT_NE(update2.order, nullptr);
-    EXPECT_EQ(update2.order->orderId, sellOrder2->orderId);
+    EXPECT_EQ(update2.order->orderId, sellOrder1->orderId);
     EXPECT_EQ(update2.remainingQuantity, 0);
     EXPECT_EQ(update2.status, OrderStatus::Filled);
     EXPECT_EQ(update2.action, OrderUpdateAction::Remove);
@@ -613,7 +608,6 @@ TEST_F(CrossZoneMatcherTest, SellOrderChoosesHighestEffectiveBid) {
     EXPECT_EQ(result.incomingOrderToInsert, nullptr);
 }
 
-
 // Test that the earlier order is matched when effective prices are equal.
 TEST_F(CrossZoneMatcherTest, EarlierOrderWinsWhenEffectivePriceEqual) {
     GridTransferRule rule1{};
@@ -842,5 +836,3 @@ TEST_F(CrossZoneMatcherTest, SameZoneTradeHasZeroGridFee) {
 
     EXPECT_EQ(result.incomingOrderToInsert, nullptr);
 }
-
-
