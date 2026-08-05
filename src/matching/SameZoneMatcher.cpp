@@ -10,7 +10,6 @@ namespace gridx::matching::matching {
 
 constexpr GridTransferRule kSameZoneRule{.allowed = true, .gridFeePerKwh = 0, .version = 0};
 
-
 SameZoneMatcher::SameZoneMatcher(orderbook::MarketBook& marketBook, TradeManager& tradeManager)
     : m_marketBook(marketBook), m_tradeManager(tradeManager) {}
 

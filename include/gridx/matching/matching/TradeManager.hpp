@@ -1,8 +1,8 @@
 #pragma once
 
+#include "gridx/matching/domain/GridTransferRule.hpp"
 #include "gridx/matching/domain/Order.hpp"
 #include "gridx/matching/domain/Trade.hpp"
-#include "gridx/matching/domain/GridTransferRule.hpp"
 
 namespace gridx::matching::matching {
 

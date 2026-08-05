@@ -53,11 +53,11 @@ private:
     [[nodiscard]]
     MatchingResult matchSell(Order incomingSell) const;
 
-
     [[nodiscard]]
     static bool isBetterCandidate(const OrderPtr& candidateOrder, Price candidateEffectivePrice,
                                   const GridZoneId& candidateZone, const OrderPtr& currentBestOrder,
-                                  Price currentBestEffectivePrice, const GridZoneId& incomingZone,  bool higherPriceWins);
+                                  Price currentBestEffectivePrice, const GridZoneId& incomingZone,
+                                  bool higherPriceWins);
 
 private:
     /// Market order books used during matching.
