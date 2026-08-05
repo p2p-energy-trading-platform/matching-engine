@@ -1,5 +1,6 @@
 #pragma once
 
+#include "gridx/matching/domain/GridTransferRule.hpp"
 #include "gridx/matching/domain/Order.hpp"
 #include "gridx/matching/domain/Trade.hpp"
 
@@ -18,7 +19,7 @@ public:
 
     [[nodiscard]]
     Trade createTrade(const Order& buyOrder, const Order& sellOrder, Quantity tradedQuantity,
-                      Price executionPrice, GridFee gridFee) const;
+                      Price executionPrice, const GridTransferRule& rule) const;
 };
 
 }  // namespace gridx::matching::matching

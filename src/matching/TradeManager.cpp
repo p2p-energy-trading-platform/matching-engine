@@ -6,7 +6,7 @@ namespace gridx::matching::matching {
 
 Trade TradeManager::createTrade(const Order& buyOrder, const Order& sellOrder,
                                 Quantity tradedQuantity, Price executionPrice,
-                                GridFee gridFee) const {
+                                const GridTransferRule& rule) const {
     Trade trade{};
 
     // TODO: Replace with Trade ID generator.
@@ -22,12 +22,12 @@ Trade TradeManager::createTrade(const Order& buyOrder, const Order& sellOrder,
     trade.sellerGridZone = sellOrder.gridZone;
 
     trade.energyPrice = executionPrice;
-    trade.gridFee = gridFee;
+    trade.gridFee = rule.gridFeePerKwh;
+
     trade.quantity = tradedQuantity;
 
-    // Same-zone trades currently don't require grid transfer rules.
-    // TODO: Populate from Grid Rule Service once cross-zone matching is implemented.
-    trade.gridRuleVersion = 0;
+    // Grid transfer rule version applied when the trade was executed.
+    trade.gridRuleVersion = rule.version;
 
     // TODO: Replace with injectable clock if deterministic timestamps are required.
     trade.executedAt = std::chrono::system_clock::now();

@@ -30,7 +30,7 @@ public:
     OrderBook& operator=(OrderBook&&) noexcept = default;
 
     /**
-     * Returns an iterator to the beginning of the order book.
+     * Returns an iterator over resting orders in price-time priority.
      */
     [[nodiscard]]
     ConstOrderIterator ordersBegin() const;
