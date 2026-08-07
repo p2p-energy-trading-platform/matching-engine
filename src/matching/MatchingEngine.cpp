@@ -16,7 +16,7 @@ MatchingResult MatchingEngine::match(Order incomingOrder) {
 }
 
 // TODO
-// Implement cross-zone matching logic here. 
+// Implement cross-zone matching logic here.
 // OR
 // Merge cross-zone matching into SameZoneMatcher and rename it to ZoneMatcher.
 

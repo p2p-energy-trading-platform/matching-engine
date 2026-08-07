@@ -4,8 +4,7 @@
 
 namespace gridx::matching::adapters::kafka {
 
-gridx::trade::v1::TradeExecuted
-TradeEventMapper::toProtobuf(const Trade& trade) const {
+gridx::trade::v1::TradeExecuted TradeEventMapper::toProtobuf(const Trade& trade) const {
     gridx::trade::v1::TradeExecuted event;
 
     // TODO: Replace with a proper Event ID generator.
@@ -33,12 +32,9 @@ TradeEventMapper::toProtobuf(const Trade& trade) const {
 
     const auto duration = trade.executedAt.time_since_epoch();
 
-    const auto seconds =
-        std::chrono::duration_cast<std::chrono::seconds>(duration);
+    const auto seconds = std::chrono::duration_cast<std::chrono::seconds>(duration);
 
-    const auto nanos =
-        std::chrono::duration_cast<std::chrono::nanoseconds>(
-            duration - seconds);
+    const auto nanos = std::chrono::duration_cast<std::chrono::nanoseconds>(duration - seconds);
 
     executedAt->set_seconds(seconds.count());
     executedAt->set_nanos(static_cast<int32_t>(nanos.count()));

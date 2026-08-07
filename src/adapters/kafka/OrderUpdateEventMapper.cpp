@@ -14,8 +14,7 @@ google::protobuf::Timestamp toProtobufTimestamp(const Timestamp& timestamp) {
 
     const auto seconds = duration_cast<std::chrono::seconds>(duration);
 
-    const auto nanos =
-        duration_cast<std::chrono::nanoseconds>(duration - seconds);
+    const auto nanos = duration_cast<std::chrono::nanoseconds>(duration - seconds);
 
     google::protobuf::Timestamp protoTimestamp;
 
@@ -27,8 +26,7 @@ google::protobuf::Timestamp toProtobufTimestamp(const Timestamp& timestamp) {
 
 }  // namespace
 
-gridx::order::v1::OrderUpdated
-OrderUpdateEventMapper::toProtobuf(const OrderUpdate& update) const {
+gridx::order::v1::OrderUpdated OrderUpdateEventMapper::toProtobuf(const OrderUpdate& update) const {
     if (!update.order) {
         throw std::invalid_argument("Order update does not contain an order");
     }
@@ -38,8 +36,7 @@ OrderUpdateEventMapper::toProtobuf(const OrderUpdate& update) const {
     // TODO: Replace with a proper Event ID generator.
     event.set_event_id("");
 
-    event.set_event_type(
-        toProtobufUpdateType(update.action, update.status));
+    event.set_event_type(toProtobufUpdateType(update.action, update.status));
 
     event.set_order_id(update.order->orderId);
 
@@ -47,14 +44,12 @@ OrderUpdateEventMapper::toProtobuf(const OrderUpdate& update) const {
 
     event.set_remaining_quantity(update.remainingQuantity);
 
-    *event.mutable_updated_at() =
-        toProtobufTimestamp(std::chrono::system_clock::now());
+    *event.mutable_updated_at() = toProtobufTimestamp(std::chrono::system_clock::now());
 
     return event;
 }
 
-gridx::order::v1::OrderStatus
-OrderUpdateEventMapper::toProtobufOrderStatus(OrderStatus status) {
+gridx::order::v1::OrderStatus OrderUpdateEventMapper::toProtobufOrderStatus(OrderStatus status) {
     using ProtoStatus = gridx::order::v1::OrderStatus;
 
     switch (status) {
@@ -78,9 +73,8 @@ OrderUpdateEventMapper::toProtobufOrderStatus(OrderStatus status) {
     }
 }
 
-gridx::order::v1::OrderUpdateType
-OrderUpdateEventMapper::toProtobufUpdateType(OrderUpdateAction action,
-                                             OrderStatus status) {
+gridx::order::v1::OrderUpdateType OrderUpdateEventMapper::toProtobufUpdateType(
+    OrderUpdateAction action, OrderStatus status) {
     using ProtoType = gridx::order::v1::OrderUpdateType;
 
     switch (action) {
@@ -101,8 +95,7 @@ OrderUpdateEventMapper::toProtobufUpdateType(OrderUpdateAction action,
                     return ProtoType::ORDER_UPDATE_TYPE_EXPIRED;
 
                 default:
-                    throw std::invalid_argument(
-                        "Unsupported order update status");
+                    throw std::invalid_argument("Unsupported order update status");
             }
 
         default:

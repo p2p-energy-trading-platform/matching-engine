@@ -59,12 +59,9 @@ TEST_F(TradeEventMapperTest, MapsTradeToProtobufEvent) {
 
     const auto duration = trade.executedAt.time_since_epoch();
 
-    const auto seconds =
-        duration_cast<std::chrono::seconds>(duration);
+    const auto seconds = duration_cast<std::chrono::seconds>(duration);
 
-    const auto nanos =
-        duration_cast<std::chrono::nanoseconds>(
-            duration - seconds);
+    const auto nanos = duration_cast<std::chrono::nanoseconds>(duration - seconds);
 
     EXPECT_EQ(event.executed_at().seconds(), seconds.count());
     EXPECT_EQ(event.executed_at().nanos(), nanos.count());

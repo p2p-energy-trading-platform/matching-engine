@@ -9,8 +9,7 @@ namespace gridx::matching::adapters::kafka {
 
 class MatchingResultPublisher {
 public:
-    MatchingResultPublisher(KafkaProducer& producer,
-                            TradeEventMapper& tradeEventMapper,
+    MatchingResultPublisher(KafkaProducer& producer, TradeEventMapper& tradeEventMapper,
                             OrderUpdateEventMapper& orderUpdateEventMapper);
 
     /**

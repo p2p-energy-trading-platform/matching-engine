@@ -1,12 +1,12 @@
 #pragma once
 
 #include <cstddef>
+#include <cstring>
 #include <limits>
 #include <optional>
 #include <span>
 #include <stdexcept>
 #include <vector>
-#include <cstring>
 
 namespace gridx::matching::adapters::kafka {
 

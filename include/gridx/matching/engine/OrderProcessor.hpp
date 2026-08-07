@@ -13,8 +13,7 @@ namespace gridx::matching::engine {
 class OrderProcessor {
 public:
     OrderProcessor(adapters::kafka::OrderEventMapper& orderEventMapper,
-                   validation::OrderValidator& validator,
-                   matching::MatchingEngine& matchingEngine,
+                   validation::OrderValidator& validator, matching::MatchingEngine& matchingEngine,
                    orderbook::OrderBookUpdater& orderBookUpdater,
                    adapters::kafka::MatchingResultPublisher& matchingResultPublisher);
 

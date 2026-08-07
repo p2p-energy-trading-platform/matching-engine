@@ -31,11 +31,9 @@ TEST_F(OrderUpdateEventMapperTest, MapsFilledOrderUpdate) {
     EXPECT_EQ(event.order_id(), order->orderId);
     EXPECT_EQ(event.remaining_quantity(), 0);
 
-    EXPECT_EQ(event.status(),
-              gridx::order::v1::ORDER_STATUS_FILLED);
+    EXPECT_EQ(event.status(), gridx::order::v1::ORDER_STATUS_FILLED);
 
-    EXPECT_EQ(event.event_type(),
-              gridx::order::v1::ORDER_UPDATE_TYPE_FILLED);
+    EXPECT_EQ(event.event_type(), gridx::order::v1::ORDER_UPDATE_TYPE_FILLED);
 
     EXPECT_TRUE(event.has_updated_at());
 }
@@ -57,11 +55,9 @@ TEST_F(OrderUpdateEventMapperTest, MapsPartiallyFilledOrderUpdate) {
     EXPECT_EQ(event.order_id(), order->orderId);
     EXPECT_EQ(event.remaining_quantity(), 25);
 
-    EXPECT_EQ(event.status(),
-              gridx::order::v1::ORDER_STATUS_PARTIALLY_FILLED);
+    EXPECT_EQ(event.status(), gridx::order::v1::ORDER_STATUS_PARTIALLY_FILLED);
 
-    EXPECT_EQ(event.event_type(),
-              gridx::order::v1::ORDER_UPDATE_TYPE_PARTIALLY_FILLED);
+    EXPECT_EQ(event.event_type(), gridx::order::v1::ORDER_UPDATE_TYPE_PARTIALLY_FILLED);
 }
 
 TEST_F(OrderUpdateEventMapperTest, MapsCancelledOrderUpdate) {
@@ -78,11 +74,9 @@ TEST_F(OrderUpdateEventMapperTest, MapsCancelledOrderUpdate) {
 
     const auto event = mapper.toProtobuf(update);
 
-    EXPECT_EQ(event.status(),
-              gridx::order::v1::ORDER_STATUS_CANCELLED);
+    EXPECT_EQ(event.status(), gridx::order::v1::ORDER_STATUS_CANCELLED);
 
-    EXPECT_EQ(event.event_type(),
-              gridx::order::v1::ORDER_UPDATE_TYPE_CANCELLED);
+    EXPECT_EQ(event.event_type(), gridx::order::v1::ORDER_UPDATE_TYPE_CANCELLED);
 }
 
 TEST_F(OrderUpdateEventMapperTest, MapsExpiredOrderUpdate) {
@@ -99,11 +93,9 @@ TEST_F(OrderUpdateEventMapperTest, MapsExpiredOrderUpdate) {
 
     const auto event = mapper.toProtobuf(update);
 
-    EXPECT_EQ(event.status(),
-              gridx::order::v1::ORDER_STATUS_EXPIRED);
+    EXPECT_EQ(event.status(), gridx::order::v1::ORDER_STATUS_EXPIRED);
 
-    EXPECT_EQ(event.event_type(),
-              gridx::order::v1::ORDER_UPDATE_TYPE_EXPIRED);
+    EXPECT_EQ(event.event_type(), gridx::order::v1::ORDER_UPDATE_TYPE_EXPIRED);
 }
 
 TEST_F(OrderUpdateEventMapperTest, ThrowsWhenOrderPointerIsNull) {

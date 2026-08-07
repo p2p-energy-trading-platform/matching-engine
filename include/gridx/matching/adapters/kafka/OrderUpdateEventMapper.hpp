@@ -25,9 +25,8 @@ private:
      * Converts a domain OrderUpdateAction to its protobuf event type.
      */
     [[nodiscard]]
-    static gridx::order::v1::OrderUpdateType toProtobufUpdateType(
-        OrderUpdateAction action,
-        OrderStatus status);
+    static gridx::order::v1::OrderUpdateType toProtobufUpdateType(OrderUpdateAction action,
+                                                                  OrderStatus status);
 };
 
 }  // namespace gridx::matching::adapters::kafka
