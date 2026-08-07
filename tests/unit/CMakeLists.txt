@@ -21,6 +21,7 @@ add_executable(
     adapters/kafka/TradeEventMapperTest.cpp
     adapters/kafka/OrderUpdateEventMapperTest.cpp
     matching/TradeManagerTest.cpp
+    config/EnvConfigLoaderTest.cpp
 
 )
 

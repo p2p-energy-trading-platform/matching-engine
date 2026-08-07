@@ -7,10 +7,14 @@ namespace gridx::matching::adapters::kafka {
 
 MatchingResultPublisher::MatchingResultPublisher(KafkaProducer& producer,
                                                  TradeEventMapper& tradeEventMapper,
-                                                 OrderUpdateEventMapper& orderUpdateEventMapper)
+                                                 OrderUpdateEventMapper& orderUpdateEventMapper,
+                                                 std::string tradeTopic,
+                                                 std::string orderStateTopic)
     : m_producer(producer)
     , m_tradeEventMapper(tradeEventMapper)
-    , m_orderUpdateEventMapper(orderUpdateEventMapper) {}
+    , m_orderUpdateEventMapper(orderUpdateEventMapper)
+    , m_tradeTopic(std::move(tradeTopic))
+    , m_orderStateTopic(std::move(orderStateTopic)) {}
 
 void MatchingResultPublisher::publish(const MatchingResult& result) {
     publishTrades(result);
@@ -23,7 +27,7 @@ void MatchingResultPublisher::publishTrades(const MatchingResult& result) {
 
         const auto payload = ProtobufCodec::serialize(event);
 
-        m_producer.send(topics::kTradeExecuted, payload);
+        m_producer.send(m_tradeTopic, payload);
     }
 }
 
@@ -33,7 +37,7 @@ void MatchingResultPublisher::publishOrderUpdates(const MatchingResult& result) 
 
         const auto payload = ProtobufCodec::serialize(event);
 
-        m_producer.send(topics::kOrderUpdated, payload);
+        m_producer.send(m_orderStateTopic, payload);
     }
 }
 

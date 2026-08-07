@@ -111,6 +111,7 @@ target_sources(
      src/adapters/kafka/OrderUpdateEventMapper.cpp
      src/adapters/kafka/MatchingResultPublisher.cpp
      src/matching/TradeIdGenerator.cpp
+     src/config/EnvConfigLoader.cpp
     # or we can use file(GLOB ...) to automatically include all .cpp files in the src directory
 )
 
@@ -131,9 +132,9 @@ target_link_libraries(
     gridx_matching_core
     PUBLIC
         gridx::cpp_sdk
+        spdlog::spdlog
     PRIVATE
         fmt::fmt
-        spdlog::spdlog
         RdKafka::rdkafka++
 )
 

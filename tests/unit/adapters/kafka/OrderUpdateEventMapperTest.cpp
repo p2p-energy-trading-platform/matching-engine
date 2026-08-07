@@ -105,7 +105,7 @@ TEST_F(OrderUpdateEventMapperTest, ThrowsWhenOrderPointerIsNull) {
     update.status = OrderStatus::Filled;
     update.action = OrderUpdateAction::Remove;
 
-    EXPECT_THROW(mapper.toProtobuf(update), std::invalid_argument);
+    EXPECT_THROW((void) mapper.toProtobuf(update), std::invalid_argument);
 }
 
 }  // namespace gridx::matching::adapters::kafka

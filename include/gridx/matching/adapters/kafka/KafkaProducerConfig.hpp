@@ -1,5 +1,6 @@
 #pragma once
 
+#include <chrono>
 #include <string>
 
 namespace gridx::matching::adapters::kafka {
@@ -7,7 +8,7 @@ namespace gridx::matching::adapters::kafka {
 struct KafkaProducerConfig {
     std::string bootstrapServers;
     std::string clientId;
-    std::string orderTopic;
+    std::chrono::seconds bootstrapTimeout;
 };
 
 }  // namespace gridx::matching::adapters::kafka

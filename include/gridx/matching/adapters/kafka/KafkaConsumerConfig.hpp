@@ -7,10 +7,11 @@ namespace gridx::matching::adapters::kafka {
 
 struct KafkaConsumerConfig {
     std::string bootstrapServers;
+    std::string clientId;
     std::string consumerGroup;
     std::string topic;
-    std::chrono::milliseconds pollTimeout{100};
-    std::chrono::seconds bootstrapTimeout{30};
+    std::chrono::milliseconds pollTimeout;
+    std::chrono::seconds bootstrapTimeout;
 };
 
 }  // namespace gridx::matching::adapters::kafka
