@@ -40,7 +40,7 @@ FetchContent_Declare(
     GIT_REPOSITORY
         https://github.com/p2p-energy-trading-platform/cpp-sdk.git
     GIT_TAG
-        v1.0.0
+        v1.1.1
     GIT_SHALLOW
         TRUE
 )
@@ -107,6 +107,9 @@ target_sources(
      src/adapters/kafka/KafkaGridTransferConsumer.cpp
      src/matching/CrossZoneMatcher.cpp
      src/matching/EffectivePriceCalculator.cpp
+     src/adapters/kafka/TradeEventMapper.cpp
+     src/adapters/kafka/OrderUpdateEventMapper.cpp
+     src/adapters/kafka/MatchingResultPublisher.cpp
      src/matching/TradeIdGenerator.cpp
     # or we can use file(GLOB ...) to automatically include all .cpp files in the src directory
 )

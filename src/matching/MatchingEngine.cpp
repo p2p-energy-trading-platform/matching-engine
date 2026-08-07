@@ -15,4 +15,9 @@ MatchingResult MatchingEngine::match(Order incomingOrder) {
     return m_sameZoneMatcher.match(std::move(incomingOrder));
 }
 
+// TODO
+// Implement cross-zone matching logic here.
+// OR
+// Merge cross-zone matching into SameZoneMatcher and rename it to ZoneMatcher.
+
 }  // namespace gridx::matching::matching

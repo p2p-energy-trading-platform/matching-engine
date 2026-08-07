@@ -1,7 +1,7 @@
-#include <iostream>
 #include <atomic>
 #include <chrono>
 #include <csignal>
+#include <iostream>
 #include <thread>
 
 #include <gridx/matching/common/Version.hpp>

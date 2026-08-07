@@ -18,6 +18,8 @@ add_executable(
     orderbook/OrderBookUpdaterTest.cpp
     matching/CrossZoneMatcherTest.cpp
     matching/EffectivePriceCalculatorTest.cpp
+    adapters/kafka/TradeEventMapperTest.cpp
+    adapters/kafka/OrderUpdateEventMapperTest.cpp
     matching/TradeManagerTest.cpp
 
 )
