@@ -11,12 +11,9 @@ namespace gridx::matching::adapters::kafka {
 
 class MatchingResultPublisher {
 public:
-    MatchingResultPublisher(
-        KafkaProducer& producer,
-        TradeEventMapper& tradeEventMapper,
-        OrderUpdateEventMapper& orderUpdateEventMapper,
-        std::string tradeTopic,
-        std::string orderStateTopic);
+    MatchingResultPublisher(KafkaProducer& producer, TradeEventMapper& tradeEventMapper,
+                            OrderUpdateEventMapper& orderUpdateEventMapper, std::string tradeTopic,
+                            std::string orderStateTopic);
 
     /**
      * Publishes all events produced during a matching cycle.

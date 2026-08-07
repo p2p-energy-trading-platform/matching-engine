@@ -39,21 +39,18 @@ constexpr std::string_view kBootstrapTimeout = "KAFKA_BOOTSTRAP_TIMEOUT_SECONDS"
 
 constexpr std::string_view kLogLevel = "LOG_LEVEL";
 
+constexpr std::array<std::string_view, 11> kEnvironmentVariables{kBootstrapServers,
+                                                                 kOrderConsumerGroupId,
+                                                                 kGridTransferConsumerGroupId,
+                                                                 kOrderTopic,
+                                                                 kGridTransferTopic,
+                                                                 kTradeTopic,
+                                                                 kOrderStateTopic,
+                                                                 kClientId,
+                                                                 kPollTimeout,
+                                                                 kBootstrapTimeout,
 
-constexpr std::array<std::string_view, 11> kEnvironmentVariables{
-    kBootstrapServers,
-    kOrderConsumerGroupId,
-    kGridTransferConsumerGroupId,
-    kOrderTopic,
-    kGridTransferTopic,
-    kTradeTopic,
-    kOrderStateTopic,
-    kClientId,
-    kPollTimeout,
-    kBootstrapTimeout,
-  
-    kLogLevel
-};
+                                                                 kLogLevel};
 
 }  // namespace
 
@@ -313,8 +310,7 @@ ConfigLoadResult EnvConfigLoader::loadFromEnvironment() {
     std::unordered_map<std::string, std::string> environment;
 
     for (const auto variable : kEnvironmentVariables) {
-        if (const char* value = std::getenv(variable.data());
-            value != nullptr) {
+        if (const char* value = std::getenv(variable.data()); value != nullptr) {
             environment.emplace(variable, value);
         }
     }

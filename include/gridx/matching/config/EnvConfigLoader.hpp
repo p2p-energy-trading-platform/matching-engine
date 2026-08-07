@@ -33,8 +33,7 @@ public:
      * This overload is intended for unit testing.
      */
     [[nodiscard]]
-    static ConfigLoadResult load(
-        const std::unordered_map<std::string, std::string>& environment);
+    static ConfigLoadResult load(const std::unordered_map<std::string, std::string>& environment);
 
     /**
      * Loads and validates configuration from the current process environment.

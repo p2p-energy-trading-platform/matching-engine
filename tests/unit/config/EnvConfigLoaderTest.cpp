@@ -30,9 +30,7 @@ Environment createValidEnvironment() {
     };
 }
 
-class EnvConfigLoaderTest : public ::testing::Test {
-
-};
+class EnvConfigLoaderTest : public ::testing::Test {};
 
 TEST_F(EnvConfigLoaderTest, LoadsValidConfiguration) {
     const Environment environment = createValidEnvironment();
@@ -44,28 +42,19 @@ TEST_F(EnvConfigLoaderTest, LoadsValidConfiguration) {
 
     EXPECT_EQ(result.config.kafka.bootstrapServers, "localhost:9092");
     EXPECT_EQ(result.config.kafka.clientId, "matching-engine");
-    EXPECT_EQ(result.config.kafka.pollTimeout,
-              std::chrono::milliseconds{100});
-    EXPECT_EQ(result.config.kafka.bootstrapTimeout,
-              std::chrono::seconds{30});
+    EXPECT_EQ(result.config.kafka.pollTimeout, std::chrono::milliseconds{100});
+    EXPECT_EQ(result.config.kafka.bootstrapTimeout, std::chrono::seconds{30});
 
-    EXPECT_EQ(result.config.orderConsumer.topic,
-              "order.accepted");
-    EXPECT_EQ(result.config.orderConsumer.groupId,
-              "matching-order");
+    EXPECT_EQ(result.config.orderConsumer.topic, "order.accepted");
+    EXPECT_EQ(result.config.orderConsumer.groupId, "matching-order");
 
-    EXPECT_EQ(result.config.gridTransferConsumer.topic,
-              "grid.transfer");
-    EXPECT_EQ(result.config.gridTransferConsumer.groupId,
-              "matching-grid");
+    EXPECT_EQ(result.config.gridTransferConsumer.topic, "grid.transfer");
+    EXPECT_EQ(result.config.gridTransferConsumer.groupId, "matching-grid");
 
-    EXPECT_EQ(result.config.publisher.tradeTopic,
-              "trade.executed");
-    EXPECT_EQ(result.config.publisher.orderStateTopic,
-              "order.state");
+    EXPECT_EQ(result.config.publisher.tradeTopic, "trade.executed");
+    EXPECT_EQ(result.config.publisher.orderStateTopic, "order.state");
 
-    EXPECT_EQ(result.config.logging.level,
-              spdlog::level::debug);
+    EXPECT_EQ(result.config.logging.level, spdlog::level::debug);
 }
 
 TEST_F(EnvConfigLoaderTest, UsesDefaultValuesForOptionalVariables) {
@@ -80,17 +69,13 @@ TEST_F(EnvConfigLoaderTest, UsesDefaultValuesForOptionalVariables) {
 
     ASSERT_TRUE(result.success());
 
-    EXPECT_EQ(result.config.kafka.clientId,
-              "matching-engine");
+    EXPECT_EQ(result.config.kafka.clientId, "matching-engine");
 
-    EXPECT_EQ(result.config.kafka.pollTimeout,
-              std::chrono::milliseconds{100});
+    EXPECT_EQ(result.config.kafka.pollTimeout, std::chrono::milliseconds{100});
 
-    EXPECT_EQ(result.config.kafka.bootstrapTimeout,
-              std::chrono::seconds{30});
+    EXPECT_EQ(result.config.kafka.bootstrapTimeout, std::chrono::seconds{30});
 
-    EXPECT_EQ(result.config.logging.level,
-              spdlog::level::info);
+    EXPECT_EQ(result.config.logging.level, spdlog::level::info);
 }
 
 TEST_F(EnvConfigLoaderTest, ReportsMissingBootstrapServers) {
@@ -103,8 +88,7 @@ TEST_F(EnvConfigLoaderTest, ReportsMissingBootstrapServers) {
     EXPECT_FALSE(result.success());
     ASSERT_EQ(result.errors.size(), 1U);
 
-    EXPECT_EQ(result.errors.front().variableName,
-              "KAFKA_BOOTSTRAP_SERVERS");
+    EXPECT_EQ(result.errors.front().variableName, "KAFKA_BOOTSTRAP_SERVERS");
 }
 
 TEST_F(EnvConfigLoaderTest, ReportsMissingOrderConsumerGroupId) {
@@ -117,8 +101,7 @@ TEST_F(EnvConfigLoaderTest, ReportsMissingOrderConsumerGroupId) {
     EXPECT_FALSE(result.success());
     ASSERT_EQ(result.errors.size(), 1U);
 
-    EXPECT_EQ(result.errors.front().variableName,
-              "KAFKA_ORDER_CONSUMER_GROUP_ID");
+    EXPECT_EQ(result.errors.front().variableName, "KAFKA_ORDER_CONSUMER_GROUP_ID");
 }
 
 TEST_F(EnvConfigLoaderTest, ReportsMissingGridTransferConsumerGroupId) {
@@ -131,8 +114,7 @@ TEST_F(EnvConfigLoaderTest, ReportsMissingGridTransferConsumerGroupId) {
     EXPECT_FALSE(result.success());
     ASSERT_EQ(result.errors.size(), 1U);
 
-    EXPECT_EQ(result.errors.front().variableName,
-              "KAFKA_GRID_TRANSFER_CONSUMER_GROUP_ID");
+    EXPECT_EQ(result.errors.front().variableName, "KAFKA_GRID_TRANSFER_CONSUMER_GROUP_ID");
 }
 
 TEST_F(EnvConfigLoaderTest, ReportsMissingOrderTopic) {
@@ -145,8 +127,7 @@ TEST_F(EnvConfigLoaderTest, ReportsMissingOrderTopic) {
     EXPECT_FALSE(result.success());
     ASSERT_EQ(result.errors.size(), 1U);
 
-    EXPECT_EQ(result.errors.front().variableName,
-              "KAFKA_ORDER_TOPIC");
+    EXPECT_EQ(result.errors.front().variableName, "KAFKA_ORDER_TOPIC");
 }
 
 TEST_F(EnvConfigLoaderTest, ReportsMissingGridTransferTopic) {
@@ -159,8 +140,7 @@ TEST_F(EnvConfigLoaderTest, ReportsMissingGridTransferTopic) {
     EXPECT_FALSE(result.success());
     ASSERT_EQ(result.errors.size(), 1U);
 
-    EXPECT_EQ(result.errors.front().variableName,
-              "KAFKA_GRID_TRANSFER_TOPIC");
+    EXPECT_EQ(result.errors.front().variableName, "KAFKA_GRID_TRANSFER_TOPIC");
 }
 
 TEST_F(EnvConfigLoaderTest, ReportsMissingTradeTopic) {
@@ -173,8 +153,7 @@ TEST_F(EnvConfigLoaderTest, ReportsMissingTradeTopic) {
     EXPECT_FALSE(result.success());
     ASSERT_EQ(result.errors.size(), 1U);
 
-    EXPECT_EQ(result.errors.front().variableName,
-              "KAFKA_TRADE_TOPIC");
+    EXPECT_EQ(result.errors.front().variableName, "KAFKA_TRADE_TOPIC");
 }
 
 TEST_F(EnvConfigLoaderTest, ReportsMissingOrderStateTopic) {
@@ -187,8 +166,7 @@ TEST_F(EnvConfigLoaderTest, ReportsMissingOrderStateTopic) {
     EXPECT_FALSE(result.success());
     ASSERT_EQ(result.errors.size(), 1U);
 
-    EXPECT_EQ(result.errors.front().variableName,
-              "KAFKA_ORDER_STATE_TOPIC");
+    EXPECT_EQ(result.errors.front().variableName, "KAFKA_ORDER_STATE_TOPIC");
 }
 
 TEST_F(EnvConfigLoaderTest, RejectsEmptyRequiredValue) {
@@ -201,8 +179,7 @@ TEST_F(EnvConfigLoaderTest, RejectsEmptyRequiredValue) {
     EXPECT_FALSE(result.success());
     ASSERT_EQ(result.errors.size(), 1U);
 
-    EXPECT_EQ(result.errors.front().variableName,
-              "KAFKA_ORDER_TOPIC");
+    EXPECT_EQ(result.errors.front().variableName, "KAFKA_ORDER_TOPIC");
 }
 
 TEST_F(EnvConfigLoaderTest, RejectsWhitespaceOnlyRequiredValue) {
@@ -215,8 +192,7 @@ TEST_F(EnvConfigLoaderTest, RejectsWhitespaceOnlyRequiredValue) {
     EXPECT_FALSE(result.success());
     ASSERT_EQ(result.errors.size(), 1U);
 
-    EXPECT_EQ(result.errors.front().variableName,
-              "KAFKA_ORDER_TOPIC");
+    EXPECT_EQ(result.errors.front().variableName, "KAFKA_ORDER_TOPIC");
 }
 
 TEST_F(EnvConfigLoaderTest, RejectsNonNumericPollTimeout) {
@@ -229,8 +205,7 @@ TEST_F(EnvConfigLoaderTest, RejectsNonNumericPollTimeout) {
     EXPECT_FALSE(result.success());
     ASSERT_EQ(result.errors.size(), 1U);
 
-    EXPECT_EQ(result.errors.front().variableName,
-              "KAFKA_POLL_TIMEOUT_MS");
+    EXPECT_EQ(result.errors.front().variableName, "KAFKA_POLL_TIMEOUT_MS");
 }
 
 TEST_F(EnvConfigLoaderTest, RejectsNegativePollTimeout) {
@@ -243,8 +218,7 @@ TEST_F(EnvConfigLoaderTest, RejectsNegativePollTimeout) {
     EXPECT_FALSE(result.success());
     ASSERT_EQ(result.errors.size(), 1U);
 
-    EXPECT_EQ(result.errors.front().variableName,
-              "KAFKA_POLL_TIMEOUT_MS");
+    EXPECT_EQ(result.errors.front().variableName, "KAFKA_POLL_TIMEOUT_MS");
 }
 
 TEST_F(EnvConfigLoaderTest, RejectsZeroPollTimeout) {
@@ -257,8 +231,7 @@ TEST_F(EnvConfigLoaderTest, RejectsZeroPollTimeout) {
     EXPECT_FALSE(result.success());
     ASSERT_EQ(result.errors.size(), 1U);
 
-    EXPECT_EQ(result.errors.front().variableName,
-              "KAFKA_POLL_TIMEOUT_MS");
+    EXPECT_EQ(result.errors.front().variableName, "KAFKA_POLL_TIMEOUT_MS");
 }
 
 TEST_F(EnvConfigLoaderTest, RejectsTrailingCharactersInPollTimeout) {
@@ -271,8 +244,7 @@ TEST_F(EnvConfigLoaderTest, RejectsTrailingCharactersInPollTimeout) {
     EXPECT_FALSE(result.success());
     ASSERT_EQ(result.errors.size(), 1U);
 
-    EXPECT_EQ(result.errors.front().variableName,
-              "KAFKA_POLL_TIMEOUT_MS");
+    EXPECT_EQ(result.errors.front().variableName, "KAFKA_POLL_TIMEOUT_MS");
 }
 
 TEST_F(EnvConfigLoaderTest, RejectsInvalidBootstrapTimeout) {
@@ -285,8 +257,7 @@ TEST_F(EnvConfigLoaderTest, RejectsInvalidBootstrapTimeout) {
     EXPECT_FALSE(result.success());
     ASSERT_EQ(result.errors.size(), 1U);
 
-    EXPECT_EQ(result.errors.front().variableName,
-              "KAFKA_BOOTSTRAP_TIMEOUT_SECONDS");
+    EXPECT_EQ(result.errors.front().variableName, "KAFKA_BOOTSTRAP_TIMEOUT_SECONDS");
 }
 
 TEST_F(EnvConfigLoaderTest, AcceptsEverySupportedLogLevel) {
@@ -322,8 +293,7 @@ TEST_F(EnvConfigLoaderTest, AcceptsCaseInsensitiveLogLevels) {
 
     ASSERT_TRUE(result.success());
 
-    EXPECT_EQ(result.config.logging.level,
-              spdlog::level::debug);
+    EXPECT_EQ(result.config.logging.level, spdlog::level::debug);
 }
 
 TEST_F(EnvConfigLoaderTest, RejectsUnsupportedLogLevel) {
@@ -336,8 +306,7 @@ TEST_F(EnvConfigLoaderTest, RejectsUnsupportedLogLevel) {
     EXPECT_FALSE(result.success());
     ASSERT_EQ(result.errors.size(), 1U);
 
-    EXPECT_EQ(result.errors.front().variableName,
-              "LOG_LEVEL");
+    EXPECT_EQ(result.errors.front().variableName, "LOG_LEVEL");
 }
 
 TEST_F(EnvConfigLoaderTest, ReportsMultipleValidationErrors) {
@@ -355,29 +324,21 @@ TEST_F(EnvConfigLoaderTest, ReportsMultipleValidationErrors) {
 
     EXPECT_EQ(result.errors.size(), 4U);
 
-    EXPECT_TRUE(std::ranges::any_of(
-        result.errors,
-        [](const ValidationError& error) {
-            return error.variableName == "KAFKA_BOOTSTRAP_SERVERS";
-        }));
+    EXPECT_TRUE(std::ranges::any_of(result.errors, [](const ValidationError& error) {
+        return error.variableName == "KAFKA_BOOTSTRAP_SERVERS";
+    }));
 
-    EXPECT_TRUE(std::ranges::any_of(
-        result.errors,
-        [](const ValidationError& error) {
-            return error.variableName == "KAFKA_ORDER_TOPIC";
-        }));
+    EXPECT_TRUE(std::ranges::any_of(result.errors, [](const ValidationError& error) {
+        return error.variableName == "KAFKA_ORDER_TOPIC";
+    }));
 
-    EXPECT_TRUE(std::ranges::any_of(
-        result.errors,
-        [](const ValidationError& error) {
-            return error.variableName == "KAFKA_POLL_TIMEOUT_MS";
-        }));
+    EXPECT_TRUE(std::ranges::any_of(result.errors, [](const ValidationError& error) {
+        return error.variableName == "KAFKA_POLL_TIMEOUT_MS";
+    }));
 
-    EXPECT_TRUE(std::ranges::any_of(
-        result.errors,
-        [](const ValidationError& error) {
-            return error.variableName == "LOG_LEVEL";
-        }));
+    EXPECT_TRUE(std::ranges::any_of(result.errors, [](const ValidationError& error) {
+        return error.variableName == "LOG_LEVEL";
+    }));
 }
 
 TEST_F(EnvConfigLoaderTest, TrimsWhitespaceFromValues) {
@@ -390,11 +351,9 @@ TEST_F(EnvConfigLoaderTest, TrimsWhitespaceFromValues) {
 
     ASSERT_TRUE(result.success());
 
-    EXPECT_EQ(result.config.kafka.bootstrapServers,
-              "localhost:9092");
+    EXPECT_EQ(result.config.kafka.bootstrapServers, "localhost:9092");
 
-    EXPECT_EQ(result.config.kafka.clientId,
-              "matching-engine");
+    EXPECT_EQ(result.config.kafka.clientId, "matching-engine");
 }
 
 TEST_F(EnvConfigLoaderTest, AppliesDefaultsWhenOptionalValuesAreWhitespace) {
@@ -409,17 +368,13 @@ TEST_F(EnvConfigLoaderTest, AppliesDefaultsWhenOptionalValuesAreWhitespace) {
 
     ASSERT_TRUE(result.success());
 
-    EXPECT_EQ(result.config.kafka.clientId,
-              "matching-engine");
+    EXPECT_EQ(result.config.kafka.clientId, "matching-engine");
 
-    EXPECT_EQ(result.config.kafka.pollTimeout,
-              std::chrono::milliseconds{100});
+    EXPECT_EQ(result.config.kafka.pollTimeout, std::chrono::milliseconds{100});
 
-    EXPECT_EQ(result.config.kafka.bootstrapTimeout,
-              std::chrono::seconds{30});
+    EXPECT_EQ(result.config.kafka.bootstrapTimeout, std::chrono::seconds{30});
 
-    EXPECT_EQ(result.config.logging.level,
-              spdlog::level::info);
+    EXPECT_EQ(result.config.logging.level, spdlog::level::info);
 }
 
 }  // namespace

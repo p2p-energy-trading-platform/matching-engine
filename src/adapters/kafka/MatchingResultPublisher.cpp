@@ -5,12 +5,11 @@
 
 namespace gridx::matching::adapters::kafka {
 
-MatchingResultPublisher::MatchingResultPublisher(
-    KafkaProducer& producer,
-    TradeEventMapper& tradeEventMapper,
-    OrderUpdateEventMapper& orderUpdateEventMapper,
-    std::string tradeTopic,
-    std::string orderStateTopic)
+MatchingResultPublisher::MatchingResultPublisher(KafkaProducer& producer,
+                                                 TradeEventMapper& tradeEventMapper,
+                                                 OrderUpdateEventMapper& orderUpdateEventMapper,
+                                                 std::string tradeTopic,
+                                                 std::string orderStateTopic)
     : m_producer(producer)
     , m_tradeEventMapper(tradeEventMapper)
     , m_orderUpdateEventMapper(orderUpdateEventMapper)
