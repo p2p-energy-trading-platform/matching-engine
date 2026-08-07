@@ -1,19 +1,21 @@
 #include "gridx/matching/config/EnvConfigLoader.hpp"
 
+#include <spdlog/spdlog.h>
 #include <algorithm>
 #include <cctype>
 #include <charconv>
+#include <chrono>
 #include <cstdlib>
 #include <optional>
 #include <string>
 #include <string_view>
+#include <system_error>
 #include <unordered_map>
 #include <vector>
-#include <system_error>
-#include <chrono>
-#include <spdlog/spdlog.h>
 
 namespace gridx::matching::config {
+
+namespace {
 
 /**
  * Removes leading and trailing whitespace.
@@ -167,7 +169,7 @@ Integer readRequiredInteger(const std::unordered_map<std::string, std::string>& 
         return {};
     }
 
-    const auto parsed = parseInteger<Integer>(value);
+const auto parsed = parseInteger<Integer>(value);
 
     if (!parsed) {
         errors.push_back({.variableName = std::string(variableName),
@@ -219,9 +221,9 @@ spdlog::level::level_enum readLogLevel(
     return *level;
 }
 
-/**
- * Loads the configuration from the environment.
- */
+}  // namespace
+
+
 ConfigLoadResult EnvConfigLoader::load(
     const std::unordered_map<std::string, std::string>& environment) {
     ConfigLoadResult result;
