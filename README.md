@@ -203,6 +203,40 @@ Release build:
 
 ---
 
+
+
+## Environment Configuration
+
+The matching engine loads its runtime configuration from environment variables.
+
+Copy the example environment file:
+
+```bash
+cp env.example .env
+```
+
+Update the values in `.env` as needed for your local environment.
+
+Before running the matching engine, export the variables into your current shell:
+
+```bash
+set -a
+source .env
+set +a
+```
+
+Then start the application:
+
+```bash
+./build/Debug/matching-engine
+```
+
+> **Note**
+>
+> The matching engine reads configuration from the process environment using `std::getenv()`. It does **not** read the `.env` file directly. The `.env` file must be sourced (or injected by Docker Compose or another process manager) before launching the application.
+
+---
+
 ## Testing
 
 Run the Debug test suite:
@@ -235,6 +269,11 @@ cmake --preset debug
 
 # Build after source code changes
 cmake --build --preset debug
+
+# Load environment variables
+set -a
+source .env
+set +a
 
 # Run tests
 ctest --preset debug
@@ -317,3 +356,8 @@ All code submitted to the repository should:
 * Pass `lint`
 * Compile without warnings (`-Werror`)
 * Pass all unit and integration tests
+
+
+
+
+
