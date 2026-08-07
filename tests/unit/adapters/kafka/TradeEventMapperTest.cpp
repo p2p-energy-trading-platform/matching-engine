@@ -33,8 +33,7 @@ TEST_F(TradeEventMapperTest, MapsTradeToProtobufEvent) {
 
     trade.gridRuleVersion = 4;
 
-    trade.executedAt = system_clock::time_point{
-        seconds{1720000000} + nanoseconds{123456789}};
+    trade.executedAt = std::chrono::system_clock::now();
 
     const auto event = mapper.toProtobuf(trade);
 
