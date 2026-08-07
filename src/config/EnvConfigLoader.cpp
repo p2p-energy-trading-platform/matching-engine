@@ -51,8 +51,9 @@ constexpr std::array<std::string_view, 11> kEnvironmentVariables{
     kClientId,
     kPollTimeout,
     kBootstrapTimeout,
+  
     kLogLevel
-};Ô
+};
 
 }  // namespace
 
