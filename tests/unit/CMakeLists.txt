@@ -20,6 +20,7 @@ add_executable(
     matching/EffectivePriceCalculatorTest.cpp
     adapters/kafka/TradeEventMapperTest.cpp
     adapters/kafka/OrderUpdateEventMapperTest.cpp
+    matching/TradeManagerTest.cpp
 
 )
 
