@@ -33,7 +33,7 @@ TEST_F(TradeEventMapperTest, MapsTradeToProtobufEvent) {
 
     trade.gridRuleVersion = 4;
 
-    trade.executedAt = std::chrono::system_clock::now();
+    trade.timestamp = std::chrono::system_clock::now();
 
     const auto event = mapper.toProtobuf(trade);
 
@@ -57,7 +57,7 @@ TEST_F(TradeEventMapperTest, MapsTradeToProtobufEvent) {
 
     EXPECT_EQ(event.grid_rule_version(), trade.gridRuleVersion);
 
-    const auto duration = trade.executedAt.time_since_epoch();
+    const auto duration = trade.timestamp.time_since_epoch();
 
     const auto seconds = duration_cast<std::chrono::seconds>(duration);
 

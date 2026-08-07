@@ -30,7 +30,7 @@ gridx::trade::v1::TradeExecuted TradeEventMapper::toProtobuf(const Trade& trade)
 
     auto* executedAt = event.mutable_executed_at();
 
-    const auto duration = trade.executedAt.time_since_epoch();
+    const auto duration = trade.timestamp.time_since_epoch();
 
     const auto seconds = std::chrono::duration_cast<std::chrono::seconds>(duration);
 
