@@ -16,15 +16,19 @@ struct Trade {
     GridZoneId buyerGridZone;
     GridZoneId sellerGridZone;
 
+    Timestamp deliverySlotStart;
+    Timestamp deliverySlotEnd;
+
     Price energyPrice;
     GridFee gridFee;
+    Price buyerTotalPrice;
 
     Quantity quantity;
 
     // Version of the grid transfer rules applied when this trade was executed.
     GridRuleVersion gridRuleVersion;
 
-    Timestamp executedAt;
+    Timestamp timestamp;
 };
 
 }  // namespace gridx::matching
