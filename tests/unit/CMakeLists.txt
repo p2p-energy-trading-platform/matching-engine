@@ -18,6 +18,7 @@ add_executable(
     orderbook/OrderBookUpdaterTest.cpp
     matching/CrossZoneMatcherTest.cpp
     matching/EffectivePriceCalculatorTest.cpp
+    matching/TradeManagerTest.cpp
 
 )
 
