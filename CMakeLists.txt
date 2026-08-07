@@ -108,6 +108,7 @@ target_sources(
      src/matching/CrossZoneMatcher.cpp
      src/matching/EffectivePriceCalculator.cpp
      src/adapters/kafka/TradeEventMapper.cpp
+     src/adapters/kafka/OrderUpdateEventMapper.cpp
     # or we can use file(GLOB ...) to automatically include all .cpp files in the src directory
 )
 
