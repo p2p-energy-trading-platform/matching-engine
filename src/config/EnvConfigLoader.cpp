@@ -17,6 +17,47 @@ namespace gridx::matching::config {
 
 namespace {
 
+constexpr std::string_view kBootstrapServers = "KAFKA_BOOTSTRAP_SERVERS";
+
+constexpr std::string_view kOrderConsumerGroupId = "KAFKA_ORDER_CONSUMER_GROUP_ID";
+
+constexpr std::string_view kGridTransferConsumerGroupId = "KAFKA_GRID_TRANSFER_CONSUMER_GROUP_ID";
+
+constexpr std::string_view kOrderTopic = "KAFKA_ORDER_TOPIC";
+
+constexpr std::string_view kGridTransferTopic = "KAFKA_GRID_TRANSFER_TOPIC";
+
+constexpr std::string_view kTradeTopic = "KAFKA_TRADE_TOPIC";
+
+constexpr std::string_view kOrderStateTopic = "KAFKA_ORDER_STATE_TOPIC";
+
+constexpr std::string_view kClientId = "KAFKA_CLIENT_ID";
+
+constexpr std::string_view kPollTimeout = "KAFKA_POLL_TIMEOUT_MS";
+
+constexpr std::string_view kBootstrapTimeout = "KAFKA_BOOTSTRAP_TIMEOUT_SECONDS";
+
+constexpr std::string_view kLogLevel = "LOG_LEVEL";
+
+
+constexpr std::array<std::string_view, 11> kEnvironmentVariables{
+    kBootstrapServers,
+    kOrderConsumerGroupId,
+    kGridTransferConsumerGroupId,
+    kOrderTopic,
+    kGridTransferTopic,
+    kTradeTopic,
+    kOrderStateTopic,
+    kClientId,
+    kPollTimeout,
+    kBootstrapTimeout,
+    kLogLevel
+};Ô
+
+}  // namespace
+
+namespace {
+
 /**
  * Removes leading and trailing whitespace.
  */
@@ -169,7 +210,7 @@ Integer readRequiredInteger(const std::unordered_map<std::string, std::string>& 
         return {};
     }
 
-const auto parsed = parseInteger<Integer>(value);
+    const auto parsed = parseInteger<Integer>(value);
 
     if (!parsed) {
         errors.push_back({.variableName = std::string(variableName),
@@ -208,7 +249,7 @@ Integer readOptionalInteger(const std::unordered_map<std::string, std::string>& 
 spdlog::level::level_enum readLogLevel(
     const std::unordered_map<std::string, std::string>& environment,
     std::vector<ValidationError>& errors) {
-    const std::string value = readOptional(environment, "LOG_LEVEL", "info");
+    const std::string value = readOptional(environment, kLogLevel, "info");
 
     const auto level = parseLogLevel(value);
 
@@ -223,7 +264,6 @@ spdlog::level::level_enum readLogLevel(
 
 }  // namespace
 
-
 ConfigLoadResult EnvConfigLoader::load(
     const std::unordered_map<std::string, std::string>& environment) {
     ConfigLoadResult result;
@@ -231,38 +271,36 @@ ConfigLoadResult EnvConfigLoader::load(
     // Kafka settings
 
     result.config.kafka.bootstrapServers =
-        readRequired(environment, "KAFKA_BOOTSTRAP_SERVERS", result.errors);
+        readRequired(environment, kBootstrapServers, result.errors);
 
-    result.config.kafka.clientId = readOptional(environment, "KAFKA_CLIENT_ID", "matching-engine");
+    result.config.kafka.clientId = readOptional(environment, kClientId, "matching-engine");
 
     result.config.kafka.pollTimeout = std::chrono::milliseconds{
-        readOptionalInteger<int>(environment, "KAFKA_POLL_TIMEOUT_MS", "100", result.errors)};
+        readOptionalInteger<int>(environment, kPollTimeout, "100", result.errors)};
 
-    result.config.kafka.bootstrapTimeout = std::chrono::seconds{readOptionalInteger<int>(
-        environment, "KAFKA_BOOTSTRAP_TIMEOUT_SECONDS", "30", result.errors)};
+    result.config.kafka.bootstrapTimeout = std::chrono::seconds{
+        readOptionalInteger<int>(environment, kBootstrapTimeout, "30", result.errors)};
 
     // Order consumer
 
-    result.config.orderConsumer.topic =
-        readRequired(environment, "KAFKA_ORDER_TOPIC", result.errors);
+    result.config.orderConsumer.topic = readRequired(environment, kOrderTopic, result.errors);
 
     result.config.orderConsumer.groupId =
-        readRequired(environment, "KAFKA_ORDER_CONSUMER_GROUP_ID", result.errors);
+        readRequired(environment, kOrderConsumerGroupId, result.errors);
 
     // Grid transfer consumer
 
     result.config.gridTransferConsumer.topic =
-        readRequired(environment, "KAFKA_GRID_TRANSFER_TOPIC", result.errors);
+        readRequired(environment, kGridTransferTopic, result.errors);
 
     result.config.gridTransferConsumer.groupId =
-        readRequired(environment, "KAFKA_GRID_TRANSFER_CONSUMER_GROUP_ID", result.errors);
+        readRequired(environment, kGridTransferConsumerGroupId, result.errors);
 
     // Publishers
-    result.config.publisher.tradeTopic =
-        readRequired(environment, "KAFKA_TRADE_TOPIC", result.errors);
+    result.config.publisher.tradeTopic = readRequired(environment, kTradeTopic, result.errors);
 
     result.config.publisher.orderStateTopic =
-        readRequired(environment, "KAFKA_ORDER_STATE_TOPIC", result.errors);
+        readRequired(environment, kOrderStateTopic, result.errors);
 
     // Logging
     result.config.logging.level = readLogLevel(environment, result.errors);
@@ -273,23 +311,12 @@ ConfigLoadResult EnvConfigLoader::load(
 ConfigLoadResult EnvConfigLoader::loadFromEnvironment() {
     std::unordered_map<std::string, std::string> environment;
 
-    auto addVariable = [&environment](const char* variableName) {
-        if (const char* value = std::getenv(variableName); value != nullptr) {
-            environment.emplace(variableName, value);
+    for (const auto variable : kEnvironmentVariables) {
+        if (const char* value = std::getenv(variable.data());
+            value != nullptr) {
+            environment.emplace(variable, value);
         }
-    };
-
-    addVariable("KAFKA_BOOTSTRAP_SERVERS");
-    addVariable("KAFKA_ORDER_CONSUMER_GROUP_ID");
-    addVariable("KAFKA_GRID_TRANSFER_CONSUMER_GROUP_ID");
-    addVariable("KAFKA_ORDER_TOPIC");
-    addVariable("KAFKA_GRID_TRANSFER_TOPIC");
-    addVariable("KAFKA_TRADE_TOPIC");
-    addVariable("KAFKA_ORDER_STATE_TOPIC");
-    addVariable("KAFKA_CLIENT_ID");
-    addVariable("KAFKA_POLL_TIMEOUT_MS");
-    addVariable("KAFKA_BOOTSTRAP_TIMEOUT_SECONDS");
-    addVariable("LOG_LEVEL");
+    }
 
     return load(environment);
 }
