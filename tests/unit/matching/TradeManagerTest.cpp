@@ -57,23 +57,21 @@ Order makeOrder(const OrderSpec& spec) {
 TEST(TradeManagerTest, CreateTradePopulatesAllAcceptanceFields) {
     const MarketId marketId{.deliverySlotStart = std::chrono::system_clock::now()};
 
-    const auto buyOrder = makeOrder(
-        OrderSpec{.orderId = 1,
-                  .userId = 100,
-                  .zone = 7,
-                  .side = Side::Buy,
-                  .price = 110,
-                  .quantity = 100,
-                  .marketId = marketId});
+    const auto buyOrder = makeOrder(OrderSpec{.orderId = 1,
+                                              .userId = 100,
+                                              .zone = 7,
+                                              .side = Side::Buy,
+                                              .price = 110,
+                                              .quantity = 100,
+                                              .marketId = marketId});
 
-    const auto sellOrder = makeOrder(
-        OrderSpec{.orderId = 2,
-                  .userId = 200,
-                  .zone = 8,
-                  .side = Side::Sell,
-                  .price = 95,
-                  .quantity = 50,
-                  .marketId = marketId});
+    const auto sellOrder = makeOrder(OrderSpec{.orderId = 2,
+                                               .userId = 200,
+                                               .zone = 8,
+                                               .side = Side::Sell,
+                                               .price = 95,
+                                               .quantity = 50,
+                                               .marketId = marketId});
 
     GridTransferRule rule{};
     rule.gridFeePerKwh = 5;
@@ -103,23 +101,21 @@ TEST(TradeManagerTest, CreateTradePopulatesAllAcceptanceFields) {
 TEST(TradeManagerTest, CreateTradeGeneratesUniqueIdsForMultipleTrades) {
     const MarketId marketId{.deliverySlotStart = std::chrono::system_clock::now()};
 
-    const auto buyOrder = makeOrder(
-        OrderSpec{.orderId = 10,
-                  .userId = 1000,
-                  .zone = 1,
-                  .side = Side::Buy,
-                  .price = 120,
-                  .quantity = 100,
-                  .marketId = marketId});
+    const auto buyOrder = makeOrder(OrderSpec{.orderId = 10,
+                                              .userId = 1000,
+                                              .zone = 1,
+                                              .side = Side::Buy,
+                                              .price = 120,
+                                              .quantity = 100,
+                                              .marketId = marketId});
 
-    const auto sellOrder = makeOrder(
-        OrderSpec{.orderId = 20,
-                  .userId = 2000,
-                  .zone = 2,
-                  .side = Side::Sell,
-                  .price = 90,
-                  .quantity = 100,
-                  .marketId = marketId});
+    const auto sellOrder = makeOrder(OrderSpec{.orderId = 20,
+                                               .userId = 2000,
+                                               .zone = 2,
+                                               .side = Side::Sell,
+                                               .price = 90,
+                                               .quantity = 100,
+                                               .marketId = marketId});
 
     const GridTransferRule rule{};
 
