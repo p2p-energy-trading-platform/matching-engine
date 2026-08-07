@@ -5,10 +5,9 @@
 
 namespace gridx::matching::adapters::kafka {
 
-MatchingResultPublisher::MatchingResultPublisher(
-    KafkaProducer& producer,
-    TradeEventMapper& tradeEventMapper,
-    OrderUpdateEventMapper& orderUpdateEventMapper)
+MatchingResultPublisher::MatchingResultPublisher(KafkaProducer& producer,
+                                                 TradeEventMapper& tradeEventMapper,
+                                                 OrderUpdateEventMapper& orderUpdateEventMapper)
     : m_producer(producer)
     , m_tradeEventMapper(tradeEventMapper)
     , m_orderUpdateEventMapper(orderUpdateEventMapper) {}
@@ -24,7 +23,7 @@ void MatchingResultPublisher::publishTrades(const MatchingResult& result) {
 
         const auto payload = ProtobufCodec::serialize(event);
 
-        m_producer.send(KafkaTopics::TradeExecuted, payload);
+        m_producer.send(topics::kTradeExecuted, payload);
     }
 }
 
@@ -34,7 +33,7 @@ void MatchingResultPublisher::publishOrderUpdates(const MatchingResult& result) 
 
         const auto payload = ProtobufCodec::serialize(event);
 
-        m_producer.send(KafkaTopics::OrderUpdated, payload);
+        m_producer.send(topics::kOrderUpdated, payload);
     }
 }
 
