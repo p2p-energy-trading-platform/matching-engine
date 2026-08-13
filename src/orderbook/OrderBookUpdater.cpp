@@ -7,11 +7,7 @@ namespace gridx::matching::orderbook {
 namespace {
 
 void removeOrder(const OrderPtr& order, ZoneOrderBook& zoneOrderBook) {
-    if (order->side == Side::Buy) {
-        zoneOrderBook.buyBook().removeFrontOrder(order->price);
-    } else {
-        zoneOrderBook.sellBook().removeFrontOrder(order->price);
-    }
+    zoneOrderBook.removeFrontOrder(order->side, order->price);
 }
 
 void updateOrder(const OrderUpdate& update) {
