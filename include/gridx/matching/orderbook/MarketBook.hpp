@@ -1,6 +1,8 @@
 #pragma once
 
 #include <map>
+#include <shared_mutex>
+#include <utility>
 
 #include "gridx/matching/domain/MarketId.hpp"
 #include "gridx/matching/orderbook/ZoneOrderBook.hpp"
@@ -28,14 +30,50 @@ public:
     ZoneOrderBook& zoneOrderBook(GridZoneId gridZone);
 
     /**
-     * Returns all Zone Order Books.
+     * Finds an existing Zone Order Book.
      */
-    std::map<GridZoneId, ZoneOrderBook>& zoneOrderBooks() noexcept;
+    [[nodiscard]]
+    const ZoneOrderBook* findZoneOrderBook(GridZoneId gridZone) const;
 
-    const std::map<GridZoneId, ZoneOrderBook>& zoneOrderBooks() const noexcept;
+    /**
+     * Returns the number of active Zone Order Books.
+     */
+    [[nodiscard]]
+    std::size_t zoneOrderBookCount() const;
+
+    /**
+     * Returns true if a Zone Order Book already exists for the given grid zone.
+     */
+    [[nodiscard]]
+    bool hasZoneOrderBook(GridZoneId gridZone) const;
+
+    /**
+     * Runs a callback while holding a shared lock on the zone-book map.
+     */
+    template <typename Fn>
+    decltype(auto) withZoneOrderBooks(Fn&& fn) const {
+        std::shared_lock lock(mutex_);
+
+        return std::forward<Fn>(fn)(zoneOrderBooks_);
+    }
+
+    /**
+     * Runs a callback while holding an exclusive lock on the zone-book map.
+     */
+    template <typename Fn>
+    decltype(auto) withZoneOrderBooks(Fn&& fn) {
+        std::unique_lock lock(mutex_);
+
+        return std::forward<Fn>(fn)(zoneOrderBooks_);
+    }
 
 private:
+    ZoneOrderBook& zoneOrderBookUnlocked(GridZoneId gridZone);
+    const ZoneOrderBook* findZoneOrderBookUnlocked(GridZoneId gridZone) const noexcept;
+
     MarketId marketId_;
+
+    mutable std::shared_mutex mutex_;
 
     std::map<GridZoneId, ZoneOrderBook> zoneOrderBooks_;
 };
