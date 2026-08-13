@@ -46,10 +46,10 @@ TEST_F(ZoneOrderBookTest, BuyOrderIsInsertedIntoBuyBook) {
 
     zoneBook.addOrder(order);
 
-    EXPECT_FALSE(zoneBook.buyBook().empty());
-    EXPECT_TRUE(zoneBook.sellBook().empty());
+    EXPECT_FALSE(zoneBook.empty(Side::Buy));
+    EXPECT_TRUE(zoneBook.empty(Side::Sell));
 
-    ASSERT_EQ(zoneBook.buyBook().priceLevels().size(), 1);
+    ASSERT_EQ(zoneBook.orderCount(Side::Buy), 1);
 }
 
 TEST_F(ZoneOrderBookTest, SellOrderIsInsertedIntoSellBook) {
@@ -57,21 +57,21 @@ TEST_F(ZoneOrderBookTest, SellOrderIsInsertedIntoSellBook) {
 
     zoneBook.addOrder(order);
 
-    EXPECT_TRUE(zoneBook.buyBook().empty());
-    EXPECT_FALSE(zoneBook.sellBook().empty());
+    EXPECT_TRUE(zoneBook.empty(Side::Buy));
+    EXPECT_FALSE(zoneBook.empty(Side::Sell));
 
-    ASSERT_EQ(zoneBook.sellBook().priceLevels().size(), 1);
+    ASSERT_EQ(zoneBook.orderCount(Side::Sell), 1);
 }
 
 TEST_F(ZoneOrderBookTest, BuyAndSellOrdersAreStoredSeparately) {
     zoneBook.addOrder(makeOrder(1, Side::Buy, 100));
     zoneBook.addOrder(makeOrder(2, Side::Sell, 100));
 
-    ASSERT_EQ(zoneBook.buyBook().priceLevels().size(), 1);
-    ASSERT_EQ(zoneBook.sellBook().priceLevels().size(), 1);
+    ASSERT_EQ(zoneBook.orderCount(Side::Buy), 1);
+    ASSERT_EQ(zoneBook.orderCount(Side::Sell), 1);
 
-    EXPECT_FALSE(zoneBook.buyBook().empty());
-    EXPECT_FALSE(zoneBook.sellBook().empty());
+    EXPECT_FALSE(zoneBook.empty(Side::Buy));
+    EXPECT_FALSE(zoneBook.empty(Side::Sell));
 }
 
 TEST_F(ZoneOrderBookTest, MultipleBuyOrdersMaintainPriceOrdering) {
@@ -79,17 +79,18 @@ TEST_F(ZoneOrderBookTest, MultipleBuyOrdersMaintainPriceOrdering) {
     zoneBook.addOrder(makeOrder(2, Side::Buy, 110));
     zoneBook.addOrder(makeOrder(3, Side::Buy, 105));
 
-    auto it = zoneBook.buyBook().priceLevels().begin();
+    const auto orders = zoneBook.snapshotOrders(Side::Buy);
+    auto it = orders.begin();
 
-    ASSERT_NE(it, zoneBook.buyBook().priceLevels().end());
+    ASSERT_NE(it, orders.end());
 
-    EXPECT_EQ(it->first, 110);
-
-    ++it;
-    EXPECT_EQ(it->first, 105);
+    EXPECT_EQ((*it)->price, 110);
 
     ++it;
-    EXPECT_EQ(it->first, 100);
+    EXPECT_EQ((*it)->price, 105);
+
+    ++it;
+    EXPECT_EQ((*it)->price, 100);
 }
 
 TEST_F(ZoneOrderBookTest, MultipleSellOrdersMaintainPriceOrdering) {
@@ -97,15 +98,16 @@ TEST_F(ZoneOrderBookTest, MultipleSellOrdersMaintainPriceOrdering) {
     zoneBook.addOrder(makeOrder(2, Side::Sell, 110));
     zoneBook.addOrder(makeOrder(3, Side::Sell, 95));
 
-    auto it = zoneBook.sellBook().priceLevels().begin();
+    const auto orders = zoneBook.snapshotOrders(Side::Sell);
+    auto it = orders.begin();
 
-    ASSERT_NE(it, zoneBook.sellBook().priceLevels().end());
+    ASSERT_NE(it, orders.end());
 
-    EXPECT_EQ(it->first, 95);
-
-    ++it;
-    EXPECT_EQ(it->first, 100);
+    EXPECT_EQ((*it)->price, 95);
 
     ++it;
-    EXPECT_EQ(it->first, 110);
+    EXPECT_EQ((*it)->price, 100);
+
+    ++it;
+    EXPECT_EQ((*it)->price, 110);
 }

@@ -15,13 +15,16 @@ SameZoneMatcher::SameZoneMatcher(orderbook::MarketBook& marketBook, TradeManager
 
 // Matches an incoming order against opposite-side orders within the same grid zone.
 MatchingResult SameZoneMatcher::match(Order incomingOrder) {
-    auto& zoneBook = m_marketBook.zoneOrderBook(incomingOrder.gridZone);
+    const auto* zoneBook = m_marketBook.findZoneOrderBook(incomingOrder.gridZone);
+    orderbook::ZoneOrderBook emptyZoneBook(incomingOrder.gridZone);
+
+    const auto& activeZoneBook = zoneBook != nullptr ? *zoneBook : emptyZoneBook;
 
     if (incomingOrder.side == Side::Buy) {
-        return matchBuy(incomingOrder, zoneBook);
+        return matchBuy(incomingOrder, activeZoneBook);
     }
 
-    return matchSell(incomingOrder, zoneBook);
+    return matchSell(incomingOrder, activeZoneBook);
 }
 
 // Matches an incoming BUY order against the SELL book.
@@ -29,11 +32,12 @@ MatchingResult SameZoneMatcher::matchBuy(Order incomingBuy,
                                          const orderbook::ZoneOrderBook& zoneBook) const {
     MatchingResult result;
 
-    const auto& sellBook = zoneBook.sellBook();
+    const auto sellOrders = zoneBook.snapshotOrders(Side::Sell);
 
-    for (auto it = sellBook.ordersBegin();
-         it != sellBook.ordersEnd() && incomingBuy.remainingQuantity > 0; ++it) {
-        const auto& restingOrder = *it;
+    for (const auto& restingOrder : sellOrders) {
+        if (incomingBuy.remainingQuantity == 0) {
+            break;
+        }
 
         if (restingOrder->price > incomingBuy.price) {
             break;
@@ -76,11 +80,12 @@ MatchingResult SameZoneMatcher::matchSell(Order incomingSell,
                                           const orderbook::ZoneOrderBook& zoneBook) const {
     MatchingResult result;
 
-    const auto& buyBook = zoneBook.buyBook();
+    const auto buyOrders = zoneBook.snapshotOrders(Side::Buy);
 
-    for (auto it = buyBook.ordersBegin();
-         it != buyBook.ordersEnd() && incomingSell.remainingQuantity > 0; ++it) {
-        const auto& restingOrder = *it;
+    for (const auto& restingOrder : buyOrders) {
+        if (incomingSell.remainingQuantity == 0) {
+            break;
+        }
 
         if (restingOrder->price < incomingSell.price) {
             break;
