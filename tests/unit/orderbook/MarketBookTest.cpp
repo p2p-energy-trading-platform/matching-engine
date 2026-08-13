@@ -1,37 +1,30 @@
 #include <gtest/gtest.h>
 
-#include <memory>
-
 #include "gridx/matching/orderbook/MarketBook.hpp"
+#include "support/TestSupport.hpp"
 
 using namespace gridx::matching;
 using namespace gridx::matching::orderbook;
+using namespace gridx::matching::test_support;
 
 class MarketBookTest : public ::testing::Test {
 protected:
     MarketBook marketBook{MarketId{}};
 
     OrderPtr makeOrder(OrderId id, GridZoneId zone, Side side, Price price) {
-        auto order = std::make_shared<Order>();
-
-        order->orderId = id;
-        order->userId = 1;
-
-        order->marketId = {};
-        order->gridZone = zone;
-
-        order->side = side;
-        order->orderType = OrderType::Limit;
-        order->status = OrderStatus::New;
-
-        order->price = price;
-        order->quantity = 100;
-        order->remainingQuantity = 100;
-
-        order->createdAt = Timestamp{};
-        order->expiresAt = Timestamp{};
-
-        return order;
+        return OrderBuilder{}
+            .withOrderId(id)
+            .withUserId(1)
+            .withMarketId(MarketId{})
+            .withGridZone(zone)
+            .withSide(side)
+            .withOrderType(OrderType::Limit)
+            .withStatus(OrderStatus::New)
+            .withPrice(price)
+            .withQuantity(100)
+            .withCreatedAt(Timestamp{})
+            .withExpiresAt(Timestamp{})
+            .buildPtr();
     }
 };
 
