@@ -80,55 +80,56 @@ MatchingResult CrossZoneMatcher::matchBuy(Order incomingBuy) const {
         Quantity bestAvailableQuantity{0};
 
         // Iterate through all grid zones to find the best matching SELL order.
-        for (const auto& [zoneId, zoneBook] : m_marketBook.zoneOrderBooks()) {
-            const auto& sellBook = zoneBook.sellBook();
+        m_marketBook.withZoneOrderBooks([&](const auto& zoneOrderBooks) {
+            for (const auto& [zoneId, zoneBook] : zoneOrderBooks) {
+                const auto sellOrders = zoneBook.snapshotOrders(Side::Sell);
 
-            if (sellBook.empty()) {
-                continue;
-            }
-            for (auto it = sellBook.ordersBegin(); it != sellBook.ordersEnd(); ++it) {
-                const auto& restingOrder = *it;
+                if (sellOrders.empty()) {
+                    continue;
+                }
 
-                GridTransferRule rule{};
+                for (const auto& restingOrder : sellOrders) {
+                    GridTransferRule rule{};
 
-                if (zoneId == incomingBuy.gridZone) {
-                    rule = createSameZoneRule(zoneId, incomingBuy.gridZone);
-                } else {
-                    rule = m_gridTransferCache.resolve(zoneId, incomingBuy.gridZone);
+                    if (zoneId == incomingBuy.gridZone) {
+                        rule = createSameZoneRule(zoneId, incomingBuy.gridZone);
+                    } else {
+                        rule = m_gridTransferCache.resolve(zoneId, incomingBuy.gridZone);
 
-                    if (!rule.allowed) {
+                        if (!rule.allowed) {
+                            continue;
+                        }
+                    }
+
+                    Quantity availableQuantity = restingOrder->remainingQuantity;
+
+                    if (const auto remainingIt = remainingQuantities.find(restingOrder->orderId);
+                        remainingIt != remainingQuantities.end()) {
+                        availableQuantity = remainingIt->second;
+                    }
+
+                    if (availableQuantity == Quantity{0}) {
                         continue;
                     }
+
+                    const Price effectiveAsk = restingOrder->price + rule.gridFeePerKwh;
+
+                    if (effectiveAsk > incomingBuy.price) {
+                        continue;
+                    }
+
+                    if (!isBetterCandidate(restingOrder, effectiveAsk, zoneId, bestOrder,
+                                           bestEffectivePrice, incomingBuy.gridZone, false)) {
+                        continue;
+                    }
+
+                    bestOrder = restingOrder;
+                    bestRule = rule;
+                    bestEffectivePrice = effectiveAsk;
+                    bestAvailableQuantity = availableQuantity;
                 }
-
-                Quantity availableQuantity = restingOrder->remainingQuantity;
-
-                if (const auto remainingIt = remainingQuantities.find(restingOrder->orderId);
-                    remainingIt != remainingQuantities.end()) {
-                    availableQuantity = remainingIt->second;
-                }
-
-                if (availableQuantity == Quantity{0}) {
-                    continue;
-                }
-
-                const Price effectiveAsk = restingOrder->price + rule.gridFeePerKwh;
-
-                if (effectiveAsk > incomingBuy.price) {
-                    continue;
-                }
-
-                if (!isBetterCandidate(restingOrder, effectiveAsk, zoneId, bestOrder,
-                                       bestEffectivePrice, incomingBuy.gridZone, false)) {
-                    continue;
-                }
-
-                bestOrder = restingOrder;
-                bestRule = rule;
-                bestEffectivePrice = effectiveAsk;
-                bestAvailableQuantity = availableQuantity;
             }
-        }
+        });
 
         if (!bestOrder) {
             break;
@@ -179,57 +180,57 @@ MatchingResult CrossZoneMatcher::matchSell(Order incomingSell) const {
         Quantity bestAvailableQuantity{0};
 
         // Iterate through all grid zones to find the best matching BUY order.
-        for (const auto& [zoneId, zoneBook] : m_marketBook.zoneOrderBooks()) {
-            const auto& buyBook = zoneBook.buyBook();
+        m_marketBook.withZoneOrderBooks([&](const auto& zoneOrderBooks) {
+            for (const auto& [zoneId, zoneBook] : zoneOrderBooks) {
+                const auto buyOrders = zoneBook.snapshotOrders(Side::Buy);
 
-            if (buyBook.empty()) {
-                continue;
-            }
+                if (buyOrders.empty()) {
+                    continue;
+                }
 
-            for (auto it = buyBook.ordersBegin(); it != buyBook.ordersEnd(); ++it) {
-                const auto& restingOrder = *it;
+                for (const auto& restingOrder : buyOrders) {
+                    GridTransferRule rule{};
 
-                GridTransferRule rule{};
+                    if (zoneId == incomingSell.gridZone) {
+                        rule = createSameZoneRule(incomingSell.gridZone, zoneId);
+                    } else {
+                        rule = m_gridTransferCache.resolve(incomingSell.gridZone, zoneId);
 
-                if (zoneId == incomingSell.gridZone) {
-                    rule = createSameZoneRule(incomingSell.gridZone, zoneId);
-                } else {
-                    rule = m_gridTransferCache.resolve(incomingSell.gridZone, zoneId);
+                        if (!rule.allowed) {
+                            continue;
+                        }
+                    }
 
-                    if (!rule.allowed) {
+                    Quantity availableQuantity = restingOrder->remainingQuantity;
+
+                    if (const auto remainingIt = remainingQuantities.find(restingOrder->orderId);
+                        remainingIt != remainingQuantities.end()) {
+                        availableQuantity = remainingIt->second;
+                    }
+
+                    if (availableQuantity == Quantity{0}) {
                         continue;
                     }
+
+                    // Buyer's effective bid after paying grid fee.
+                    const Price effectiveBid = restingOrder->price - rule.gridFeePerKwh;
+
+                    if (effectiveBid < incomingSell.price) {
+                        continue;
+                    }
+
+                    if (!isBetterCandidate(restingOrder, effectiveBid, zoneId, bestOrder,
+                                           bestEffectiveBid, incomingSell.gridZone, true)) {
+                        continue;
+                    }
+
+                    bestOrder = restingOrder;
+                    bestRule = rule;
+                    bestEffectiveBid = effectiveBid;
+                    bestAvailableQuantity = availableQuantity;
                 }
-
-                Quantity availableQuantity = restingOrder->remainingQuantity;
-
-                if (const auto remainingIt = remainingQuantities.find(restingOrder->orderId);
-                    remainingIt != remainingQuantities.end()) {
-                    availableQuantity = remainingIt->second;
-                }
-
-                if (availableQuantity == Quantity{0}) {
-                    continue;
-                }
-
-                // Buyer's effective bid after paying grid fee.
-                const Price effectiveBid = restingOrder->price - rule.gridFeePerKwh;
-
-                if (effectiveBid < incomingSell.price) {
-                    continue;
-                }
-
-                if (!isBetterCandidate(restingOrder, effectiveBid, zoneId, bestOrder,
-                                       bestEffectiveBid, incomingSell.gridZone, true)) {
-                    continue;
-                }
-
-                bestOrder = restingOrder;
-                bestRule = rule;
-                bestEffectiveBid = effectiveBid;
-                bestAvailableQuantity = availableQuantity;
             }
-        }
+        });
 
         if (!bestOrder) {
             break;
