@@ -42,13 +42,13 @@ TEST_F(MarketBookTest, StoresMarketId) {
 TEST_F(MarketBookTest, CreatesZoneBookWhenFirstOrderIsAdded) {
     marketBook.addOrder(makeOrder(1, 1, Side::Buy, 100));
 
-    ASSERT_EQ(marketBook.zoneOrderBooks().size(), 1);
+    ASSERT_EQ(marketBook.zoneOrderBookCount(), 1);
 
-    auto it = marketBook.zoneOrderBooks().find(1);
+    const auto* zone = marketBook.findZoneOrderBook(1);
 
-    ASSERT_NE(it, marketBook.zoneOrderBooks().end());
+    ASSERT_NE(zone, nullptr);
 
-    EXPECT_EQ(it->second.gridZone(), 1);
+    EXPECT_EQ(zone->gridZone(), 1);
 }
 
 TEST_F(MarketBookTest, ReusesExistingZoneBook) {
@@ -56,14 +56,14 @@ TEST_F(MarketBookTest, ReusesExistingZoneBook) {
 
     marketBook.addOrder(makeOrder(2, 1, Side::Sell, 105));
 
-    EXPECT_EQ(marketBook.zoneOrderBooks().size(), 1);
+    EXPECT_EQ(marketBook.zoneOrderBookCount(), 1);
 
-    auto it = marketBook.zoneOrderBooks().find(1);
+    const auto* zone = marketBook.findZoneOrderBook(1);
 
-    ASSERT_NE(it, marketBook.zoneOrderBooks().end());
+    ASSERT_NE(zone, nullptr);
 
-    EXPECT_FALSE(it->second.buyBook().empty());
-    EXPECT_FALSE(it->second.sellBook().empty());
+    EXPECT_FALSE(zone->empty(Side::Buy));
+    EXPECT_FALSE(zone->empty(Side::Sell));
 }
 
 TEST_F(MarketBookTest, CreatesSeparateZoneBooks) {
@@ -73,7 +73,7 @@ TEST_F(MarketBookTest, CreatesSeparateZoneBooks) {
 
     marketBook.addOrder(makeOrder(3, 3, Side::Sell, 100));
 
-    EXPECT_EQ(marketBook.zoneOrderBooks().size(), 3);
+    EXPECT_EQ(marketBook.zoneOrderBookCount(), 3);
 }
 
 TEST_F(MarketBookTest, RoutesOrdersToCorrectZoneBook) {
@@ -81,17 +81,17 @@ TEST_F(MarketBookTest, RoutesOrdersToCorrectZoneBook) {
 
     marketBook.addOrder(makeOrder(2, 2, Side::Sell, 105));
 
-    auto zone1 = marketBook.zoneOrderBooks().find(1);
-    auto zone2 = marketBook.zoneOrderBooks().find(2);
+    const auto* zone1 = marketBook.findZoneOrderBook(1);
+    const auto* zone2 = marketBook.findZoneOrderBook(2);
 
-    ASSERT_NE(zone1, marketBook.zoneOrderBooks().end());
-    ASSERT_NE(zone2, marketBook.zoneOrderBooks().end());
+    ASSERT_NE(zone1, nullptr);
+    ASSERT_NE(zone2, nullptr);
 
-    EXPECT_FALSE(zone1->second.buyBook().empty());
-    EXPECT_TRUE(zone1->second.sellBook().empty());
+    EXPECT_FALSE(zone1->empty(Side::Buy));
+    EXPECT_TRUE(zone1->empty(Side::Sell));
 
-    EXPECT_TRUE(zone2->second.buyBook().empty());
-    EXPECT_FALSE(zone2->second.sellBook().empty());
+    EXPECT_TRUE(zone2->empty(Side::Buy));
+    EXPECT_FALSE(zone2->empty(Side::Sell));
 }
 
 TEST_F(MarketBookTest, ReturnsExistingZoneOrderBook) {
@@ -101,7 +101,7 @@ TEST_F(MarketBookTest, ReturnsExistingZoneOrderBook) {
 
     EXPECT_EQ(zone1.gridZone(), 1);
 
-    EXPECT_FALSE(zone1.buyBook().empty());
+    EXPECT_FALSE(zone1.empty(Side::Buy));
 }
 
 TEST_F(MarketBookTest, CreatesZoneBookOnDemand) {
@@ -109,8 +109,8 @@ TEST_F(MarketBookTest, CreatesZoneBookOnDemand) {
 
     EXPECT_EQ(zone.gridZone(), 5);
 
-    EXPECT_TRUE(zone.buyBook().empty());
-    EXPECT_TRUE(zone.sellBook().empty());
+    EXPECT_TRUE(zone.empty(Side::Buy));
+    EXPECT_TRUE(zone.empty(Side::Sell));
 
-    EXPECT_EQ(marketBook.zoneOrderBooks().size(), 1);
+    EXPECT_EQ(marketBook.zoneOrderBookCount(), 1);
 }
