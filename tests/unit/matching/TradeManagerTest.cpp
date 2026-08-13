@@ -1,83 +1,43 @@
-#include <chrono>
-#include <memory>
-
 #include <gtest/gtest.h>
 
 #include "gridx/matching/domain/GridTransferRule.hpp"
-#include "gridx/matching/domain/Order.hpp"
-#include "gridx/matching/matching/TradeIdGenerator.hpp"
 #include "gridx/matching/matching/TradeManager.hpp"
+#include "support/TestSupport.hpp"
 
 using namespace gridx::matching;
 using namespace gridx::matching::matching;
+using namespace gridx::matching::test_support;
 
-namespace {
-
-class FixedSequenceTradeIdGenerator final : public ITradeIdGenerator {
-public:
-    explicit FixedSequenceTradeIdGenerator(TradeId start) : m_nextId(start) {}
-
-    TradeId next() const override {
-        return m_nextId++;
-    }
-
-private:
-    mutable TradeId m_nextId;
-};
-
-struct OrderSpec {
-    OrderId orderId;
-    UserId userId;
-    GridZoneId zone;
-    Side side;
-    Price price;
-    Quantity quantity;
-    MarketId marketId;
-};
-
-Order makeOrder(const OrderSpec& spec) {
-    Order order{};
-    order.orderId = spec.orderId;
-    order.userId = spec.userId;
-    order.marketId = spec.marketId;
-    order.gridZone = spec.zone;
-    order.side = spec.side;
-    order.orderType = OrderType::Limit;
-    order.status = OrderStatus::New;
-    order.price = spec.price;
-    order.quantity = spec.quantity;
-    order.remainingQuantity = spec.quantity;
-    order.createdAt = std::chrono::system_clock::now();
-    order.expiresAt = order.createdAt + std::chrono::hours(1);
-    return order;
-}
-
-}  // namespace
+namespace {}  // namespace
 
 TEST(TradeManagerTest, CreateTradePopulatesAllAcceptanceFields) {
-    const MarketId marketId{.deliverySlotStart = std::chrono::system_clock::now()};
+    const auto marketId = makeMarketId();
 
-    const auto buyOrder = makeOrder(OrderSpec{.orderId = 1,
-                                              .userId = 100,
-                                              .zone = 7,
-                                              .side = Side::Buy,
-                                              .price = 110,
-                                              .quantity = 100,
-                                              .marketId = marketId});
+    const auto buyOrder = OrderBuilder{}
+                              .withOrderId(1)
+                              .withUserId(100)
+                              .withMarketId(marketId)
+                              .withGridZone(7)
+                              .buy()
+                              .withPrice(110)
+                              .withQuantity(100)
+                              .build();
 
-    const auto sellOrder = makeOrder(OrderSpec{.orderId = 2,
-                                               .userId = 200,
-                                               .zone = 8,
-                                               .side = Side::Sell,
-                                               .price = 95,
-                                               .quantity = 50,
-                                               .marketId = marketId});
+    const auto sellOrder = OrderBuilder{}
+                               .withOrderId(2)
+                               .withUserId(200)
+                               .withMarketId(marketId)
+                               .withGridZone(8)
+                               .sell()
+                               .withPrice(95)
+                               .withQuantity(50)
+                               .build();
 
     GridTransferRule rule{};
     rule.gridFeePerKwh = 5;
     rule.version = 12;
 
-    TradeManager tradeManager(std::make_unique<FixedSequenceTradeIdGenerator>(5000));
+    TradeManager tradeManager(std::make_unique<TradeIdGeneratorAdapter>(5000));
 
     const auto trade = tradeManager.createTrade(buyOrder, sellOrder, 40, 100, rule);
 
@@ -99,27 +59,31 @@ TEST(TradeManagerTest, CreateTradePopulatesAllAcceptanceFields) {
 }
 
 TEST(TradeManagerTest, CreateTradeGeneratesUniqueIdsForMultipleTrades) {
-    const MarketId marketId{.deliverySlotStart = std::chrono::system_clock::now()};
+    const auto marketId = makeMarketId();
 
-    const auto buyOrder = makeOrder(OrderSpec{.orderId = 10,
-                                              .userId = 1000,
-                                              .zone = 1,
-                                              .side = Side::Buy,
-                                              .price = 120,
-                                              .quantity = 100,
-                                              .marketId = marketId});
+    const auto buyOrder = OrderBuilder{}
+                              .withOrderId(10)
+                              .withUserId(1000)
+                              .withMarketId(marketId)
+                              .withGridZone(1)
+                              .buy()
+                              .withPrice(120)
+                              .withQuantity(100)
+                              .build();
 
-    const auto sellOrder = makeOrder(OrderSpec{.orderId = 20,
-                                               .userId = 2000,
-                                               .zone = 2,
-                                               .side = Side::Sell,
-                                               .price = 90,
-                                               .quantity = 100,
-                                               .marketId = marketId});
+    const auto sellOrder = OrderBuilder{}
+                               .withOrderId(20)
+                               .withUserId(2000)
+                               .withMarketId(marketId)
+                               .withGridZone(2)
+                               .sell()
+                               .withPrice(90)
+                               .withQuantity(100)
+                               .build();
 
     const GridTransferRule rule{};
 
-    TradeManager tradeManager(std::make_unique<FixedSequenceTradeIdGenerator>(42));
+    TradeManager tradeManager(std::make_unique<TradeIdGeneratorAdapter>(42));
 
     const auto trade1 = tradeManager.createTrade(buyOrder, sellOrder, 30, 100, rule);
     const auto trade2 = tradeManager.createTrade(buyOrder, sellOrder, 20, 100, rule);
