@@ -5,9 +5,8 @@
 
 namespace gridx::matching::expiry {
 
-using orderbook::BuyBook;
 using orderbook::MarketBook;
-using orderbook::SellBook;
+using orderbook::ZoneOrderBook;
 
 class ExpiryManager {
 public:
@@ -25,9 +24,9 @@ private:
     [[nodiscard]]
     bool isMarketExpired(const MarketBook& marketBook, Timestamp currentTime) const;
 
-    void expireBuyOrders(BuyBook& buyBook) const;
+    void expireBuyOrders(ZoneOrderBook& zoneOrderBook, Timestamp currentTime) const;
 
-    void expireSellOrders(SellBook& sellBook) const;
+    void expireSellOrders(ZoneOrderBook& zoneOrderBook, Timestamp currentTime) const;
 };
 
 }  // namespace gridx::matching::expiry
