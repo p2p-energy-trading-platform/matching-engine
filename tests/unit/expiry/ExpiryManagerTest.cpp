@@ -68,8 +68,8 @@ TEST_F(ExpiryManagerTest, DoesNotExpireOrdersBeforeDeliverySlotEnd) {
     EXPECT_EQ(buyOrder->status, OrderStatus::New);
     EXPECT_EQ(sellOrder->status, OrderStatus::New);
 
-    EXPECT_FALSE(marketBook.zoneOrderBook(kZone).buyBook().empty());
-    EXPECT_FALSE(marketBook.zoneOrderBook(kZone).sellBook().empty());
+    EXPECT_FALSE(marketBook.zoneOrderBook(kZone).empty(Side::Buy));
+    EXPECT_FALSE(marketBook.zoneOrderBook(kZone).empty(Side::Sell));
 }
 
 // Test that all orders are expired and removed once the delivery slot ends.
@@ -112,8 +112,8 @@ TEST_F(ExpiryManagerTest, ExpiresBuyAndSellOrdersWhenMarketExpires) {
     EXPECT_EQ(buyOrder->status, OrderStatus::Expired);
     EXPECT_EQ(sellOrder->status, OrderStatus::Expired);
 
-    EXPECT_TRUE(marketBook.zoneOrderBook(kZone).buyBook().empty());
-    EXPECT_TRUE(marketBook.zoneOrderBook(kZone).sellBook().empty());
+    EXPECT_TRUE(marketBook.zoneOrderBook(kZone).empty(Side::Buy));
+    EXPECT_TRUE(marketBook.zoneOrderBook(kZone).empty(Side::Sell));
 }
 
 // Test that orders in multiple grid zones are expired.
@@ -159,8 +159,8 @@ TEST_F(ExpiryManagerTest, ExpiresOrdersAcrossMultipleZones) {
     EXPECT_EQ(buyOrder->status, OrderStatus::Expired);
     EXPECT_EQ(sellOrder->status, OrderStatus::Expired);
 
-    EXPECT_TRUE(marketBook.zoneOrderBook(kZone1).buyBook().empty());
-    EXPECT_TRUE(marketBook.zoneOrderBook(kZone2).sellBook().empty());
+    EXPECT_TRUE(marketBook.zoneOrderBook(kZone1).empty(Side::Buy));
+    EXPECT_TRUE(marketBook.zoneOrderBook(kZone2).empty(Side::Sell));
 }
 
 // Test that all order books are cleared after expiry.
@@ -198,13 +198,13 @@ TEST_F(ExpiryManagerTest, ClearsOrderBooksAfterExpiry) {
     marketBook.addOrder(buyOrder);
     marketBook.addOrder(sellOrder);
 
-    ASSERT_FALSE(marketBook.zoneOrderBook(kZone).buyBook().empty());
-    ASSERT_FALSE(marketBook.zoneOrderBook(kZone).sellBook().empty());
+    ASSERT_FALSE(marketBook.zoneOrderBook(kZone).empty(Side::Buy));
+    ASSERT_FALSE(marketBook.zoneOrderBook(kZone).empty(Side::Sell));
 
     expiryManager.expireOrders(marketBook, marketId.deliverySlotEnd());
 
-    EXPECT_TRUE(marketBook.zoneOrderBook(kZone).buyBook().empty());
-    EXPECT_TRUE(marketBook.zoneOrderBook(kZone).sellBook().empty());
+    EXPECT_TRUE(marketBook.zoneOrderBook(kZone).empty(Side::Buy));
+    EXPECT_TRUE(marketBook.zoneOrderBook(kZone).empty(Side::Sell));
 
     EXPECT_EQ(buyOrder->status, OrderStatus::Expired);
     EXPECT_EQ(sellOrder->status, OrderStatus::Expired);
