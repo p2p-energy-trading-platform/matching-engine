@@ -75,7 +75,7 @@ TEST_F(OrderBookUpdaterTest, RemovesFilledBuyOrder) {
 
     updater.apply(result, zoneOrderBook);
 
-    EXPECT_TRUE(zoneOrderBook.buyBook().empty());
+    EXPECT_TRUE(zoneOrderBook.empty(Side::Buy));
 }
 // Verify that a fully matched order is removed from the order book.
 TEST_F(OrderBookUpdaterTest, RemovesFilledSellOrder) {
@@ -92,7 +92,7 @@ TEST_F(OrderBookUpdaterTest, RemovesFilledSellOrder) {
 
     updater.apply(result, zoneOrderBook);
 
-    EXPECT_TRUE(zoneOrderBook.sellBook().empty());
+    EXPECT_TRUE(zoneOrderBook.empty(Side::Sell));
 }
 
 // Verify that a remaining incoming order is added to the order book.
@@ -103,7 +103,7 @@ TEST_F(OrderBookUpdaterTest, InsertsRemainingIncomingOrder) {
 
     updater.apply(result, zoneOrderBook);
 
-    EXPECT_FALSE(zoneOrderBook.buyBook().empty());
+    EXPECT_FALSE(zoneOrderBook.empty(Side::Buy));
 }
 
 // Verify that an existing order is updated and a new incoming order is inserted.
@@ -126,7 +126,7 @@ TEST_F(OrderBookUpdaterTest, UpdatesExistingOrderAndInsertsIncomingOrder) {
     EXPECT_EQ(existing->remainingQuantity, 3);
     EXPECT_EQ(existing->status, OrderStatus::PartiallyFilled);
 
-    EXPECT_FALSE(zoneOrderBook.buyBook().empty());
+    EXPECT_FALSE(zoneOrderBook.empty(Side::Buy));
 }
 
 // Verify that an empty MatchingResult does not cause any errors.
