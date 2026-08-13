@@ -4,9 +4,11 @@
 #include <functional>
 #include <map>
 #include <memory>
+#include <mutex>
+#include <shared_mutex>
+#include <vector>
 
 #include "gridx/matching/domain/Order.hpp"
-#include "gridx/matching/orderbook/RestingOrderIterator.hpp"
 
 namespace gridx::matching::orderbook {
 
@@ -17,8 +19,7 @@ template <typename Comparator>
 class OrderBook {
 public:
     using PriceLevels = std::map<Price, OrderQueue, Comparator>;
-
-    using ConstOrderIterator = RestingOrderIterator<Comparator>;
+    using PriceLevelSnapshot = std::vector<std::pair<Price, OrderQueue>>;
 
     OrderBook() = default;
     ~OrderBook() = default;
@@ -30,16 +31,16 @@ public:
     OrderBook& operator=(OrderBook&&) noexcept = default;
 
     /**
-     * Returns an iterator over resting orders in price-time priority.
+     * Returns all price levels in price-time priority.
      */
     [[nodiscard]]
-    ConstOrderIterator ordersBegin() const;
+    PriceLevelSnapshot snapshotPriceLevels() const;
 
     /**
-     * Returns an iterator to the end of the order book.
+     * Returns all resting orders in price-time priority.
      */
     [[nodiscard]]
-    ConstOrderIterator ordersEnd() const;
+    std::vector<OrderPtr> snapshotOrders() const;
 
     /**
      * Inserts an order into the appropriate price level.
@@ -54,44 +55,38 @@ public:
     void removeFrontOrder(Price price);
 
     /**
-     * Returns the best price level.
+     * Returns the best available price.
      * Returns nullptr if the book is empty.
-     */
-    [[nodiscard]]
-    const OrderQueue* bestPriceLevel() const;
-
-    /**
-     * Returns the oldest order at the best price level.
-     * Returns nullptr if the order book is empty.
      */
     [[nodiscard]]
     OrderPtr bestOrder() const;
 
     /**
      * Returns the best available price.
-     * Returns Price{} if the order book is empty.
+     * Returns Price{} if the book is empty.
      */
     [[nodiscard]]
     Price bestPrice() const;
 
     /**
-     * Returns all price levels.
+     * Returns the number of resting orders in the book.
      */
     [[nodiscard]]
-    const PriceLevels& priceLevels() const noexcept;
+    std::size_t orderCount() const;
 
     /**
      * Returns true if the order book contains no orders.
      */
     [[nodiscard]]
-    bool empty() const noexcept;
+    bool empty() const;
 
     /**
      * Removes all orders.
      */
-    void clear() noexcept;
+    void clear();
 
 private:
+    mutable std::shared_mutex mutex_;
     PriceLevels priceLevels_;
 };
 
