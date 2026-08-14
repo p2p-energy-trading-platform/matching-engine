@@ -7,10 +7,12 @@
 #include "gridx/matching/matching/CrossZoneMatcher.hpp"
 #include "gridx/matching/matching/TradeManager.hpp"
 #include "gridx/matching/orderbook/MarketBook.hpp"
+#include "support/TestSupport.hpp"
 
 using namespace gridx::matching;
 using namespace gridx::matching::matching;
 using namespace gridx::matching::orderbook;
+using namespace gridx::matching::test_support;
 
 class CrossZoneMatcherTest : public ::testing::Test {
 protected:
@@ -20,6 +22,41 @@ protected:
           }
         , marketBook(marketId)
         , matcher(marketBook, tradeManager, gridTransferCache) {}
+
+    OrderPtr makeOrder(OrderId orderId, UserId userId, GridZoneId gridZone, Side side, Price price,
+                       Quantity quantity, const Timestamp& createdAt = fixedTimestamp()) const {
+        return OrderBuilder{}
+            .withOrderId(orderId)
+            .withUserId(userId)
+            .withMarketId(marketId)
+            .withGridZone(gridZone)
+            .withSide(side)
+            .withOrderType(OrderType::Limit)
+            .withStatus(OrderStatus::New)
+            .withPrice(price)
+            .withQuantity(quantity)
+            .withCreatedAt(createdAt)
+            .withExpiresAt(after(createdAt, std::chrono::hours{1}))
+            .buildPtr();
+    }
+
+    Order makeOrderValue(OrderId orderId, UserId userId, GridZoneId gridZone, Side side,
+                         Price price, Quantity quantity,
+                         const Timestamp& createdAt = fixedTimestamp()) const {
+        return OrderBuilder{}
+            .withOrderId(orderId)
+            .withUserId(userId)
+            .withMarketId(marketId)
+            .withGridZone(gridZone)
+            .withSide(side)
+            .withOrderType(OrderType::Limit)
+            .withStatus(OrderStatus::New)
+            .withPrice(price)
+            .withQuantity(quantity)
+            .withCreatedAt(createdAt)
+            .withExpiresAt(after(createdAt, std::chrono::hours{1}))
+            .build();
+    }
 
     static constexpr GridZoneId kBuyerZone = 1;
     static constexpr GridZoneId kSellerZone = 2;
@@ -47,37 +84,13 @@ TEST_F(CrossZoneMatcherTest, BuyOrderFullyMatchesSellOrderAcrossZones) {
 
     ASSERT_TRUE(gridTransferCache.upsert(rule));
 
-    auto sellOrder = std::make_shared<Order>();
-
-    sellOrder->orderId = 1;
-    sellOrder->userId = 10;
-    sellOrder->marketId = marketId;
-    sellOrder->gridZone = kSellerZone;
-    sellOrder->side = Side::Sell;
-    sellOrder->orderType = OrderType::Limit;
-    sellOrder->status = OrderStatus::New;
-    sellOrder->price = 100;
-    sellOrder->quantity = 10;
-    sellOrder->remainingQuantity = 10;
-    sellOrder->createdAt = std::chrono::system_clock::now();
-    sellOrder->expiresAt = sellOrder->createdAt + std::chrono::hours(1);
+    auto sellOrder =
+        makeOrder(1, 10, kSellerZone, Side::Sell, 100, 10, std::chrono::system_clock::now());
 
     marketBook.addOrder(sellOrder);
 
-    Order buyOrder{};
-
-    buyOrder.orderId = 2;
-    buyOrder.userId = 20;
-    buyOrder.marketId = marketId;
-    buyOrder.gridZone = kBuyerZone;
-    buyOrder.side = Side::Buy;
-    buyOrder.orderType = OrderType::Limit;
-    buyOrder.status = OrderStatus::New;
-    buyOrder.price = 105;
-    buyOrder.quantity = 10;
-    buyOrder.remainingQuantity = 10;
-    buyOrder.createdAt = std::chrono::system_clock::now();
-    buyOrder.expiresAt = buyOrder.createdAt + std::chrono::hours(1);
+    Order buyOrder =
+        makeOrderValue(2, 20, kBuyerZone, Side::Buy, 105, 10, std::chrono::system_clock::now());
 
     const auto result = matcher.match(buyOrder);
 
@@ -126,37 +139,13 @@ TEST_F(CrossZoneMatcherTest, SellOrderFullyMatchesBuyOrderAcrossZones) {
 
     ASSERT_TRUE(gridTransferCache.upsert(rule));
 
-    auto buyOrder = std::make_shared<Order>();
-
-    buyOrder->orderId = 1;
-    buyOrder->userId = 10;
-    buyOrder->marketId = marketId;
-    buyOrder->gridZone = kBuyerZone;
-    buyOrder->side = Side::Buy;
-    buyOrder->orderType = OrderType::Limit;
-    buyOrder->status = OrderStatus::New;
-    buyOrder->price = 105;
-    buyOrder->quantity = 10;
-    buyOrder->remainingQuantity = 10;
-    buyOrder->createdAt = std::chrono::system_clock::now();
-    buyOrder->expiresAt = buyOrder->createdAt + std::chrono::hours(1);
+    auto buyOrder =
+        makeOrder(1, 10, kBuyerZone, Side::Buy, 105, 10, std::chrono::system_clock::now());
 
     marketBook.addOrder(buyOrder);
 
-    Order sellOrder{};
-
-    sellOrder.orderId = 2;
-    sellOrder.userId = 20;
-    sellOrder.marketId = marketId;
-    sellOrder.gridZone = kSellerZone;
-    sellOrder.side = Side::Sell;
-    sellOrder.orderType = OrderType::Limit;
-    sellOrder.status = OrderStatus::New;
-    sellOrder.price = 100;
-    sellOrder.quantity = 10;
-    sellOrder.remainingQuantity = 10;
-    sellOrder.createdAt = std::chrono::system_clock::now();
-    sellOrder.expiresAt = sellOrder.createdAt + std::chrono::hours(1);
+    Order sellOrder =
+        makeOrderValue(2, 20, kSellerZone, Side::Sell, 100, 10, std::chrono::system_clock::now());
 
     const auto result = matcher.match(sellOrder);
 
@@ -205,37 +194,13 @@ TEST_F(CrossZoneMatcherTest, BuyOrderPartiallyMatchesSellOrderAcrossZones) {
 
     ASSERT_TRUE(gridTransferCache.upsert(rule));
 
-    auto sellOrder = std::make_shared<Order>();
-
-    sellOrder->orderId = 1;
-    sellOrder->userId = 10;
-    sellOrder->marketId = marketId;
-    sellOrder->gridZone = kSellerZone;
-    sellOrder->side = Side::Sell;
-    sellOrder->orderType = OrderType::Limit;
-    sellOrder->status = OrderStatus::New;
-    sellOrder->price = 100;
-    sellOrder->quantity = 20;
-    sellOrder->remainingQuantity = 20;
-    sellOrder->createdAt = std::chrono::system_clock::now();
-    sellOrder->expiresAt = sellOrder->createdAt + std::chrono::hours(1);
+    auto sellOrder =
+        makeOrder(1, 10, kSellerZone, Side::Sell, 100, 20, std::chrono::system_clock::now());
 
     marketBook.addOrder(sellOrder);
 
-    Order buyOrder{};
-
-    buyOrder.orderId = 2;
-    buyOrder.userId = 20;
-    buyOrder.marketId = marketId;
-    buyOrder.gridZone = kBuyerZone;
-    buyOrder.side = Side::Buy;
-    buyOrder.orderType = OrderType::Limit;
-    buyOrder.status = OrderStatus::New;
-    buyOrder.price = 105;
-    buyOrder.quantity = 10;
-    buyOrder.remainingQuantity = 10;
-    buyOrder.createdAt = std::chrono::system_clock::now();
-    buyOrder.expiresAt = buyOrder.createdAt + std::chrono::hours(1);
+    Order buyOrder =
+        makeOrderValue(2, 20, kBuyerZone, Side::Buy, 105, 10, std::chrono::system_clock::now());
 
     const auto result = matcher.match(buyOrder);
 

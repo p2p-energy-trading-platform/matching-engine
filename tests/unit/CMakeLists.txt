@@ -33,6 +33,13 @@ target_link_libraries(
         GTest::gtest_main
 )
 
+target_include_directories(
+    unit-tests
+
+    PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}
+)
+
 include(GoogleTest)
 
 gtest_discover_tests(

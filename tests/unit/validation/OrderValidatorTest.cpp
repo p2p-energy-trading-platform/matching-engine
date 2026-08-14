@@ -1,39 +1,30 @@
-#include <chrono>
-
 #include <gtest/gtest.h>
 
-#include "gridx/matching/domain/MarketId.hpp"
 #include "gridx/matching/validation/OrderValidator.hpp"
+#include "support/TestSupport.hpp"
 
 using namespace gridx::matching;
 using namespace gridx::matching::validation;
+using namespace gridx::matching::test_support;
 
 class OrderValidatorTest : public ::testing::Test {
 protected:
     OrderValidator validator;
 
     Order createValidOrder() const {
-        Order order{};
-
-        order.orderId = 1;
-        order.userId = 1;
-
-        order.marketId.deliverySlotStart = std::chrono::system_clock::now();
-
-        order.gridZone = 1;
-
-        order.side = Side::Buy;
-        order.orderType = OrderType::Limit;
-        order.status = OrderStatus::New;
-
-        order.price = 100.0;
-        order.quantity = 10.0;
-        order.remainingQuantity = 10.0;
-
-        order.createdAt = std::chrono::system_clock::now();
-        order.expiresAt = order.createdAt + std::chrono::minutes(30);
-
-        return order;
+        return OrderBuilder{}
+            .withOrderId(1)
+            .withUserId(1)
+            .withMarketId(makeMarketId())
+            .withGridZone(1)
+            .buy()
+            .withOrderType(OrderType::Limit)
+            .withStatus(OrderStatus::New)
+            .withPrice(100.0)
+            .withQuantity(10.0)
+            .withCreatedAt(fixedTimestamp())
+            .withExpiresAt(after(fixedTimestamp(), std::chrono::minutes{30}))
+            .build();
     }
 };
 

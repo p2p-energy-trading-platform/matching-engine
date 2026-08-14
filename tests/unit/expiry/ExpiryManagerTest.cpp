@@ -2,14 +2,14 @@
 
 #include <gtest/gtest.h>
 
-#include "gridx/matching/domain/MarketId.hpp"
-#include "gridx/matching/domain/Order.hpp"
 #include "gridx/matching/expiry/ExpiryManager.hpp"
 #include "gridx/matching/orderbook/MarketBook.hpp"
+#include "support/TestSupport.hpp"
 
 using namespace gridx::matching;
 using namespace gridx::matching::expiry;
 using namespace gridx::matching::orderbook;
+using namespace gridx::matching::test_support;
 
 class ExpiryManagerTest : public ::testing::Test {
 protected:
@@ -18,6 +18,23 @@ protected:
               std::chrono::system_clock::now(),
           }
         , marketBook(marketId) {}
+
+    OrderPtr makeOrder(OrderId orderId, UserId userId, GridZoneId gridZone, Side side, Price price,
+                       Quantity quantity, const Timestamp& createdAt = fixedTimestamp()) const {
+        return OrderBuilder{}
+            .withOrderId(orderId)
+            .withUserId(userId)
+            .withMarketId(marketId)
+            .withGridZone(gridZone)
+            .withSide(side)
+            .withOrderType(OrderType::Limit)
+            .withStatus(OrderStatus::New)
+            .withPrice(price)
+            .withQuantity(quantity)
+            .withCreatedAt(createdAt)
+            .withExpiresAt(after(createdAt, std::chrono::hours{1}))
+            .buildPtr();
+    }
 
     static constexpr GridZoneId kZone = 1;
 
@@ -30,35 +47,9 @@ protected:
 
 // Test that orders are not expired before the delivery slot ends.
 TEST_F(ExpiryManagerTest, DoesNotExpireOrdersBeforeDeliverySlotEnd) {
-    auto buyOrder = std::make_shared<Order>();
+    auto buyOrder = makeOrder(1, 10, kZone, Side::Buy, 100, 10, std::chrono::system_clock::now());
 
-    buyOrder->orderId = 1;
-    buyOrder->userId = 10;
-    buyOrder->marketId = marketId;
-    buyOrder->gridZone = kZone;
-    buyOrder->side = Side::Buy;
-    buyOrder->orderType = OrderType::Limit;
-    buyOrder->status = OrderStatus::New;
-    buyOrder->price = 100;
-    buyOrder->quantity = 10;
-    buyOrder->remainingQuantity = 10;
-    buyOrder->createdAt = std::chrono::system_clock::now();
-    buyOrder->expiresAt = buyOrder->createdAt + std::chrono::hours(1);
-
-    auto sellOrder = std::make_shared<Order>();
-
-    sellOrder->orderId = 2;
-    sellOrder->userId = 20;
-    sellOrder->marketId = marketId;
-    sellOrder->gridZone = kZone;
-    sellOrder->side = Side::Sell;
-    sellOrder->orderType = OrderType::Limit;
-    sellOrder->status = OrderStatus::New;
-    sellOrder->price = 100;
-    sellOrder->quantity = 10;
-    sellOrder->remainingQuantity = 10;
-    sellOrder->createdAt = std::chrono::system_clock::now();
-    sellOrder->expiresAt = sellOrder->createdAt + std::chrono::hours(1);
+    auto sellOrder = makeOrder(2, 20, kZone, Side::Sell, 100, 10, std::chrono::system_clock::now());
 
     marketBook.addOrder(buyOrder);
     marketBook.addOrder(sellOrder);
@@ -74,35 +65,9 @@ TEST_F(ExpiryManagerTest, DoesNotExpireOrdersBeforeDeliverySlotEnd) {
 
 // Test that all orders are expired and removed once the delivery slot ends.
 TEST_F(ExpiryManagerTest, ExpiresBuyAndSellOrdersWhenMarketExpires) {
-    auto buyOrder = std::make_shared<Order>();
+    auto buyOrder = makeOrder(1, 10, kZone, Side::Buy, 100, 10, std::chrono::system_clock::now());
 
-    buyOrder->orderId = 1;
-    buyOrder->userId = 10;
-    buyOrder->marketId = marketId;
-    buyOrder->gridZone = kZone;
-    buyOrder->side = Side::Buy;
-    buyOrder->orderType = OrderType::Limit;
-    buyOrder->status = OrderStatus::New;
-    buyOrder->price = 100;
-    buyOrder->quantity = 10;
-    buyOrder->remainingQuantity = 10;
-    buyOrder->createdAt = std::chrono::system_clock::now();
-    buyOrder->expiresAt = buyOrder->createdAt + std::chrono::hours(1);
-
-    auto sellOrder = std::make_shared<Order>();
-
-    sellOrder->orderId = 2;
-    sellOrder->userId = 20;
-    sellOrder->marketId = marketId;
-    sellOrder->gridZone = kZone;
-    sellOrder->side = Side::Sell;
-    sellOrder->orderType = OrderType::Limit;
-    sellOrder->status = OrderStatus::New;
-    sellOrder->price = 100;
-    sellOrder->quantity = 10;
-    sellOrder->remainingQuantity = 10;
-    sellOrder->createdAt = std::chrono::system_clock::now();
-    sellOrder->expiresAt = sellOrder->createdAt + std::chrono::hours(1);
+    auto sellOrder = makeOrder(2, 20, kZone, Side::Sell, 100, 10, std::chrono::system_clock::now());
 
     marketBook.addOrder(buyOrder);
     marketBook.addOrder(sellOrder);
@@ -121,35 +86,10 @@ TEST_F(ExpiryManagerTest, ExpiresOrdersAcrossMultipleZones) {
     constexpr GridZoneId kZone1 = 1;
     constexpr GridZoneId kZone2 = 2;
 
-    auto buyOrder = std::make_shared<Order>();
+    auto buyOrder = makeOrder(1, 10, kZone1, Side::Buy, 100, 10, std::chrono::system_clock::now());
 
-    buyOrder->orderId = 1;
-    buyOrder->userId = 10;
-    buyOrder->marketId = marketId;
-    buyOrder->gridZone = kZone1;
-    buyOrder->side = Side::Buy;
-    buyOrder->orderType = OrderType::Limit;
-    buyOrder->status = OrderStatus::New;
-    buyOrder->price = 100;
-    buyOrder->quantity = 10;
-    buyOrder->remainingQuantity = 10;
-    buyOrder->createdAt = std::chrono::system_clock::now();
-    buyOrder->expiresAt = buyOrder->createdAt + std::chrono::hours(1);
-
-    auto sellOrder = std::make_shared<Order>();
-
-    sellOrder->orderId = 2;
-    sellOrder->userId = 20;
-    sellOrder->marketId = marketId;
-    sellOrder->gridZone = kZone2;
-    sellOrder->side = Side::Sell;
-    sellOrder->orderType = OrderType::Limit;
-    sellOrder->status = OrderStatus::New;
-    sellOrder->price = 100;
-    sellOrder->quantity = 10;
-    sellOrder->remainingQuantity = 10;
-    sellOrder->createdAt = std::chrono::system_clock::now();
-    sellOrder->expiresAt = sellOrder->createdAt + std::chrono::hours(1);
+    auto sellOrder =
+        makeOrder(2, 20, kZone2, Side::Sell, 100, 10, std::chrono::system_clock::now());
 
     marketBook.addOrder(buyOrder);
     marketBook.addOrder(sellOrder);
@@ -165,35 +105,9 @@ TEST_F(ExpiryManagerTest, ExpiresOrdersAcrossMultipleZones) {
 
 // Test that all order books are cleared after expiry.
 TEST_F(ExpiryManagerTest, ClearsOrderBooksAfterExpiry) {
-    auto buyOrder = std::make_shared<Order>();
+    auto buyOrder = makeOrder(1, 10, kZone, Side::Buy, 100, 10, std::chrono::system_clock::now());
 
-    buyOrder->orderId = 1;
-    buyOrder->userId = 10;
-    buyOrder->marketId = marketId;
-    buyOrder->gridZone = kZone;
-    buyOrder->side = Side::Buy;
-    buyOrder->orderType = OrderType::Limit;
-    buyOrder->status = OrderStatus::New;
-    buyOrder->price = 100;
-    buyOrder->quantity = 10;
-    buyOrder->remainingQuantity = 10;
-    buyOrder->createdAt = std::chrono::system_clock::now();
-    buyOrder->expiresAt = buyOrder->createdAt + std::chrono::hours(1);
-
-    auto sellOrder = std::make_shared<Order>();
-
-    sellOrder->orderId = 2;
-    sellOrder->userId = 20;
-    sellOrder->marketId = marketId;
-    sellOrder->gridZone = kZone;
-    sellOrder->side = Side::Sell;
-    sellOrder->orderType = OrderType::Limit;
-    sellOrder->status = OrderStatus::New;
-    sellOrder->price = 100;
-    sellOrder->quantity = 10;
-    sellOrder->remainingQuantity = 10;
-    sellOrder->createdAt = std::chrono::system_clock::now();
-    sellOrder->expiresAt = sellOrder->createdAt + std::chrono::hours(1);
+    auto sellOrder = makeOrder(2, 20, kZone, Side::Sell, 100, 10, std::chrono::system_clock::now());
 
     marketBook.addOrder(buyOrder);
     marketBook.addOrder(sellOrder);

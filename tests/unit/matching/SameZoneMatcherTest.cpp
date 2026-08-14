@@ -2,15 +2,15 @@
 
 #include <gtest/gtest.h>
 
-#include "gridx/matching/domain/MarketId.hpp"
-#include "gridx/matching/domain/Order.hpp"
 #include "gridx/matching/matching/SameZoneMatcher.hpp"
 #include "gridx/matching/matching/TradeManager.hpp"
 #include "gridx/matching/orderbook/MarketBook.hpp"
+#include "support/TestSupport.hpp"
 
 using namespace gridx::matching;
 using namespace gridx::matching::matching;
 using namespace gridx::matching::orderbook;
+using namespace gridx::matching::test_support;
 
 class SameZoneMatcherTest : public ::testing::Test {
 protected:
@@ -20,6 +20,40 @@ protected:
           }
         , marketBook(marketId)
         , matcher(marketBook, tradeManager) {}
+
+    OrderPtr makeOrder(OrderId orderId, UserId userId, Side side, Price price, Quantity quantity,
+                       const Timestamp& createdAt = fixedTimestamp()) const {
+        return OrderBuilder{}
+            .withOrderId(orderId)
+            .withUserId(userId)
+            .withMarketId(marketId)
+            .withGridZone(kZone)
+            .withSide(side)
+            .withOrderType(OrderType::Limit)
+            .withStatus(OrderStatus::New)
+            .withPrice(price)
+            .withQuantity(quantity)
+            .withCreatedAt(createdAt)
+            .withExpiresAt(after(createdAt, std::chrono::hours{1}))
+            .buildPtr();
+    }
+
+    Order makeOrderValue(OrderId orderId, UserId userId, Side side, Price price, Quantity quantity,
+                         const Timestamp& createdAt = fixedTimestamp()) const {
+        return OrderBuilder{}
+            .withOrderId(orderId)
+            .withUserId(userId)
+            .withMarketId(marketId)
+            .withGridZone(kZone)
+            .withSide(side)
+            .withOrderType(OrderType::Limit)
+            .withStatus(OrderStatus::New)
+            .withPrice(price)
+            .withQuantity(quantity)
+            .withCreatedAt(createdAt)
+            .withExpiresAt(after(createdAt, std::chrono::hours{1}))
+            .build();
+    }
 
     static constexpr GridZoneId kZone = 1;
 
@@ -34,37 +68,11 @@ protected:
 
 // Test that a BUY order fully matches a SELL order in the same grid zone.
 TEST_F(SameZoneMatcherTest, BuyOrderFullyMatchesSellOrder) {
-    auto sellOrder = std::make_shared<Order>();
-
-    sellOrder->orderId = 1;
-    sellOrder->userId = 10;
-    sellOrder->marketId = marketId;
-    sellOrder->gridZone = kZone;
-    sellOrder->side = Side::Sell;
-    sellOrder->orderType = OrderType::Limit;
-    sellOrder->status = OrderStatus::New;
-    sellOrder->price = 100;
-    sellOrder->quantity = 10;
-    sellOrder->remainingQuantity = 10;
-    sellOrder->createdAt = std::chrono::system_clock::now();
-    sellOrder->expiresAt = sellOrder->createdAt + std::chrono::hours(1);
+    auto sellOrder = makeOrder(1, 10, Side::Sell, 100, 10, std::chrono::system_clock::now());
 
     marketBook.addOrder(sellOrder);
 
-    Order buyOrder{};
-
-    buyOrder.orderId = 2;
-    buyOrder.userId = 20;
-    buyOrder.marketId = marketId;
-    buyOrder.gridZone = kZone;
-    buyOrder.side = Side::Buy;
-    buyOrder.orderType = OrderType::Limit;
-    buyOrder.status = OrderStatus::New;
-    buyOrder.price = 100;
-    buyOrder.quantity = 10;
-    buyOrder.remainingQuantity = 10;
-    buyOrder.createdAt = std::chrono::system_clock::now();
-    buyOrder.expiresAt = buyOrder.createdAt + std::chrono::hours(1);
+    Order buyOrder = makeOrderValue(2, 20, Side::Buy, 100, 10, std::chrono::system_clock::now());
 
     const auto result = matcher.match(buyOrder);
 
