@@ -10,7 +10,7 @@
 namespace gridx::matching::test_support {
 
 inline Timestamp fixedTimestamp() {
-    return Timestamp{};
+    return Timestamp{} + std::chrono::hours{24 * 365 * 100};
 }
 
 template <typename Rep, typename Period>
