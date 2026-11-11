@@ -23,8 +23,9 @@ protected:
         , marketBook(marketId)
         , matcher(marketBook, tradeManager, gridTransferCache) {}
 
-    OrderPtr makeOrder(OrderId orderId, std::uint64_t userId, GridZoneId gridZone, Side side, Price price,
-                       Quantity quantity, const Timestamp& createdAt = fixedTimestamp()) const {
+    OrderPtr makeOrder(OrderId orderId, std::uint64_t userId, GridZoneId gridZone, Side side,
+                       Price price, Quantity quantity,
+                       const Timestamp& createdAt = fixedTimestamp()) const {
         return OrderBuilder{}
             .withOrderId(orderId)
             .withUserId(testUserId(userId))

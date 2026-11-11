@@ -21,8 +21,8 @@ protected:
         , marketBook(marketId)
         , matcher(marketBook, tradeManager) {}
 
-    OrderPtr makeOrder(OrderId orderId, std::uint64_t userId, Side side, Price price, Quantity quantity,
-                       const Timestamp& createdAt = fixedTimestamp()) const {
+    OrderPtr makeOrder(OrderId orderId, std::uint64_t userId, Side side, Price price,
+                       Quantity quantity, const Timestamp& createdAt = fixedTimestamp()) const {
         return OrderBuilder{}
             .withOrderId(orderId)
             .withUserId(testUserId(userId))
@@ -38,8 +38,8 @@ protected:
             .buildPtr();
     }
 
-    Order makeOrderValue(OrderId orderId, std::uint64_t userId, Side side, Price price, Quantity quantity,
-                         const Timestamp& createdAt = fixedTimestamp()) const {
+    Order makeOrderValue(OrderId orderId, std::uint64_t userId, Side side, Price price,
+                         Quantity quantity, const Timestamp& createdAt = fixedTimestamp()) const {
         return OrderBuilder{}
             .withOrderId(orderId)
             .withUserId(testUserId(userId))

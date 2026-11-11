@@ -10,7 +10,6 @@
 
 namespace gridx::matching {
 
-
 class UserId {
 public:
     static constexpr std::size_t kByteCount = 16;
@@ -20,7 +19,6 @@ public:
 
     explicit constexpr UserId(const Bytes& bytes) : m_bytes(bytes) {}
 
-    
     [[nodiscard]] static constexpr std::optional<UserId> fromString(std::string_view text) {
         if (text.size() != kTextLength) {
             return std::nullopt;
