@@ -3,6 +3,7 @@
 #include <memory>
 
 #include "gridx/matching/orderbook/ZoneOrderBook.hpp"
+#include "support/TestSupport.hpp"
 
 using namespace gridx::matching;
 using namespace gridx::matching::orderbook;
@@ -17,7 +18,7 @@ protected:
         auto order = std::make_shared<Order>();
 
         order->orderId = id;
-        order->userId = 1;
+        order->userId = test_support::testUserId(1);
 
         order->marketId = {};
         order->gridZone = ZoneId;
