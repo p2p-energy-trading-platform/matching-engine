@@ -18,6 +18,20 @@ inline Timestamp after(const Timestamp& base, const std::chrono::duration<Rep, P
     return base + std::chrono::duration_cast<Timestamp::duration>(delta);
 }
 
+/*
+ * Builds a deterministic, valid (version 4) UUID from a small number so tests can
+ * keep using readable IDs: testUserId(10) -> "00000000-0000-4000-8000-00000000000a".
+ */
+constexpr UserId testUserId(std::uint64_t value) {
+    UserId::Bytes bytes{};
+    bytes[6] = 0x40;  // version 4
+    bytes[8] = 0x80;  // RFC 4122 variant
+    for (std::size_t i = 0; i < 6; ++i) {
+        bytes[UserId::kByteCount - 1 - i] = static_cast<std::uint8_t>(value >> (8 * i));
+    }
+    return UserId{bytes};
+}
+
 inline MarketId makeMarketId(const Timestamp& deliverySlotStart = fixedTimestamp()) {
     return MarketId{.deliverySlotStart = deliverySlotStart};
 }
@@ -41,7 +55,6 @@ private:
 
 using OrderIdGenerator = SequentialIdGenerator<OrderId>;
 using TradeIdGenerator = SequentialIdGenerator<TradeId>;
-using UserIdGenerator = SequentialIdGenerator<UserId>;
 using GridZoneIdGenerator = SequentialIdGenerator<GridZoneId>;
 
 class TradeIdGeneratorAdapter final : public matching::ITradeIdGenerator {
@@ -60,7 +73,7 @@ class OrderBuilder {
 public:
     OrderBuilder() {
         m_order.orderId = 1;
-        m_order.userId = 1;
+        m_order.userId = testUserId(1);
         m_order.marketId = makeMarketId();
         m_order.gridZone = 1;
         m_order.side = Side::Buy;
@@ -171,8 +184,8 @@ public:
         m_trade.tradeId = 1;
         m_trade.buyOrderId = 1;
         m_trade.sellOrderId = 2;
-        m_trade.buyerId = 1;
-        m_trade.sellerId = 2;
+        m_trade.buyerId = testUserId(1);
+        m_trade.sellerId = testUserId(2);
         m_trade.buyerGridZone = 1;
         m_trade.sellerGridZone = 2;
         m_trade.deliverySlotStart = fixedTimestamp();

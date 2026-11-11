@@ -14,7 +14,7 @@ protected:
     Order createValidOrder() const {
         return OrderBuilder{}
             .withOrderId(1)
-            .withUserId(1)
+            .withUserId(testUserId(1))
             .withMarketId(makeMarketId())
             .withGridZone(1)
             .buy()
@@ -49,7 +49,7 @@ TEST_F(OrderValidatorTest, RejectsInvalidOrderId) {
 
 TEST_F(OrderValidatorTest, RejectsInvalidUserId) {
     auto order = createValidOrder();
-    order.userId = 0;
+    order.userId = UserId{};  // nil UUID
 
     const auto result = validator.validate(order);
 

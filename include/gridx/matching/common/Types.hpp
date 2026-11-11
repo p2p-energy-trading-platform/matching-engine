@@ -4,17 +4,18 @@
 #include <cstdint>
 #include <string>
 
+#include "gridx/matching/common/UserId.hpp"
+
 namespace gridx::matching {
 
 // Identifier Types
 using OrderId = std::uint64_t;
 using TradeId = std::uint64_t;
-using UserId = std::uint64_t;
 
 // Market Types
-using Price = std::int64_t;     // 1 AED = 1,000,000 micro-AED
-using Quantity = std::int64_t;  // 1 kWh = 1000 Wh
-using GridFee = std::int64_t;   // 1 AED = 1,000,000 micro-AED
+using Price = std::int64_t;     // micro-AED per kWh (1 AED = 1,000,000 micro-AED)
+using Quantity = std::int64_t;  // Wh (1 kWh = 1000 Wh)
+using GridFee = std::int64_t;   // micro-AED per kWh (1 AED = 1,000,000 micro-AED)
 
 // Domain Types
 using GridZoneId = std::uint32_t;

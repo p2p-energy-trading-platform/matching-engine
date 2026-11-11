@@ -4,6 +4,7 @@ add_executable(
     unit-tests
 
     VersionTest.cpp
+    common/UserIdTest.cpp
     validation/OrderValidatorTest.cpp
     orderbook/MarketBookTest.cpp
     orderbook/ZoneOrderBookTest.cpp

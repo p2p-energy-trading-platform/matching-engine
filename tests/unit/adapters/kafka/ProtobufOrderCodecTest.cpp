@@ -12,7 +12,7 @@ TEST(ProtobufOrderCodecTest, DeserializesValidOrderAccepted) {
     OrderAccepted original;
 
     original.set_order_id(101);
-    original.set_user_id(202);
+    original.set_user_id("550e8400-e29b-41d4-a716-446655440000");
     original.set_grid_zone_id(3);
     original.set_side(gridx::order::v1::SIDE_BUY);
     original.set_order_type(gridx::order::v1::ORDER_TYPE_LIMIT);

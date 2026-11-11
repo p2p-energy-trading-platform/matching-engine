@@ -9,7 +9,7 @@ ValidationResult OrderValidator::validate(const Order& order) const {
         return {false, ValidationError::InvalidOrderId};
     }
 
-    if (order.userId == 0) {
+    if (order.userId.isNil()) {
         return {false, ValidationError::InvalidUserId};
     }
 

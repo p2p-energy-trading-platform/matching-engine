@@ -15,8 +15,8 @@ gridx::trade::v1::TradeExecuted TradeEventMapper::toProtobuf(const Trade& trade)
     event.set_buy_order_id(trade.buyOrderId);
     event.set_sell_order_id(trade.sellOrderId);
 
-    event.set_buyer_id(trade.buyerId);
-    event.set_seller_id(trade.sellerId);
+    event.set_buyer_user_id(trade.buyerId.toString());
+    event.set_seller_user_id(trade.sellerId.toString());
 
     event.set_buyer_grid_zone_id(trade.buyerGridZone);
     event.set_seller_grid_zone_id(trade.sellerGridZone);

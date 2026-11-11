@@ -21,8 +21,8 @@ TEST_F(TradeEventMapperTest, MapsTradeToProtobufEvent) {
     trade.buyOrderId = 2001;
     trade.sellOrderId = 2002;
 
-    trade.buyerId = 3001;
-    trade.sellerId = 3002;
+    trade.buyerId = *UserId::fromString("11111111-1111-4111-8111-111111111111");
+    trade.sellerId = *UserId::fromString("22222222-2222-4222-8222-222222222222");
 
     trade.buyerGridZone = 10;
     trade.sellerGridZone = 20;
@@ -44,8 +44,8 @@ TEST_F(TradeEventMapperTest, MapsTradeToProtobufEvent) {
     EXPECT_EQ(event.buy_order_id(), trade.buyOrderId);
     EXPECT_EQ(event.sell_order_id(), trade.sellOrderId);
 
-    EXPECT_EQ(event.buyer_id(), trade.buyerId);
-    EXPECT_EQ(event.seller_id(), trade.sellerId);
+    EXPECT_EQ(event.buyer_user_id(), "11111111-1111-4111-8111-111111111111");
+    EXPECT_EQ(event.seller_user_id(), "22222222-2222-4222-8222-222222222222");
 
     EXPECT_EQ(event.buyer_grid_zone_id(), trade.buyerGridZone);
     EXPECT_EQ(event.seller_grid_zone_id(), trade.sellerGridZone);

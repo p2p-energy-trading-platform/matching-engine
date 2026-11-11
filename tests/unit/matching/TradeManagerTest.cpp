@@ -15,7 +15,7 @@ TEST(TradeManagerTest, CreateTradePopulatesAllAcceptanceFields) {
 
     const auto buyOrder = OrderBuilder{}
                               .withOrderId(1)
-                              .withUserId(100)
+                              .withUserId(testUserId(100))
                               .withMarketId(marketId)
                               .withGridZone(7)
                               .buy()
@@ -25,7 +25,7 @@ TEST(TradeManagerTest, CreateTradePopulatesAllAcceptanceFields) {
 
     const auto sellOrder = OrderBuilder{}
                                .withOrderId(2)
-                               .withUserId(200)
+                               .withUserId(testUserId(200))
                                .withMarketId(marketId)
                                .withGridZone(8)
                                .sell()
@@ -63,7 +63,7 @@ TEST(TradeManagerTest, CreateTradeGeneratesUniqueIdsForMultipleTrades) {
 
     const auto buyOrder = OrderBuilder{}
                               .withOrderId(10)
-                              .withUserId(1000)
+                              .withUserId(testUserId(1000))
                               .withMarketId(marketId)
                               .withGridZone(1)
                               .buy()
@@ -73,7 +73,7 @@ TEST(TradeManagerTest, CreateTradeGeneratesUniqueIdsForMultipleTrades) {
 
     const auto sellOrder = OrderBuilder{}
                                .withOrderId(20)
-                               .withUserId(2000)
+                               .withUserId(testUserId(2000))
                                .withMarketId(marketId)
                                .withGridZone(2)
                                .sell()

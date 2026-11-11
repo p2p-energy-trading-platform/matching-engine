@@ -14,7 +14,7 @@ protected:
     OrderPtr makeOrder(OrderId id, GridZoneId zone, Side side, Price price) {
         return OrderBuilder{}
             .withOrderId(id)
-            .withUserId(1)
+            .withUserId(testUserId(1))
             .withMarketId(MarketId{})
             .withGridZone(zone)
             .withSide(side)
