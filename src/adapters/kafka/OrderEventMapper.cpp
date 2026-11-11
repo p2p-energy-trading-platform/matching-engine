@@ -79,8 +79,14 @@ Order OrderEventMapper::toDomain(const gridx::order::v1::OrderAccepted& event) c
         throw std::invalid_argument("Order event does not contain a creation timestamp");
     }
 
+    const auto userId = UserId::fromString(event.user_id());
+
+    if (!userId) {
+        throw std::invalid_argument("Order event does not contain a valid user ID (UUID)");
+    }
+
     return Order{.orderId = event.order_id(),
-                 .userId = event.user_id(),
+                 .userId = *userId,
                  .marketId = MarketId{.deliverySlotStart =
                                           toTimestamp(event.market_id().delivery_slot_start())},
                  .gridZone = event.grid_zone_id(),
