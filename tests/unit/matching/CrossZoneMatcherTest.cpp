@@ -23,11 +23,11 @@ protected:
         , marketBook(marketId)
         , matcher(marketBook, tradeManager, gridTransferCache) {}
 
-    OrderPtr makeOrder(OrderId orderId, UserId userId, GridZoneId gridZone, Side side, Price price,
+    OrderPtr makeOrder(OrderId orderId, std::uint64_t userId, GridZoneId gridZone, Side side, Price price,
                        Quantity quantity, const Timestamp& createdAt = fixedTimestamp()) const {
         return OrderBuilder{}
             .withOrderId(orderId)
-            .withUserId(userId)
+            .withUserId(testUserId(userId))
             .withMarketId(marketId)
             .withGridZone(gridZone)
             .withSide(side)
@@ -40,12 +40,12 @@ protected:
             .buildPtr();
     }
 
-    Order makeOrderValue(OrderId orderId, UserId userId, GridZoneId gridZone, Side side,
+    Order makeOrderValue(OrderId orderId, std::uint64_t userId, GridZoneId gridZone, Side side,
                          Price price, Quantity quantity,
                          const Timestamp& createdAt = fixedTimestamp()) const {
         return OrderBuilder{}
             .withOrderId(orderId)
-            .withUserId(userId)
+            .withUserId(testUserId(userId))
             .withMarketId(marketId)
             .withGridZone(gridZone)
             .withSide(side)
@@ -254,7 +254,7 @@ TEST_F(CrossZoneMatcherTest, BuyOrderMatchesMultipleSellOrdersAcrossZones) {
     auto sellOrder1 = std::make_shared<Order>();
 
     sellOrder1->orderId = 1;
-    sellOrder1->userId = 10;
+    sellOrder1->userId = testUserId(10);
     sellOrder1->marketId = marketId;
     sellOrder1->gridZone = kSellerZone;
     sellOrder1->side = Side::Sell;
@@ -269,7 +269,7 @@ TEST_F(CrossZoneMatcherTest, BuyOrderMatchesMultipleSellOrdersAcrossZones) {
     auto sellOrder2 = std::make_shared<Order>();
 
     sellOrder2->orderId = 2;
-    sellOrder2->userId = 11;
+    sellOrder2->userId = testUserId(11);
     sellOrder2->marketId = marketId;
     sellOrder2->gridZone = 3;
     sellOrder2->side = Side::Sell;
@@ -287,7 +287,7 @@ TEST_F(CrossZoneMatcherTest, BuyOrderMatchesMultipleSellOrdersAcrossZones) {
     Order buyOrder{};
 
     buyOrder.orderId = 3;
-    buyOrder.userId = 20;
+    buyOrder.userId = testUserId(20);
     buyOrder.marketId = marketId;
     buyOrder.gridZone = kBuyerZone;
     buyOrder.side = Side::Buy;
@@ -345,7 +345,7 @@ TEST_F(CrossZoneMatcherTest, BuyOrderDoesNotMatchWhenTransferNotAllowed) {
     auto sellOrder = std::make_shared<Order>();
 
     sellOrder->orderId = 1;
-    sellOrder->userId = 10;
+    sellOrder->userId = testUserId(10);
     sellOrder->marketId = marketId;
     sellOrder->gridZone = kSellerZone;
     sellOrder->side = Side::Sell;
@@ -362,7 +362,7 @@ TEST_F(CrossZoneMatcherTest, BuyOrderDoesNotMatchWhenTransferNotAllowed) {
     Order buyOrder{};
 
     buyOrder.orderId = 2;
-    buyOrder.userId = 20;
+    buyOrder.userId = testUserId(20);
     buyOrder.marketId = marketId;
     buyOrder.gridZone = kBuyerZone;
     buyOrder.side = Side::Buy;
@@ -413,7 +413,7 @@ TEST_F(CrossZoneMatcherTest, BuyOrderChoosesLowestEffectiveAsk) {
     auto sellOrder1 = std::make_shared<Order>();
 
     sellOrder1->orderId = 1;
-    sellOrder1->userId = 10;
+    sellOrder1->userId = testUserId(10);
     sellOrder1->marketId = marketId;
     sellOrder1->gridZone = kSellerZone;
     sellOrder1->side = Side::Sell;
@@ -428,7 +428,7 @@ TEST_F(CrossZoneMatcherTest, BuyOrderChoosesLowestEffectiveAsk) {
     auto sellOrder2 = std::make_shared<Order>();
 
     sellOrder2->orderId = 2;
-    sellOrder2->userId = 11;
+    sellOrder2->userId = testUserId(11);
     sellOrder2->marketId = marketId;
     sellOrder2->gridZone = 3;
     sellOrder2->side = Side::Sell;
@@ -446,7 +446,7 @@ TEST_F(CrossZoneMatcherTest, BuyOrderChoosesLowestEffectiveAsk) {
     Order buyOrder{};
 
     buyOrder.orderId = 3;
-    buyOrder.userId = 20;
+    buyOrder.userId = testUserId(20);
     buyOrder.marketId = marketId;
     buyOrder.gridZone = kBuyerZone;
     buyOrder.side = Side::Buy;
@@ -502,7 +502,7 @@ TEST_F(CrossZoneMatcherTest, SellOrderChoosesHighestEffectiveBid) {
     auto buyOrder1 = std::make_shared<Order>();
 
     buyOrder1->orderId = 1;
-    buyOrder1->userId = 10;
+    buyOrder1->userId = testUserId(10);
     buyOrder1->marketId = marketId;
     buyOrder1->gridZone = kBuyerZone;
     buyOrder1->side = Side::Buy;
@@ -517,7 +517,7 @@ TEST_F(CrossZoneMatcherTest, SellOrderChoosesHighestEffectiveBid) {
     auto buyOrder2 = std::make_shared<Order>();
 
     buyOrder2->orderId = 2;
-    buyOrder2->userId = 11;
+    buyOrder2->userId = testUserId(11);
     buyOrder2->marketId = marketId;
     buyOrder2->gridZone = 3;
     buyOrder2->side = Side::Buy;
@@ -535,7 +535,7 @@ TEST_F(CrossZoneMatcherTest, SellOrderChoosesHighestEffectiveBid) {
     Order sellOrder{};
 
     sellOrder.orderId = 3;
-    sellOrder.userId = 20;
+    sellOrder.userId = testUserId(20);
     sellOrder.marketId = marketId;
     sellOrder.gridZone = kSellerZone;
     sellOrder.side = Side::Sell;
@@ -601,7 +601,7 @@ TEST_F(CrossZoneMatcherTest, EarlierOrderWinsWhenEffectivePriceEqual) {
     auto sellOrder1 = std::make_shared<Order>();
 
     sellOrder1->orderId = 1;
-    sellOrder1->userId = 10;
+    sellOrder1->userId = testUserId(10);
     sellOrder1->marketId = marketId;
     sellOrder1->gridZone = kSellerZone;
     sellOrder1->side = Side::Sell;
@@ -616,7 +616,7 @@ TEST_F(CrossZoneMatcherTest, EarlierOrderWinsWhenEffectivePriceEqual) {
     auto sellOrder2 = std::make_shared<Order>();
 
     sellOrder2->orderId = 2;
-    sellOrder2->userId = 11;
+    sellOrder2->userId = testUserId(11);
     sellOrder2->marketId = marketId;
     sellOrder2->gridZone = 3;
     sellOrder2->side = Side::Sell;
@@ -634,7 +634,7 @@ TEST_F(CrossZoneMatcherTest, EarlierOrderWinsWhenEffectivePriceEqual) {
     Order buyOrder{};
 
     buyOrder.orderId = 3;
-    buyOrder.userId = 20;
+    buyOrder.userId = testUserId(20);
     buyOrder.marketId = marketId;
     buyOrder.gridZone = kBuyerZone;
     buyOrder.side = Side::Buy;
@@ -677,7 +677,7 @@ TEST_F(CrossZoneMatcherTest, SameZonePreferredWhenEffectivePriceAndTimestampEqua
     auto sameZoneSellOrder = std::make_shared<Order>();
 
     sameZoneSellOrder->orderId = 1;
-    sameZoneSellOrder->userId = 10;
+    sameZoneSellOrder->userId = testUserId(10);
     sameZoneSellOrder->marketId = marketId;
     sameZoneSellOrder->gridZone = kBuyerZone;
     sameZoneSellOrder->side = Side::Sell;
@@ -692,7 +692,7 @@ TEST_F(CrossZoneMatcherTest, SameZonePreferredWhenEffectivePriceAndTimestampEqua
     auto crossZoneSellOrder = std::make_shared<Order>();
 
     crossZoneSellOrder->orderId = 2;
-    crossZoneSellOrder->userId = 11;
+    crossZoneSellOrder->userId = testUserId(11);
     crossZoneSellOrder->marketId = marketId;
     crossZoneSellOrder->gridZone = kSellerZone;
     crossZoneSellOrder->side = Side::Sell;
@@ -710,7 +710,7 @@ TEST_F(CrossZoneMatcherTest, SameZonePreferredWhenEffectivePriceAndTimestampEqua
     Order buyOrder{};
 
     buyOrder.orderId = 3;
-    buyOrder.userId = 20;
+    buyOrder.userId = testUserId(20);
     buyOrder.marketId = marketId;
     buyOrder.gridZone = kBuyerZone;
     buyOrder.side = Side::Buy;
@@ -742,7 +742,7 @@ TEST_F(CrossZoneMatcherTest, SameZoneTradeHasZeroGridFee) {
     auto sellOrder = std::make_shared<Order>();
 
     sellOrder->orderId = 1;
-    sellOrder->userId = 10;
+    sellOrder->userId = testUserId(10);
     sellOrder->marketId = marketId;
     sellOrder->gridZone = kBuyerZone;
     sellOrder->side = Side::Sell;
@@ -759,7 +759,7 @@ TEST_F(CrossZoneMatcherTest, SameZoneTradeHasZeroGridFee) {
     Order buyOrder{};
 
     buyOrder.orderId = 2;
-    buyOrder.userId = 20;
+    buyOrder.userId = testUserId(20);
     buyOrder.marketId = marketId;
     buyOrder.gridZone = kBuyerZone;
     buyOrder.side = Side::Buy;

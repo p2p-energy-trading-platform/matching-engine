@@ -19,11 +19,11 @@ protected:
           }
         , marketBook(marketId) {}
 
-    OrderPtr makeOrder(OrderId orderId, UserId userId, GridZoneId gridZone, Side side, Price price,
+    OrderPtr makeOrder(OrderId orderId, std::uint64_t userId, GridZoneId gridZone, Side side, Price price,
                        Quantity quantity, const Timestamp& createdAt = fixedTimestamp()) const {
         return OrderBuilder{}
             .withOrderId(orderId)
-            .withUserId(userId)
+            .withUserId(testUserId(userId))
             .withMarketId(marketId)
             .withGridZone(gridZone)
             .withSide(side)

@@ -23,7 +23,7 @@ protected:
         proto::OrderAccepted event;
 
         event.set_order_id(101);
-        event.set_user_id(202);
+        event.set_user_id("550e8400-e29b-41d4-a716-446655440000");
         event.set_grid_zone_id(3);
 
         event.set_side(proto::SIDE_BUY);
@@ -67,7 +67,7 @@ TEST_F(OrderEventMapperTest, MapsValidEventDomainOrder) {
     const auto order = mapper.toDomain(event);
 
     EXPECT_EQ(order.orderId, 101);
-    EXPECT_EQ(order.userId, 202);
+    EXPECT_EQ(order.userId.toString(), "550e8400-e29b-41d4-a716-446655440000");
     EXPECT_EQ(order.gridZone, 3);
 
     EXPECT_EQ(order.side, Side::Buy);
@@ -164,6 +164,20 @@ TEST_F(OrderEventMapperTest, RejectsMissingExpiryTimestamp) {
 TEST_F(OrderEventMapperTest, RejectsMissingCreationTimestamp) {
     auto event = makeValidEvent();
     event.clear_created_at();
+
+    EXPECT_THROW(static_cast<void>(mapper.toDomain(event)), std::invalid_argument);
+}
+
+TEST_F(OrderEventMapperTest, RejectsMissingUserId) {
+    auto event = makeValidEvent();
+    event.clear_user_id();
+
+    EXPECT_THROW(static_cast<void>(mapper.toDomain(event)), std::invalid_argument);
+}
+
+TEST_F(OrderEventMapperTest, RejectsNonUuidUserId) {
+    auto event = makeValidEvent();
+    event.set_user_id("202");
 
     EXPECT_THROW(static_cast<void>(mapper.toDomain(event)), std::invalid_argument);
 }
