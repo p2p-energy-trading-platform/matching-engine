@@ -98,6 +98,62 @@ TEST_F(OrderUpdateEventMapperTest, MapsExpiredOrderUpdate) {
     EXPECT_EQ(event.event_type(), gridx::order::v1::ORDER_UPDATE_TYPE_EXPIRED);
 }
 
+namespace {
+
+constexpr auto kOwnerUuid = "550e8400-e29b-41d4-a716-446655440000";
+
+OrderUpdate makeUpdateWithOwner(OrderStatus status, OrderUpdateAction action,
+                                Quantity remainingQuantity) {
+    auto order = std::make_shared<Order>();
+
+    order->orderId = 500;
+    order->userId = *UserId::fromString(kOwnerUuid);
+    order->quantity = 10'000;  // 10 kWh
+
+    return OrderUpdate{.order = order,
+                       .remainingQuantity = remainingQuantity,
+                       .status = status,
+                       .action = action};
+}
+
+}  // namespace
+
+TEST_F(OrderUpdateEventMapperTest, SetsOwnerAndOriginalQuantityOnPartialFill) {
+    const auto event = mapper.toProtobuf(
+        makeUpdateWithOwner(OrderStatus::PartiallyFilled, OrderUpdateAction::Update, 6'000));
+
+    EXPECT_EQ(event.user_id(), kOwnerUuid);
+    EXPECT_EQ(event.original_quantity(), 10'000);
+    EXPECT_EQ(event.remaining_quantity(), 6'000);  // 40% filled
+}
+
+TEST_F(OrderUpdateEventMapperTest, SetsOwnerAndOriginalQuantityOnFill) {
+    const auto event =
+        mapper.toProtobuf(makeUpdateWithOwner(OrderStatus::Filled, OrderUpdateAction::Remove, 0));
+
+    EXPECT_EQ(event.user_id(), kOwnerUuid);
+    EXPECT_EQ(event.original_quantity(), 10'000);
+}
+
+TEST_F(OrderUpdateEventMapperTest, SetsOwnerAndOriginalQuantityOnCancel) {
+    const auto event = mapper.toProtobuf(
+        makeUpdateWithOwner(OrderStatus::Cancelled, OrderUpdateAction::Remove, 10'000));
+
+    EXPECT_EQ(event.event_type(), gridx::order::v1::ORDER_UPDATE_TYPE_CANCELLED);
+    EXPECT_EQ(event.user_id(), kOwnerUuid);
+    EXPECT_EQ(event.original_quantity(), 10'000);
+}
+
+TEST_F(OrderUpdateEventMapperTest, SetsOwnerAndOriginalQuantityOnExpiry) {
+    const auto event = mapper.toProtobuf(
+        makeUpdateWithOwner(OrderStatus::Expired, OrderUpdateAction::Remove, 2'000));
+
+    EXPECT_EQ(event.event_type(), gridx::order::v1::ORDER_UPDATE_TYPE_EXPIRED);
+    EXPECT_EQ(event.user_id(), kOwnerUuid);
+    EXPECT_EQ(event.original_quantity(), 10'000);
+    EXPECT_EQ(event.remaining_quantity(), 2'000);
+}
+
 TEST_F(OrderUpdateEventMapperTest, ThrowsWhenOrderPointerIsNull) {
     OrderUpdate update{};
 
