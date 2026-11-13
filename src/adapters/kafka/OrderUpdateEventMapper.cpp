@@ -40,6 +40,11 @@ gridx::order::v1::OrderUpdated OrderUpdateEventMapper::toProtobuf(const OrderUpd
 
     event.set_order_id(update.order->orderId);
 
+    // Owner and original size let consumers address the user and show "x% filled"
+    // without looking the order up. Set for every update type, including CANCELLED and EXPIRED.
+    event.set_user_id(update.order->userId.toString());
+    event.set_original_quantity(update.order->quantity);
+
     event.set_status(toProtobufOrderStatus(update.status));
 
     event.set_remaining_quantity(update.remainingQuantity);
