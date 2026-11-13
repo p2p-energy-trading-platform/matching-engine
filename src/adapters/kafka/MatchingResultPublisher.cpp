@@ -1,5 +1,7 @@
 #include "gridx/matching/adapters/kafka/MatchingResultPublisher.hpp"
 
+#include <string>
+
 #include "gridx/matching/adapters/kafka/KafkaTopics.hpp"
 #include "gridx/matching/adapters/kafka/ProtobufCodec.hpp"
 
@@ -37,7 +39,10 @@ void MatchingResultPublisher::publishOrderUpdates(const MatchingResult& result) 
 
         const auto payload = ProtobufCodec::serialize(event);
 
-        m_producer.send(m_orderStateTopic, payload);
+
+        const auto key = std::to_string(event.order_id());
+
+        m_producer.send(m_orderStateTopic, payload, key);
     }
 }
 
