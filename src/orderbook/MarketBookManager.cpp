@@ -28,6 +28,10 @@ const MarketBook* MarketBookManager::find(const MarketId& marketId) const {
     return &iterator->second;
 }
 
+bool MarketBookManager::erase(const MarketId& marketId) {
+    return marketBooks_.erase(marketId) > 0;
+}
+
 void MarketBookManager::clear() noexcept {
     marketBooks_.clear();
 }
