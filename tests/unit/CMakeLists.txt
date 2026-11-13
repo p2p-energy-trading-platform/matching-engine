@@ -15,6 +15,7 @@ add_executable(
     adapters/kafka/ProtobufGridTransferCodecTest.cpp
     adapters/kafka/GridTransferEventMapperTest.cpp
     expiry/ExpiryManagerTest.cpp
+    engine/ExpiryProcessorTest.cpp
     orderbook/MarketBookManagerTest.cpp
     orderbook/OrderBookUpdaterTest.cpp
     matching/CrossZoneMatcherTest.cpp
