@@ -5,11 +5,12 @@
 #include "gridx/matching/adapters/kafka/KafkaProducer.hpp"
 #include "gridx/matching/adapters/kafka/OrderUpdateEventMapper.hpp"
 #include "gridx/matching/adapters/kafka/TradeEventMapper.hpp"
+#include "gridx/matching/adapters/ports/IMatchingResultPublisher.hpp"
 #include "gridx/matching/domain/MatchingResult.hpp"
 
 namespace gridx::matching::adapters::kafka {
 
-class MatchingResultPublisher {
+class MatchingResultPublisher final : public ports::IMatchingResultPublisher {
 public:
     MatchingResultPublisher(KafkaProducer& producer, TradeEventMapper& tradeEventMapper,
                             OrderUpdateEventMapper& orderUpdateEventMapper, std::string tradeTopic,
@@ -18,7 +19,7 @@ public:
     /**
      * Publishes all events produced during a matching cycle.
      */
-    void publish(const MatchingResult& result);
+    void publish(const MatchingResult& result) override;
 
 private:
     void publishTrades(const MatchingResult& result);

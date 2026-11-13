@@ -40,7 +40,7 @@ FetchContent_Declare(
     GIT_REPOSITORY
         https://github.com/p2p-energy-trading-platform/cpp-sdk.git
     GIT_TAG
-        v1.23.0
+        v1.24.0
     GIT_SHALLOW
         TRUE
 )
@@ -97,6 +97,7 @@ target_sources(
      src/matching/MatchingEngine.cpp
      src/matching/TradeManager.cpp
      src/engine/OrderProcessor.cpp
+     src/engine/ExpiryProcessor.cpp
      src/adapters/kafka/KafkaOrderConsumer.cpp
      src/expiry/ExpiryManager.cpp
      src/adapters/kafka/KafkaProducer.cpp

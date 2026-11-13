@@ -8,7 +8,14 @@
 #include <spdlog/spdlog.h>
 
 #include <gridx/matching/common/Version.hpp>
+#include "gridx/matching/adapters/kafka/KafkaProducer.hpp"
+#include "gridx/matching/adapters/kafka/MatchingResultPublisher.hpp"
+#include "gridx/matching/adapters/kafka/OrderUpdateEventMapper.hpp"
+#include "gridx/matching/adapters/kafka/TradeEventMapper.hpp"
 #include "gridx/matching/config/EnvConfigLoader.hpp"
+#include "gridx/matching/engine/ExpiryProcessor.hpp"
+#include "gridx/matching/expiry/ExpiryManager.hpp"
+#include "gridx/matching/orderbook/MarketBookManager.hpp"
 
 namespace {
 
@@ -48,16 +55,51 @@ int main() {
     spdlog::info("Grid transfer topic: {}", appConfig.gridTransferConsumer.topic);
     spdlog::info("Trade topic: {}", appConfig.publisher.tradeTopic);
     spdlog::info("Order state topic: {}", appConfig.publisher.orderStateTopic);
-    // TODO: Construct shared infrastructure (kafka clients, caches, metrics).
+    namespace kafka = gridx::matching::adapters::kafka;
+
+    kafka::KafkaProducer producer(kafka::KafkaProducerConfig{
+        .bootstrapServers = appConfig.kafka.bootstrapServers,
+        .clientId = appConfig.kafka.clientId,
+        .bootstrapTimeout = appConfig.kafka.bootstrapTimeout,
+    });
+
+    kafka::TradeEventMapper tradeEventMapper;
+    kafka::OrderUpdateEventMapper orderUpdateEventMapper;
+
+    kafka::MatchingResultPublisher matchingResultPublisher(
+        producer, tradeEventMapper, orderUpdateEventMapper, appConfig.publisher.tradeTopic,
+        appConfig.publisher.orderStateTopic);
+
+    // TODO: Share this MarketBookManager with the OrderProcessor once order consumption is wired.
+    gridx::matching::orderbook::MarketBookManager marketBookManager;
+
+    const gridx::matching::expiry::ExpiryManager expiryManager;
+    gridx::matching::engine::ExpiryProcessor expiryProcessor(marketBookManager, expiryManager,
+                                                             matchingResultPublisher);
+
+    // TODO: Construct remaining shared infrastructure (caches, metrics).
     // TODO: Wire and start order/grid-transfer consumers.
 
     spdlog::info("Bootstrapping complete. Entering main loop.");
+
+    // The loop sleeps 100 ms per tick, so expiry runs about once per second.
+    constexpr std::uint64_t kExpiryCheckEveryTicks = 10;
 
     std::uint64_t loopTick = 0;
 
     while (g_isRunning.load(std::memory_order_relaxed)) {
         // TODO: Poll inbound messages and hand off to OrderProcessor.
         // TODO: Flush producer buffers and emit periodic metrics/health.
+
+        // Expiry runs on the main loop thread, the same thread that will process orders,
+        // because MarketBookManager is not thread-safe.
+        if ((loopTick % kExpiryCheckEveryTicks) == 0) {
+            try {
+                static_cast<void>(expiryProcessor.process(std::chrono::system_clock::now()));
+            } catch (const std::exception& error) {
+                spdlog::error("Order expiry failed: {}", error.what());
+            }
+        }
 
         if ((loopTick % 100) == 0) {
             spdlog::info("Matching engine loop heartbeat tick={}", loopTick);

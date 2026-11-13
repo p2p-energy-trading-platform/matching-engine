@@ -104,6 +104,64 @@ TEST_F(ExpiryManagerTest, ExpiresOrdersAcrossMultipleZones) {
     EXPECT_TRUE(marketBook.zoneOrderBook(kZone2).empty(Side::Sell));
 }
 
+// Test that nothing is reported before the delivery slot ends.
+TEST_F(ExpiryManagerTest, ReturnsNoUpdatesBeforeDeliverySlotEnd) {
+    marketBook.addOrder(makeOrder(1, 10, kZone, Side::Buy, 100, 10));
+
+    const auto updates = expiryManager.expireOrders(
+        marketBook, marketId.deliverySlotEnd() - std::chrono::seconds(1));
+
+    EXPECT_TRUE(updates.empty());
+}
+
+// Test that each expired order is reported as a Remove/Expired update carrying the order.
+TEST_F(ExpiryManagerTest, ReturnsExpiredUpdateForEachOrder) {
+    auto buyOrder = makeOrder(1, 10, kZone, Side::Buy, 100, 10);
+    auto sellOrder = makeOrder(2, 20, kZone, Side::Sell, 100, 10);
+    sellOrder->remainingQuantity = 4;  // partially filled before expiry
+
+    marketBook.addOrder(buyOrder);
+    marketBook.addOrder(sellOrder);
+
+    const auto updates = expiryManager.expireOrders(marketBook, marketId.deliverySlotEnd());
+
+    ASSERT_EQ(updates.size(), 2U);
+
+    for (const auto& update : updates) {
+        EXPECT_EQ(update.status, OrderStatus::Expired);
+        EXPECT_EQ(update.action, OrderUpdateAction::Remove);
+        EXPECT_EQ(update.remainingQuantity, update.order->remainingQuantity);
+    }
+
+    EXPECT_EQ(updates[0].order, buyOrder);
+    EXPECT_EQ(updates[1].order, sellOrder);
+    EXPECT_EQ(updates[1].remainingQuantity, 4);
+}
+
+// Test that expireMarkets only expires ended markets and removes their Market Books.
+TEST(ExpiryManagerMarketsTest, ExpiresOnlyEndedMarketsAndRemovesThem) {
+    const Timestamp now = std::chrono::system_clock::now();
+
+    const MarketId endedMarket{now - std::chrono::hours{1}};
+    const MarketId openMarket{now};
+
+    MarketBookManager marketBookManager;
+
+    marketBookManager.getOrCreate(endedMarket)
+        .addOrder(OrderBuilder{}.withOrderId(1).withMarketId(endedMarket).buildPtr());
+    marketBookManager.getOrCreate(openMarket)
+        .addOrder(OrderBuilder{}.withOrderId(2).withMarketId(openMarket).buildPtr());
+
+    const ExpiryManager expiryManager;
+    const auto updates = expiryManager.expireMarkets(marketBookManager, now);
+
+    ASSERT_EQ(updates.size(), 1U);
+    EXPECT_EQ(updates[0].order->orderId, 1U);
+
+    EXPECT_EQ(marketBookManager.find(endedMarket), nullptr);
+    EXPECT_NE(marketBookManager.find(openMarket), nullptr);
+}
+
 // Test that all order books are cleared after expiry.
 TEST_F(ExpiryManagerTest, ClearsOrderBooksAfterExpiry) {
     auto buyOrder = makeOrder(1, 10, kZone, Side::Buy, 100, 10, std::chrono::system_clock::now());

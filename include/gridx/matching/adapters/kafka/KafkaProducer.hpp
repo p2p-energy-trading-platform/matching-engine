@@ -4,6 +4,7 @@
 
 #include <memory>
 #include <span>
+#include <string_view>
 
 namespace RdKafka {
 class Producer;
@@ -31,7 +32,9 @@ public:
     // Removes move assignment
     KafkaProducer& operator=(KafkaProducer&&) = delete;
 
-    void send(std::string_view topic, std::span<const std::byte> payload);
+    // Sends a message to the specified Kafka topic with an optional key.
+    void send(std::string_view topic, std::span<const std::byte> payload,
+              std::string_view key = {});
 
     void flush();
 
