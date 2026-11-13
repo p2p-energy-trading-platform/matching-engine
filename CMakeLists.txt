@@ -97,6 +97,7 @@ target_sources(
      src/matching/MatchingEngine.cpp
      src/matching/TradeManager.cpp
      src/engine/OrderProcessor.cpp
+     src/engine/ExpiryProcessor.cpp
      src/adapters/kafka/KafkaOrderConsumer.cpp
      src/expiry/ExpiryManager.cpp
      src/adapters/kafka/KafkaProducer.cpp
