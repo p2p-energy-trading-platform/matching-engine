@@ -108,8 +108,8 @@ TEST_F(ExpiryManagerTest, ExpiresOrdersAcrossMultipleZones) {
 TEST_F(ExpiryManagerTest, ReturnsNoUpdatesBeforeDeliverySlotEnd) {
     marketBook.addOrder(makeOrder(1, 10, kZone, Side::Buy, 100, 10));
 
-    const auto updates =
-        expiryManager.expireOrders(marketBook, marketId.deliverySlotEnd() - std::chrono::seconds(1));
+    const auto updates = expiryManager.expireOrders(
+        marketBook, marketId.deliverySlotEnd() - std::chrono::seconds(1));
 
     EXPECT_TRUE(updates.empty());
 }

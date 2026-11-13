@@ -23,7 +23,6 @@ public:
     ExpiryManager(ExpiryManager&&) noexcept = default;
     ExpiryManager& operator=(ExpiryManager&&) noexcept = default;
 
-   
     std::vector<OrderUpdate> expireOrders(MarketBook& marketBook, Timestamp currentTime) const;
 
     std::vector<OrderUpdate> expireMarkets(MarketBookManager& marketBookManager,

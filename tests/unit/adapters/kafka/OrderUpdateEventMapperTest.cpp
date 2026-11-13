@@ -110,10 +110,8 @@ OrderUpdate makeUpdateWithOwner(OrderStatus status, OrderUpdateAction action,
     order->userId = *UserId::fromString(kOwnerUuid);
     order->quantity = 10'000;  // 10 kWh
 
-    return OrderUpdate{.order = order,
-                       .remainingQuantity = remainingQuantity,
-                       .status = status,
-                       .action = action};
+    return OrderUpdate{
+        .order = order, .remainingQuantity = remainingQuantity, .status = status, .action = action};
 }
 
 }  // namespace

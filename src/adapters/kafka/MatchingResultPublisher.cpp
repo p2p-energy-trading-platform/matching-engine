@@ -39,7 +39,6 @@ void MatchingResultPublisher::publishOrderUpdates(const MatchingResult& result) 
 
         const auto payload = ProtobufCodec::serialize(event);
 
-
         const auto key = std::to_string(event.order_id());
 
         m_producer.send(m_orderStateTopic, payload, key);
