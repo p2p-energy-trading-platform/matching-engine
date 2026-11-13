@@ -49,6 +49,26 @@ public:
     const MarketBook* find(const MarketId& marketId) const;
 
     /**
+     * Calls fn(MarketBook&) for every Market Book, in delivery slot order.
+     *
+     * fn must not add or remove Market Books.
+     */
+    template <typename Fn>
+    void forEach(Fn&& fn) {
+        for (auto& [marketId, marketBook] : marketBooks_) {
+            (void) marketId;
+            fn(marketBook);
+        }
+    }
+
+    /**
+     * Removes the Market Book for the specified market.
+     *
+     * @return true if a Market Book was removed.
+     */
+    bool erase(const MarketId& marketId);
+
+    /**
      * Removes all Market Books.
      *
      * Primarily intended for testing or engine reset.
